@@ -19,7 +19,7 @@ export function useAuth() {
 
         // Listen untuk perubahan auth state
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
+            async (_, session) => {
                 setSession(session);
                 setUser(session?.user ?? null);
                 setLoading(false);
@@ -42,9 +42,7 @@ export function useAuth() {
             email,
             password,
             options: {
-                data: {
-                username,
-                },
+                data: { username },
                 emailRedirectTo: `${window.location.origin}/signin`,
             },
         });

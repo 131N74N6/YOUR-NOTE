@@ -59,3 +59,7 @@ export type NoteComponentProps = Note & {
     onView: string;
     onDelete: (id: string) => void;
 }
+
+export type NavbarProps = {
+    class_name: string;
+}

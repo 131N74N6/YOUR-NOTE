@@ -1,34 +1,34 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../services/useAuth";
 
-export default function NoteDetail() {
+export default function AddNote() {
     const navigate = useNavigate();
     const noteTable = 'notes';
-    const { id } = useParams();
-    const { data, updateData } = useSupabaseTable<Note>({ 
-        tableName: noteTable,
-        additionalQuery: (addQuery) => addQuery.eq('id', id)
-    });
+    const { user } = useAuth();
+    const { insertData } = useSupabaseTable<Note>({ tableName: noteTable });
 
-    const [content, setContent] = useState<string>(data[0].note_content);
-    const [title, setTitle] = useState<string>(data[0].note_title);
+    const [content, setContent] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
 
-    async function handleUpdateNote(event: React.FormEvent): Promise<void> {
+    async function handleAddNote(event: React.FormEvent): Promise<void> {
         event.preventDefault();
 
-        if (!id) return;
+        if (!user?.id) return;
 
-        await updateData({
+        const trimmedTitle = title.trim();
+        const trimmedContent = content.trim();
+
+        await insertData({
             tableName: noteTable,
             newData: {
-                note_content: content,
-                note_title: title
-            },
-            column: 'id',
-            values: id
+                note_content: trimmedContent,
+                note_title: trimmedTitle,
+                user_id: user?.id
+            }
         });
 
         setTitle('');
@@ -40,16 +40,16 @@ export default function NoteDetail() {
     return (
         <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
             <Navbar class_name={"w-full md:w-1/4 lg:w-1/4 flex-shrink-0 flex flex-col gap-[1rem] p-[1rem] border border-black rounded-lg"}/>
-            <form onSubmit={handleUpdateNote} className="md:w-[75%] w-[100%] p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
+            <form onSubmit={handleAddNote} className="md:w-[75%] w-[100%] p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"
-                    type="text" value={title} placeholder="title"
+                    type="text" placeholder="title"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                 />
                 <textarea 
                     className="resize-none h-[600px] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)}
-                    value={content} placeholder="content"
+                    placeholder="content"
                 ></textarea>
                 <button 
                     type="button" 
