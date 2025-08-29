@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { Navbar1 } from "../components/Navbar";
 import { useAuth } from "../services/useAuth";
 import Notification from "../components/Notification";
 
@@ -51,15 +51,15 @@ export default function AddNote() {
     }
 
     if (error) {
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-            error.message = "Check your internet connection";
-        }
-        return <div className="p-[1rem] text-center text-red-500">{error.message}</div>;
+        const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
+            ? "Check your internet connection" 
+            : error.message;
+        return <div className="p-[1rem] text-center text-red-500">{errorMessage}</div>;
     }
 
     return (
         <div className="flex flex-col relative z-10 md:flex-row p-[1rem] gap-[1rem] h-screen">
-            <Navbar class_name={"w-full md:w-1/4 lg:w-1/4 flex-shrink-0 flex flex-col gap-[1rem] p-[1rem] border border-black rounded-lg"}/>
+            <Navbar1/>
             <form onSubmit={handleAddNote} className="md:w-[75%] w-[100%] p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"

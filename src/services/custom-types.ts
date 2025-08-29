@@ -2,7 +2,7 @@ export interface DatabaseProps {
     tableName: string;
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
-    uniqueQueryKey?: string[];
+    uniqueQueryKey?: any[];
     filterKey?: string;
 }
 

@@ -14,7 +14,7 @@ export default function SignUp() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) navigate('/home', { replace: true });
+        if (user) navigate('/notes', { replace: true });
     }, [user, navigate]);
 
     async function handleSignUp(event: React.FormEvent): Promise<void> {

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import { Navbar1 } from "../components/Navbar";
 import Notification from "../components/Notification";
 
 export default function NoteDetail() {
@@ -10,13 +10,9 @@ export default function NoteDetail() {
     const noteTable = 'notes';
     const { id } = useParams();
 
-    if (!id) {
-        return <div className="p-[1rem] text-center text-red-500">Note Not Found</div>;
-    }
-
     const { data, error, updateData } = useSupabaseTable<Note>({ 
         tableName: noteTable,
-        uniqueQueryKey: [id],
+        uniqueQueryKey: id ? [id] : ['no-note'],
         additionalQuery: (addQuery) => addQuery.eq('id', id),
     });
 
@@ -27,9 +23,15 @@ export default function NoteDetail() {
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     useEffect(() => {
-        setTitle(data[0].note_title || '');
-        setContent(data[0].note_content || '');
+        if (data && data.length > 0) {
+            setTitle(data[0].note_title || '');
+            setContent(data[0].note_content || '');
+        }
     }, [data]);
+    
+    if (!id) {
+        return <div className="p-[1rem] text-center text-red-500">Note Not Found</div>;
+    }
 
     async function handleUpdateNote(event: React.FormEvent): Promise<void> {
         event.preventDefault();
@@ -60,15 +62,15 @@ export default function NoteDetail() {
     }
 
     if (error) {
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-            error.message = "Check your internet connection";
-        }
-        return <div className="p-[1rem] text-center text-red-500">{error.message}</div>;
+        const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
+            ? "Check your internet connection" 
+            : error.message;
+        return <div className="p-[1rem] text-center text-red-500">{errorMessage}</div>;
     }
 
     return (
         <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
-            <Navbar class_name={"w-full md:w-1/4 lg:w-1/4 flex-shrink-0 flex flex-col gap-[1rem] p-[1rem] border border-black rounded-lg"}/>
+            <Navbar1/>
             <form onSubmit={handleUpdateNote} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"

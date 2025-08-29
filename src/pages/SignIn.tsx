@@ -18,7 +18,7 @@ export default function SignIn() {
     const { upsertData } = useSupabaseTable<Users>({ tableName: noteUserTable });
 
     useEffect(() => {
-        if (user) navigate('/home', { replace: true });
+        if (user) navigate('/notes', { replace: true });
     }, [user, navigate]);
 
     async function handleSignIn(event: React.FormEvent): Promise<void> {

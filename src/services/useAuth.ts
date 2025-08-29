@@ -17,7 +17,6 @@ export function useAuth() {
 
         getSession();
 
-        // Listen untuk perubahan auth state
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_, session) => {
                 setSession(session);
@@ -54,12 +53,5 @@ export function useAuth() {
         return { error };
     };
 
-    return {
-        user,
-        session,
-        loading,
-        signIn,
-        signUp,
-        signOut,
-    }
+    return { user, session, loading, signIn, signUp, signOut }
 }
