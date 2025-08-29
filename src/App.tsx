@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import NoteDetail from "./pages/NoteDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddNote from "./pages/AddNote";
+import AskAI from "./pages/AskAI";
 
 export default function App() {
     const initClient = new QueryClient();
@@ -20,6 +21,7 @@ export default function App() {
                         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
                         <Route path="/todo" element={<ProtectedRoute><ToDo/></ProtectedRoute>}/>
                         <Route path="/add-note" element={<ProtectedRoute><AddNote/></ProtectedRoute>}/>
+                        <Route path="/ask-ai" element={<ProtectedRoute><AskAI/></ProtectedRoute>}/>
                         <Route path="/note-detail/:id" element={<ProtectedRoute><NoteDetail/></ProtectedRoute>}/>
                         <Route path="/" element={<Navigate to="/home" replace/>} />
                         <Route path="*" element={<Navigate to="/signin" replace/>} />

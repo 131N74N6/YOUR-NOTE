@@ -24,6 +24,10 @@ export default function Navbar(props: NavbarProps) {
                 <i className="fa-solid fa-list"></i>
                 <span>To-Do</span>
             </Link>
+            <Link to={'/ask-ai'} className="flex items-center outline-0 gap-[0.5rem] font-[550] text-[1rem] cursor-pointer hover:p-[0.5rem] hover:border hover:border-black rounded-md text-center">
+                <i className="fa-solid fa-robot"></i>
+                <span>Ask AI</span>
+            </Link>
             <div className="flex-grow"></div> {/* Spacer to push the next element to the bottom */}
             <button 
                 type="button" 

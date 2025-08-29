@@ -2,6 +2,8 @@ export interface DatabaseProps {
     tableName: string;
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
+    uniqueQueryKey?: string[];
+    filterKey?: string;
 }
 
 export type InsertDataProps<A> = {
@@ -62,4 +64,9 @@ export type NoteComponentProps = Note & {
 
 export type NavbarProps = {
     class_name: string;
+}
+
+export type NotificationProps = {
+    class_name: string;
+    message: string;
 }

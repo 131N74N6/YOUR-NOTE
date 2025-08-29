@@ -6,7 +6,7 @@ import type { DatabaseProps, DeleteDataProps, InsertDataProps, UpdateDataProps, 
 
 export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps) {
     const queryClient = useQueryClient();
-    const queryKey = [props.tableName];
+    const queryKey = [props.tableName, ...(props.uniqueQueryKey || [])];
 
     const fetchData = async (): Promise<B[]> => {
         let query = supabase.from(props.tableName).select(props.relationalQuery || '*');
@@ -34,9 +34,10 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
         .on(
             'postgres_changes',
             { 
-                event: '*', 
-                schema: 'public', 
-                table: props.tableName 
+                event: '*',
+                schema: 'public',
+                table: props.tableName,
+                filter: props.filterKey || undefined
             },
             async (payload: RealtimePostgresChangesPayload<B>) => {
                 switch (payload.eventType) {
@@ -53,7 +54,12 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
                         if (error) throw new Error('Failed fetching inserted data');
                         
                         const transformedData = transformsData(newData) as B;
-                        queryClient.setQueryData(queryKey, (old: B[] = []) => [...old, transformedData]);
+                        queryClient.setQueryData(queryKey, (old: B[] = []) => {
+                            if (old.some(item => item.id === transformedData.id)) {
+                                return old;
+                            }
+                            return [...old, transformedData];
+                        });
                         break;
                     }
                     case 'UPDATE': {
@@ -89,7 +95,7 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [props.tableName, queryClient, queryKey, props.additionalQuery, props.relationalQuery]);
+    }, [props.tableName, queryClient, queryKey, props.filterKey, props.uniqueQueryKey, props.additionalQuery, props.relationalQuery]);
 
     const insertMutation = useMutation({
         mutationFn: async (props: InsertDataProps<B>) => {

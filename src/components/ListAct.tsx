@@ -10,5 +10,5 @@ export default function ListAct(props: ActivityComponentProps) {
                 <button type="button" onClick={() => props.onDelete(props.id)}>Delete</button>
             </div>
         </div>
-    )
+    );
 }

@@ -3,7 +3,7 @@ import type { NoteComponentProps } from "../services/custom-types";
 
 export default function NoteList(noteProps: NoteComponentProps) {
     return (
-        <div className="border-[1px] rounded-lg border-black p-[1rem] flex flex-col gap-[1rem]">
+        <div className="h-[250px] md:h-[300px] border-[1px] rounded-lg border-black p-[1rem] flex flex-col gap-[1rem]">
             <h3 className="font-[600]">{noteProps.note_title}</h3>
             <p>{noteProps.created_at.toLocaleString()}</p>
             <div className="h-[200px] overflow-y-hidden">{noteProps.note_content}</div>
