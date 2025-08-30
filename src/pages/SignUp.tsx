@@ -78,7 +78,10 @@ export default function SignUp() {
                         placeholder="your_password" 
                         className="p-[0.45rem] text-[0.9rem] font-[550] outline-0 border-[1px] text-[#000000]"
                     />
-                    <div className="text-center"><span>Already have account?</span> <Link className="text-blue-600 hover:underline" to={'/signin'}>Sign In</Link></div>
+                    <div className="text-center">
+                        <span>Already have account?</span> 
+                        <Link className="text-blue-600 hover:underline" to={'/signin'}>Sign In</Link>
+                    </div>
                     {showMessage ? 
                         <div className="text-red-600 text-sm font-medium text-center">
                             {message}

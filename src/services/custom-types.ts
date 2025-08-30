@@ -45,6 +45,7 @@ export type Activity = {
 }
 
 export type ActivityComponentProps = Activity & {
+    selectedId: string | null;
     onSelect: (id: string) => void;
     onDelete: (id: string) => void;
 }
@@ -69,4 +70,16 @@ export type NavbarProps = {
 export type NotificationProps = {
     class_name: string;
     message: string;
+}
+
+export type ListActFormProps = {
+    actName: string;
+    onChangeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSend: (event: React.FormEvent) => Promise<void>;
+    onClose: () => void;
+}
+
+export type AIResponse = {
+    choices: Array<{ message: { content: string } }>;
+    error: { message: string }
 }

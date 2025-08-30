@@ -95,7 +95,10 @@ export default function SignIn() {
                         className="p-[0.45rem] text-[0.9rem] font-[550] outline-0 border-[1px] text-[#000000]"
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                     />
-                    <div className="text-center"><span>Don't have account?</span> <Link className="text-blue-600 hover:underline" to={'/signup'}>Sign Up</Link></div>
+                    <div className="text-center">
+                        <span>Don't have account?</span> 
+                        <Link className="text-blue-600 hover:underline" to={'/signup'}>Sign Up</Link>
+                    </div>
                     {showMessage ? 
                         <div className="text-red-600 text-sm font-medium text-center">
                             {message}

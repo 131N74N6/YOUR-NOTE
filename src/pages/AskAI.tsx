@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Navbar1 } from "../components/Navbar";
+import type { AIResponse } from "../services/custom-types";
 
 export default function AskAI() {
     const [prompt, setPrompt] = useState<string>('');
-    const [result, setResult] = useState();
+    const [result, setResult] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
 
     async function sendPrompt(event: React.FormEvent): Promise<void> {
         event.preventDefault();
         setLoading(true);
-        try {            
+        try {
             const trimmedPrompt = prompt.trim();
             const request = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -29,11 +31,23 @@ export default function AskAI() {
                     ]
                 })
             });
-            const response = await request.json();
-            setResult(response);
+
+            if (request.ok) {
+                const response: AIResponse = await request.json();
+                if (response.error) {
+                    throw new Error(response.error.message);
+                } else if (response.choices[0].message) {
+                    setResult(response.choices[0].message.content);
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            } else {
+                throw new Error('Request failed');
+            }
         } catch (error: any) {
-            setResult(error.message);
+            setError(error.message);
         } finally {
+            setPrompt('');
             setLoading(false);
         }
     }
@@ -42,11 +56,11 @@ export default function AskAI() {
         <div className="flex md:flex-row flex-col p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
             <form onSubmit={sendPrompt} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
-                <div className="md:h-[70%] h-[30%] p-[1rem] border border-black">
-                    {loading ? 'Wait a moment...' : result ? result : 'Result will appear here...'}
+                <div className="md:h-[70%] h-[50%] p-[1rem] border border-black overflow-auto">
+                    {loading ? 'Wait a moment...' : result ? result : error ? error : 'Result will appear here...'}
                 </div>
                 <textarea 
-                    className="resize-none md:h-[30%] h-[15%] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
+                    className="resize-none md:h-[30%] h-[100%] border border-black p-[0.5rem] text-[1rem] font-[550] overflow-auto outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt(event.target.value)}
                     placeholder="write here..."
                 ></textarea>
