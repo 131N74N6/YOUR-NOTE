@@ -12,7 +12,7 @@ export default function NoteDetail() {
 
     const { data, error, updateData } = useSupabaseTable<Note>({ 
         tableName: noteTable,
-        uniqueQueryKey: id ? [id] : ['no-note'],
+        uniqueQueryKey: id ? [id] : [],
         additionalQuery: (addQuery) => addQuery.eq('id', id),
     });
 

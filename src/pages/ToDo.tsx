@@ -1,34 +1,34 @@
-import ListAct from "../components/ListAct";
+import ActivityList from "../components/ActivityList";
 import { Navbar1 } from "../components/Navbar";
 import type { Activity } from "../services/custom-types";
 import { useAuth } from "../services/useAuth";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import Notification from "../components/Notification";
-import { useState } from "react";
-import ListActForm from "../components/ListActForm";
+import { useCallback, useState } from "react";
+import ActivityForm from "../components/ActivityForm";
 
 export default function ToDo() {
     const activityTable = 'activity_list';
     const { user } = useAuth();
-    const { data, insertData, isLoading, error, deleteData } = useSupabaseTable<Activity>({ 
+    const { data, isLoading, error, insertData, updateData, deleteData } = useSupabaseTable<Activity>({ 
         tableName: activityTable, 
-        uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
-        filterKey: user?.id ? `user_id=eq.${user.id}` : undefined,
+        uniqueQueryKey: user?.id ? [user.id] : [],
         additionalQuery: (addQuery) => addQuery.eq('user_id', user?.id)
     });
     
     const [message, setMessage] = useState<string>('');
     const [activity, setActivity] = useState<string>('');
+    const [newActivity, setNewActivity] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showForm, setShowForm] = useState<boolean>(false);
     const [selectId, setSelectId] = useState<string | null>(null);
 
-    async function addActivity(event: React.FormEvent): Promise<void> {
+    const addActivity = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedActivity = activity.trim();
 
         try {            
-            if (!user?.id) return;
+            if (!user?.id) throw new Error('User not found!');
 
             if (trimmedActivity === '') throw new Error('Missing required data!');
 
@@ -46,9 +46,9 @@ export default function ToDo() {
             setShowForm(false);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }
+    }, [user, activity]);
 
-    async function deleteSelectedActivity(actId: string) {
+    const deleteSelectedActivity = useCallback(async (actId: string): Promise<void> => {
         try {
             if (data.length > 0) {            
                 await deleteData({ 
@@ -60,12 +60,32 @@ export default function ToDo() {
         } catch (error: any) {
             setShowMessage(true);
             setMessage(error.message);
-        } finally {
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }
+    }, [user, data]);
 
-    async function deleteAllList(): Promise<void> {
+    const updateSelectedActivity = useCallback(async (actId: string, newActivity: string) => {
+        try {
+            if (!actId) throw new Error('Activity not found!');
+
+            await updateData({
+                tableName: activityTable,
+                newData: {
+                    act_name: newActivity
+                },
+                column: 'id',
+                values: actId
+            });
+            setSelectId(null);
+            setNewActivity('');
+        } catch (error: any) {
+            setMessage(error.message);
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
+        }
+    }, [user, data, newActivity]);
+
+    const deleteAllList = useCallback(async() : Promise<void> =>  {
         try {            
             await deleteData({
                 tableName: activityTable,
@@ -75,10 +95,19 @@ export default function ToDo() {
         } catch (error: any) {
             setShowMessage(true);
             setMessage(error.message);
-        } finally {
             setTimeout(() => setShowMessage(false), 3000);
-        }
-    }
+        } 
+    }, [user, data]);
+
+    const selectActivity = useCallback((id: string, currentActivity: string) => {
+        setSelectId(id);
+        setNewActivity(currentActivity);
+    }, []);
+
+    const handleCancelEdit = useCallback(() => {
+        setSelectId(null);
+        setNewActivity('');
+    }, []);
 
     const openForm = () => setShowForm(true);
     const closeForm = () => setShowForm(false);
@@ -99,7 +128,7 @@ export default function ToDo() {
             <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
                 <Navbar1/>
                 {showForm ? 
-                    <ListActForm 
+                    <ActivityForm 
                         onSend={addActivity}
                         actName={activity} 
                         onChangeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActivity(event.target.value)}
@@ -126,16 +155,16 @@ export default function ToDo() {
                         </button>
                     </div>
                     <main className="w-full flex flex-col border p-[1rem] gap-[1rem] border-black rounded-lg overflow-auto">
-                        {data.length > 0 ? data.map((act) => <ListAct 
-                            id={act.id} created_at={act.created_at} user_id={act.user_id}
-                            act_name={act.act_name} key={act.id}
-                            onDelete={deleteSelectedActivity} 
-                            onSelect={setSelectId}
-                            selectedId={selectId}
-                        />) 
-                        : <div className="flex justify-center items-center h-screen">
-                            <span className="text-red-600 font-[600] text-[1.3rem]">'No activity added currently...'</span>
-                        </div>}
+                        <ActivityList 
+                            data={data} 
+                            selectedId={selectId} 
+                            onSelect={selectActivity} 
+                            onCancel={handleCancelEdit}
+                            onDelete={deleteSelectedActivity}
+                            onUpdate={updateSelectedActivity}
+                            newActivity={newActivity}
+                            onEditActivityChange={setNewActivity}
+                        />
                     </main>
                 </div>
                 {showMessage ?

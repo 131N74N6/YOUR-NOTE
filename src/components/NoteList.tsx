@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import type { NoteComponentProps } from "../services/custom-types";
+import { memo } from "react";
 
-export default function NoteList(noteProps: NoteComponentProps) {
+const NoteList = memo((noteProps: NoteComponentProps) => {
     return (
         <div className="h-[250px] md:h-[300px] border-[1px] rounded-lg border-black p-[1rem] flex flex-col gap-[1rem]">
             <h3 className="font-[600]">{noteProps.note_title}</h3>
@@ -13,4 +14,6 @@ export default function NoteList(noteProps: NoteComponentProps) {
             </div>
         </div>
     );
-}
+});
+
+export default NoteList;

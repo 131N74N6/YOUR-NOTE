@@ -3,7 +3,6 @@ export interface DatabaseProps {
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
     uniqueQueryKey?: any[];
-    filterKey?: string;
 }
 
 export type InsertDataProps<A> = {
@@ -37,6 +36,13 @@ export type Users = {
     password: string;
 }
 
+export type ActivityFormProps = {
+    actName: string;
+    onChangeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSend: (event: React.FormEvent) => Promise<void>;
+    onClose: () => void;
+}
+
 export type Activity = {
     id: string;
     created_at: Date;
@@ -44,10 +50,26 @@ export type Activity = {
     user_id: string;
 }
 
-export type ActivityComponentProps = Activity & {
+export type ActivityListProps = {
+    data: Activity[];
     selectedId: string | null;
-    onSelect: (id: string) => void;
-    onDelete: (id: string) => void;
+    newActivity: string;
+    onSelect: (id: string, activity: string) => void;
+    onCancel: () => void;
+    onUpdate: (id: string, newActivity: string) => Promise<void>;
+    onDelete: (id: string) => Promise<void>;
+    onEditActivityChange: (newActivity: string) => void;
+}
+
+export type ActivityItemProps = {
+    detail: Activity;
+    isSelected: boolean;
+    newActivity: string;
+    onSelect: (id: string, activity: string) => void;
+    onCancel: () => void;
+    onUpdate: (id: string, newActivity: string) => Promise<void>;
+    onDelete: (id: string) => Promise<void>;
+    onEditActivityChange: (newActivity: string) => void;
 }
 
 export type Note = {
@@ -70,13 +92,6 @@ export type NavbarProps = {
 export type NotificationProps = {
     class_name: string;
     message: string;
-}
-
-export type ListActFormProps = {
-    actName: string;
-    onChangeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onSend: (event: React.FormEvent) => Promise<void>;
-    onClose: () => void;
 }
 
 export type AIResponse = {

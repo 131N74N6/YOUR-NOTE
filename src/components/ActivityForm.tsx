@@ -1,6 +1,7 @@
-import type { ListActFormProps } from "../services/custom-types";
+import { memo } from "react";
+import type { ActivityFormProps } from "../services/custom-types";
 
-export default function ListActForm(props: ListActFormProps) {
+const ActivityForm = memo((props: ActivityFormProps) => {
     return (
         <form onSubmit={props.onSend} className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.3)]">
             <div className="bg-white flex flex-col gap-[1rem] p-[1rem] w-[305px] border border-black">
@@ -21,4 +22,6 @@ export default function ListActForm(props: ListActFormProps) {
             </div>
         </form>
     );
-}
+});
+
+export default ActivityForm;

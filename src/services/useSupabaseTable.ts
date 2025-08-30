@@ -24,7 +24,7 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
     const { data, isLoading, error } = useQuery<B[], Error>({
         queryKey,
         queryFn: fetchData,
-        staleTime: 5 * 60 * 1000, // Data dianggap fresh selama 5 menit
+        staleTime: 5 * 60 * 1000, 
     });
 
     // Setup realtime subscription
@@ -37,7 +37,6 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
                 event: '*',
                 schema: 'public',
                 table: props.tableName,
-                filter: props.filterKey || undefined
             },
             async (payload: RealtimePostgresChangesPayload<B>) => {
                 switch (payload.eventType) {
@@ -95,7 +94,7 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [props.tableName, queryClient, queryKey, props.filterKey, props.uniqueQueryKey, props.additionalQuery, props.relationalQuery]);
+    }, [props.tableName, queryClient, queryKey, props.uniqueQueryKey, props.additionalQuery, props.relationalQuery]);
 
     const insertMutation = useMutation({
         mutationFn: async (props: InsertDataProps<B>) => {
@@ -179,7 +178,7 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
 
 function transformsData<B>(data: any): B {
     if (data && data.created_at && typeof data.created_at === 'string') {
-        return { ...data, created_at: new Date(data.created_at) };
+        return { ...data, created_at: new Date(data.created_at) } as B;
     }
-    return data;
+    return data as B;
 }

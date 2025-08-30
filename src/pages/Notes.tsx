@@ -11,8 +11,7 @@ export default function Notes() {
     const { user } = useAuth();
     const { data, error, deleteData } = useSupabaseTable<Note>({ 
         tableName: noteTable, 
-        uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
-        filterKey: user?.id ? `user_id=eq.${user.id}` : undefined,
+        uniqueQueryKey: user?.id ? [user.id] : [],
         additionalQuery: (addQuery) => addQuery.eq('user_id', user?.id)
     });
 
