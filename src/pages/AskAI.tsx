@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navbar1 } from "../components/Navbar";
+import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { AIResponse } from "../services/custom-types";
 
 export default function AskAI() {
@@ -55,12 +55,13 @@ export default function AskAI() {
     return (
         <div className="flex md:flex-row flex-col p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
+            <Navbar2/>
             <form onSubmit={sendPrompt} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
-                <div className="md:h-[70%] h-[50%] p-[1rem] border border-black overflow-auto">
+                <div className="md:h-[75%] h-[45vh] p-[0.5rem] border border-black overflow-auto">
                     {loading ? 'Wait a moment...' : result ? result : error ? error : 'Result will appear here...'}
                 </div>
                 <textarea 
-                    className="resize-none md:h-[30%] h-[100%] border border-black p-[0.5rem] text-[1rem] font-[550] overflow-auto outline-0"
+                    className="resize-none md:h-[25%] h-[20vh] border border-black p-[0.5rem] text-[1rem] font-[550] overflow-auto outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt(event.target.value)}
                     placeholder="write here..."
                 ></textarea>

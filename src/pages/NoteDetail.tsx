@@ -10,37 +10,43 @@ export default function NoteDetail() {
     const noteTable = 'notes';
     const { id } = useParams();
 
-    const { data, error, updateData } = useSupabaseTable<Note>({ 
+    const { realtimeInit, initTableData, updateData } = useSupabaseTable<Note>();
+    const { error, isLoading } = initTableData({
         tableName: noteTable,
-        uniqueQueryKey: id ? [id] : ['no-note'],
-        additionalQuery: (addQuery) => id ? addQuery.eq('id', id) : addQuery,
+        additionalQuery: (addQuery) => addQuery.eq('id', id),
+        uniqueQueryKey: id ? [id] : ['no-data']
     });
+    const updateMutation = updateData();
 
     const [content, setContent] = useState<string>('');
     const [title, setTitle] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
+    // Initialize realtime connection
     useEffect(() => {
-        if (data && data.length > 0) {
-            setTitle(data[0].note_title || '');
-            setContent(data[0].note_content || '');
+        if (id) {
+            realtimeInit({
+                tableName: noteTable,
+                uniqueQueryKey: [id],
+                additionalQuery: (query) => query.eq('id', id),
+                callback: (data) => {
+                    if (data && data.length > 0) {
+                        setTitle(data[0].note_title);
+                        setContent(data[0].note_content);
+                    }
+                }
+            });
         }
-    }, [data]);
-    
-    if (!id) {
-        return <div className="p-[1rem] text-center text-red-500">Note Not Found</div>;
-    }
+    }, [id, realtimeInit]);
 
     async function handleUpdateNote(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        setLoading(true);
 
         try {
             if (!id) return;
 
-            await updateData({
+            await updateMutation.mutateAsync({
                 tableName: noteTable,
                 newData: {
                     note_content: content,
@@ -49,16 +55,17 @@ export default function NoteDetail() {
                 column: 'id',
                 values: id
             });
+            
             navigate('/home', { replace: true });
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
-        } finally {
-            setTitle('');
-            setContent('');
-            setLoading(false);
         }
+    }
+
+    if (!id) {
+        return <div className="p-[1rem] text-center text-red-500">Note Not Found</div>;
     }
 
     if (error) {
@@ -68,33 +75,40 @@ export default function NoteDetail() {
         return <div className="p-[1rem] text-center text-red-500">{errorMessage}</div>;
     }
 
+    if (isLoading) {
+        return <div className="p-[1rem] text-center">Loading note details...</div>;
+    }
+
     return (
         <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
             <form onSubmit={handleUpdateNote} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"
-                    type="text" value={title} placeholder="title"
+                    type="text" 
+                    value={title} 
+                    placeholder="title"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                 />
                 <textarea 
                     className="resize-none md:h-[600px] h-[300px] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)}
-                    value={content} placeholder="content"
+                    value={content} 
+                    placeholder="content"
                 ></textarea>
                 <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={updateMutation.isPending}
                     className="bg-black text-white text-[0.9rem] font-[550] cursor-pointer p-[0.45rem] border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {loading ? 'Please wait...' : 'Save'}
+                    {updateMutation.isPending ? 'Saving...' : 'Save'}
                 </button>
             </form>
-            {showMessage ?
+            {showMessage &&
                 <div className="flex justify-center items-center inset-0 fixed">
                     <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
                 </div>
-            : null}
+            }
         </div>
     );
 }

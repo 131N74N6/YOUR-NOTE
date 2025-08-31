@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useNavigate } from "react-router-dom";
-import { Navbar1 } from "../components/Navbar";
+import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useAuth } from "../services/useAuth";
 import Notification from "../components/Notification";
 
@@ -10,7 +10,10 @@ export default function AddNote() {
     const navigate = useNavigate();
     const noteTable = 'notes';
     const { user } = useAuth();
-    const { error, insertData } = useSupabaseTable<Note>({ tableName: noteTable });
+    
+    const { insertData, initTableData } = useSupabaseTable<Note>();
+    const insertMutation = insertData();
+    const { error } = initTableData({ tableName: noteTable });
 
     const [content, setContent] = useState('');
     const [title, setTitle] = useState('');
@@ -30,7 +33,7 @@ export default function AddNote() {
 
             if (trimmedTitle === '' || trimmedContent === '') throw new Error('Please fill in all fields');
 
-            await insertData({
+            await insertMutation.mutateAsync({
                 tableName: noteTable,
                 newData: {
                     note_content: trimmedContent,
@@ -60,6 +63,7 @@ export default function AddNote() {
     return (
         <div className="flex flex-col relative z-10 md:flex-row p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
+            <Navbar2/>
             <form onSubmit={handleAddNote} className="md:w-[75%] w-[100%] p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"

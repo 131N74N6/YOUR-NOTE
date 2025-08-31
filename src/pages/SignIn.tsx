@@ -67,6 +67,7 @@ export default function SignIn() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
         } finally {
             setEmail('');
             setPassword('');

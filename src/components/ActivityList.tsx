@@ -9,7 +9,7 @@ const ActivityList = memo((props: ActivityListProps) => {
                 <ActivityItem 
                     key={`act_${act.id}`}
                     detail={act} 
-                    isSelected={act.id === props.selectedId} 
+                    isSelected={props.selectedId === act.id} 
                     onCancel={props.onCancel}
                     onDelete={props.onDelete} 
                     onSelect={props.onSelect}

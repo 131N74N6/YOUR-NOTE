@@ -1,9 +1,10 @@
-export interface DatabaseProps {
+export interface DatabaseProps<B> {
     tableName: string;
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
     uniqueQueryKey?: any[];
     filterKey?: string;
+    callback?: (data: B[]) => void;
 }
 
 export type InsertDataProps<A> = {

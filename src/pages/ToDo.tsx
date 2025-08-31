@@ -1,21 +1,34 @@
 import ActivityList from "../components/ActivityList";
-import { Navbar1 } from "../components/Navbar";
+import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { Activity } from "../services/custom-types";
 import { useAuth } from "../services/useAuth";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import Notification from "../components/Notification";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ActivityForm from "../components/ActivityForm";
 
 export default function ToDo() {
     const activityTable = 'activity_list';
     const { user } = useAuth();
-    const { data, isLoading, error, insertData, updateData, deleteData } = useSupabaseTable<Activity>({ 
-        tableName: activityTable, 
+    const { insertData, updateData, deleteData, initTableData, realtimeInit } = useSupabaseTable<Activity>();
+    const { data = [], error } = initTableData({
+        tableName: activityTable,
         uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
         additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery,
-        filterKey: user?.id ? `user_id=eq.${user.id}` : undefined
     });
+    const insertMutation = insertData();
+    const updateMutation = updateData();
+    const deleteMutation = deleteData();
+
+    useEffect(() => {
+        if (user?.id) {
+            realtimeInit({
+                tableName: activityTable,
+                uniqueQueryKey: [user.id],
+                additionalQuery: (addQuery) => addQuery.eq('user_id', user.id),
+            });
+        }
+    }, [user?.id, realtimeInit]);
     
     const [message, setMessage] = useState<string>('');
     const [activity, setActivity] = useState<string>('');
@@ -33,7 +46,7 @@ export default function ToDo() {
 
             if (trimmedActivity === '') throw new Error('Missing required data!');
 
-            await insertData({
+            await insertMutation.mutateAsync({
                 tableName: activityTable,
                 newData: {
                     act_name: trimmedActivity,
@@ -44,6 +57,7 @@ export default function ToDo() {
             setShowMessage(true);
             setMessage(error.message);
         } finally {
+            setActivity('');
             setShowForm(false);
             setTimeout(() => setShowMessage(false), 3000);
         }
@@ -52,7 +66,7 @@ export default function ToDo() {
     const deleteSelectedActivity = useCallback(async (actId: string): Promise<void> => {
         try {
             if (data.length > 0) {            
-                await deleteData({ 
+                await deleteMutation.mutateAsync({ 
                     tableName: activityTable, 
                     column: 'id', 
                     values: actId 
@@ -69,7 +83,7 @@ export default function ToDo() {
         try {
             if (!actId) throw new Error('Activity not found!');
 
-            await updateData({
+            await updateMutation.mutateAsync({
                 tableName: activityTable,
                 newData: {
                     act_name: newActivity
@@ -88,7 +102,7 @@ export default function ToDo() {
 
     const deleteAllList = useCallback(async() : Promise<void> =>  {
         try {            
-            await deleteData({
+            await deleteMutation.mutateAsync({
                 tableName: activityTable,
                 column: 'user_id',
                 values: user?.id
@@ -111,10 +125,10 @@ export default function ToDo() {
     }, []);
 
     const openForm = () => setShowForm(true);
-    const closeForm = () => setShowForm(false);
 
-    if (isLoading) {
-        return <div>Loading...</div>
+    function closeForm(): void {
+        setShowForm(false);
+        setActivity('');
     }
 
     if (error) {
@@ -128,6 +142,7 @@ export default function ToDo() {
         <>
             <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
                 <Navbar1/>
+                <Navbar2/>
                 {showForm ? 
                     <ActivityForm 
                         onSend={addActivity}

@@ -2,9 +2,9 @@ import { memo } from "react";
 import type { ActivityItemProps } from "../services/custom-types";
 
 const ActivityItem = memo((props: ActivityItemProps) => {
-    function handleSave(event: React.FormEvent): void {
+    async function handleSave(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        props.onUpdate(props.detail.id, props.detail.act_name);
+        await props.onUpdate(props.detail.id, props.detail.act_name);
     }
 
     if (props.isSelected) {
