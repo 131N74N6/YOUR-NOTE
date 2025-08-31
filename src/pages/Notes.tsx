@@ -5,20 +5,20 @@ import Notification from "../components/Notification";
 import type { Note } from "../services/custom-types";
 import { useAuth } from "../services/useAuth";
 import { useSupabaseTable } from "../services/useSupabaseTable";
+import { Link } from "react-router-dom";
 
 export default function Notes() {
     const noteTable = 'notes';
     const { user } = useAuth();
     const { data, error, deleteData } = useSupabaseTable<Note>({ 
         tableName: noteTable, 
-        uniqueQueryKey: user?.id ? [user.id] : [],
-        additionalQuery: (addQuery) => addQuery.eq('user_id', user?.id)
+        uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
+        additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery,
+        filterKey: user?.id ? `user_id=eq.${user.id}` : undefined
     });
 
     const [message, setMessage] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
-
-    if (!user?.id) return <div className="p-[1rem] text-center text-red-500">User Not Found</div>;
 
     async function deleteSelectedNote(noteId: string) {
         try {
@@ -41,11 +41,13 @@ export default function Notes() {
 
     async function deleteAllNotes(): Promise<void> {
         try {
+            if (!user?.id) throw new Error('User not found!');
+
             if (data.length > 0) {
                 await deleteData({
                     tableName: noteTable,
                     column: 'user_id',
-                    values: user?.id
+                    values: user.id
                 });
             } else {
                 throw new Error('Empty!');
@@ -78,6 +80,10 @@ export default function Notes() {
                         <i className="fa-solid fa-trash-can"></i>
                         <span>Delete All</span>
                     </button>
+                    <Link to={'/add-note'} className="bg-black border-0 rounded-[0.4rem] flex items-center gap-[0.4rem] text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]">
+                        <i className="fa-solid fa-circle-plus"></i>
+                        <span>Add Note</span>
+                    </Link>
                 </div>
                 <main className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-[1rem] p-[1rem] border border-black rounded-lg overflow-auto">
                     {data.length > 0 ? data.map((note) => (

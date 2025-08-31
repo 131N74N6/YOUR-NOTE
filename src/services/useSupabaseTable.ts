@@ -24,35 +24,26 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
     const { data, isLoading, error } = useQuery<B[], Error>({
         queryKey,
         queryFn: fetchData,
-        staleTime: 5 * 60 * 1000, 
+        staleTime: 5 * 60 * 1000,
     });
 
     // Setup realtime subscription
     useEffect(() => {
         const channel = supabase
-        .channel(`db_${props.tableName}`)
+        .channel(`db_${props.tableName}_${props.uniqueQueryKey?.join('_') || 'default'}`)
         .on(
             'postgres_changes',
             { 
-                event: '*',
-                schema: 'public',
+                event: '*', 
+                schema: 'public', 
                 table: props.tableName,
+                filter: props.filterKey || undefined
             },
             async (payload: RealtimePostgresChangesPayload<B>) => {
                 switch (payload.eventType) {
                     case 'INSERT': {
-                        let query = supabase
-                        .from(props.tableName)
-                        .select(props.relationalQuery || '*')
-                        .eq('id', payload.new.id)
-                        .single();
-                        
-                        if (props.additionalQuery) query = props.additionalQuery(query);
-                        
-                        const { data: newData, error } = await query;
-                        if (error) throw new Error('Failed fetching inserted data');
-                        
-                        const transformedData = transformsData(newData) as B;
+                        // Optimistic update tanpa fetch tambahan
+                        const transformedData = transformsData(payload.new) as B;
                         queryClient.setQueryData(queryKey, (old: B[] = []) => {
                             if (old.some(item => item.id === transformedData.id)) {
                                 return old;
@@ -62,18 +53,8 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
                         break;
                     }
                     case 'UPDATE': {
-                        let query = supabase
-                        .from(props.tableName)
-                        .select(props.relationalQuery || '*')
-                        .eq('id', payload.new.id)
-                        .single();
-                        
-                        if (props.additionalQuery) query = props.additionalQuery(query);
-                        
-                        const { data: updatedData, error } = await query;
-                        if (error) throw new Error ('Failed fetching updated data');
-                        
-                        const transformedData = transformsData(updatedData) as B;
+                        // Langsung gunakan data dari payload tanpa fetch ulang
+                        const transformedData = transformsData(payload.new) as B;
                         queryClient.setQueryData(queryKey, (old: B[] = []) => 
                             old.map(item => item.id === transformedData.id ? transformedData : item)
                         );
@@ -87,14 +68,17 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
                         break;
                     }
                 }
-            }
+            } 
         ).subscribe();
 
-        // Cleanup subscription
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [props.tableName, queryClient, queryKey, props.uniqueQueryKey, props.additionalQuery, props.relationalQuery]);
+    }, [
+        props.tableName, queryClient, queryKey, 
+        props.additionalQuery, props.relationalQuery, props.filterKey,
+        props.uniqueQueryKey
+    ]);
 
     const insertMutation = useMutation({
         mutationFn: async (props: InsertDataProps<B>) => {
@@ -103,22 +87,38 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
             .insert([props.newData])
             .select();
             
-            if (error) throw new Error('Failed to add new data');
+            if (error) throw new Error(error.message);
             return data[0];
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+        onSuccess: (newData) => {
+            // Optimistic update
+            queryClient.setQueryData(queryKey, (old: B[] = []) => {
+                if (old.some(item => item.id === newData.id)) {
+                    return old;
+                }
+                return [...old, transformsData(newData) as B];
+            });
+        },
     });
 
     const updateMutation = useMutation({
         mutationFn: async (props: UpdateDataProps<B>) => {
-            const { error } = await supabase
+            const { data, error } = await supabase
             .from(props.tableName)
             .update(props.newData)
-            .eq(props.column, props.values);
+            .eq(props.column, props.values)
+            .select()
+            .single();
             
-            if (error) throw new Error('Failed to change data');
+            if (error) throw new Error(error.message);
+            return data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+        onSuccess: (updatedData) => {
+            // Optimistic update
+            queryClient.setQueryData(queryKey, (old: B[] = []) => 
+                old.map(item => item.id === updatedData.id ? transformsData(updatedData) as B : item)
+            );
+        },
     });
 
     const upsertMutation = useMutation({
@@ -129,40 +129,59 @@ export function useSupabaseTable<B extends { id: string }>(props: DatabaseProps)
             .select()
             .single();
 
-            if (error) throw new Error('Failed to process data');
+            if (error) throw new Error(error.message);
             return data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey }),
-    })
+        onSuccess: (upsertedData) => {
+            // Optimistic update
+            queryClient.setQueryData(queryKey, (old: B[] = []) => {
+                const transformedData = transformsData(upsertedData) as B;
+                const existingIndex = old.findIndex(item => item.id === transformedData.id);
+                
+                if (existingIndex >= 0) {
+                    // Update existing
+                    const newData = [...old];
+                    newData[existingIndex] = transformedData;
+                    return newData;
+                } else {
+                    // Add new
+                    return [...old, transformedData];
+                }
+            });
+        },
+    });
 
     const deleteMutation = useMutation({
         mutationFn: async (props: DeleteDataProps) => {
             if (props.column !== undefined) {
+                let query = supabase
+                    .from(props.tableName)
+                    .delete();
+                
                 if (Array.isArray(props.values)) {
-                    const { error } = await supabase
-                    .from(props.tableName)
-                    .delete()
-                    .in(props.column, props.values);
-                    
-                    if (error) throw new Error('Failed to delete data');
+                    query = query.in(props.column, props.values);
                 } else if (typeof props.values === 'string') {
-                    const { error } = await supabase
-                    .from(props.tableName)
-                    .delete()
-                    .eq(props.column, props.values);
-                    
-                    if (error) throw new Error('Failed to delete data');
-                } else {
-                    const { error } = await supabase
-                    .from(props.tableName)
-                    .delete()
-                    .not(props.column, 'is', null);
-        
-                    if (error) throw new Error('Failed to delete data');
+                    query = query.eq(props.column, props.values);
+                } else if (props.values !== undefined) {
+                    query = query.not(props.column, 'is', null);
                 }
+                
+                const { error } = await query;
+                if (error) throw new Error(error.message);
             }
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey })
+        onSuccess: (_, variables) => {
+            // Optimistic delete
+            queryClient.setQueryData(queryKey, (old: B[] = []) => {
+                if (Array.isArray(variables.values)) {
+                    return old.filter(item => !variables.values?.includes(item.id));
+                } else if (typeof variables.values === 'string') {
+                    return old.filter(item => item.id !== variables.values);
+                } else {
+                    return old.filter(item => item[variables.column as keyof B] !== null);
+                }
+            });
+        }
     });
 
     return {

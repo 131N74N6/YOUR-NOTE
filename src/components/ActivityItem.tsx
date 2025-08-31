@@ -17,7 +17,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onEditActivityChange(event.target.value)}
                     className="font-[550] border border-black p-[0.4rem] text-[0.9rem]" 
                 />
-                <div>{props.detail.created_at.toLocaleString()}</div>
+                <div>{`${props.detail.created_at.toLocaleString()}`}</div>
                 <div className="flex">
                     <button 
                         type="submit" 
@@ -40,7 +40,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
     return (
         <div className="border flex flex-col gap-[0.7rem] border-black p-[0.7rem]">
             <div className="font-[550]">{props.detail.act_name}</div>
-            <div>{props.detail.created_at.toLocaleString()}</div>
+            <div>{`${props.detail.created_at.toLocaleString()}`}</div>
             <div className="flex">
                 <button 
                     type="button" 

@@ -12,8 +12,8 @@ export default function NoteDetail() {
 
     const { data, error, updateData } = useSupabaseTable<Note>({ 
         tableName: noteTable,
-        uniqueQueryKey: id ? [id] : [],
-        additionalQuery: (addQuery) => addQuery.eq('id', id),
+        uniqueQueryKey: id ? [id] : ['no-note'],
+        additionalQuery: (addQuery) => id ? addQuery.eq('id', id) : addQuery,
     });
 
     const [content, setContent] = useState<string>('');
@@ -53,11 +53,11 @@ export default function NoteDetail() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
         } finally {
             setTitle('');
             setContent('');
             setLoading(false);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }
 

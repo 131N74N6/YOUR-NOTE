@@ -16,10 +16,6 @@ const Navbar1 = memo(() => {
                 <i className="fa-solid fa-note-sticky"></i>
                 <span>Notes</span>
             </Link>
-            <Link to={'/add-note'} className="flex items-center outline-0 gap-[0.5rem] font-[550] text-[1rem] cursor-pointer hover:p-[0.5rem] hover:border hover:border-black rounded-md text-center">
-                <i className="fa-solid fa-circle-plus"></i>
-                <span>Add Note</span>
-            </Link>
             <Link to={'/todo'} className="flex items-center outline-0 gap-[0.5rem] font-[550] text-[1rem] cursor-pointer hover:p-[0.5rem] hover:border hover:border-black rounded-md text-center">
                 <i className="fa-solid fa-list"></i>
                 <span>To-Do</span>

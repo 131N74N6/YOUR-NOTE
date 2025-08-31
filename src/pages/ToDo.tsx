@@ -12,8 +12,9 @@ export default function ToDo() {
     const { user } = useAuth();
     const { data, isLoading, error, insertData, updateData, deleteData } = useSupabaseTable<Activity>({ 
         tableName: activityTable, 
-        uniqueQueryKey: user?.id ? [user.id] : [],
-        additionalQuery: (addQuery) => addQuery.eq('user_id', user?.id)
+        uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
+        additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery,
+        filterKey: user?.id ? `user_id=eq.${user.id}` : undefined
     });
     
     const [message, setMessage] = useState<string>('');
@@ -27,7 +28,7 @@ export default function ToDo() {
         event.preventDefault();
         const trimmedActivity = activity.trim();
 
-        try {            
+        try { 
             if (!user?.id) throw new Error('User not found!');
 
             if (trimmedActivity === '') throw new Error('Missing required data!');
@@ -36,7 +37,7 @@ export default function ToDo() {
                 tableName: activityTable,
                 newData: {
                     act_name: trimmedActivity,
-                    user_id: user?.id
+                    user_id: user.id
                 }
             });
         } catch (error: any) {
@@ -46,7 +47,7 @@ export default function ToDo() {
             setShowForm(false);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, activity]);
+    }, [user, activity, insertData]);
 
     const deleteSelectedActivity = useCallback(async (actId: string): Promise<void> => {
         try {
@@ -62,7 +63,7 @@ export default function ToDo() {
             setMessage(error.message);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, data]);
+    }, [user, data, deleteData]);
 
     const updateSelectedActivity = useCallback(async (actId: string, newActivity: string) => {
         try {
@@ -83,7 +84,7 @@ export default function ToDo() {
             setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, data, newActivity]);
+    }, [user, data, newActivity, updateData]);
 
     const deleteAllList = useCallback(async() : Promise<void> =>  {
         try {            
@@ -97,7 +98,7 @@ export default function ToDo() {
             setMessage(error.message);
             setTimeout(() => setShowMessage(false), 3000);
         } 
-    }, [user, data]);
+    }, [user, data, deleteData]);
 
     const selectActivity = useCallback((id: string, currentActivity: string) => {
         setSelectId(id);

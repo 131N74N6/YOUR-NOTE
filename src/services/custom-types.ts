@@ -3,6 +3,7 @@ export interface DatabaseProps {
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
     uniqueQueryKey?: any[];
+    filterKey?: string;
 }
 
 export type InsertDataProps<A> = {
