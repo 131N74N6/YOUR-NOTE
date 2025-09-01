@@ -15,7 +15,8 @@ export default function SignIn() {
     const noteUserTable = 'note_user';
     const { user, signIn } = useAuth();
     const navigate = useNavigate();
-    const { upsertData } = useSupabaseTable<Users>({ tableName: noteUserTable });
+    const { upsertData } = useSupabaseTable<Users>();
+    const upsertMutation = upsertData();
 
     useEffect(() => {
         if (user) navigate('/notes', { replace: true });
@@ -52,7 +53,7 @@ export default function SignIn() {
                 if (!profile) {
                     const username = user.user_metadata?.username || 'New User';
 
-                    await upsertData({
+                    await upsertMutation.mutateAsync({
                         tableName: noteUserTable,
                         dataToUpsert: {
                             id: user.id,

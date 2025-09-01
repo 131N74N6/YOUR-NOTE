@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useEffect, useState } from "react";
-import { Navbar1 } from "../components/Navbar";
+import { Navbar1, Navbar2 } from "../components/Navbar";
 import Notification from "../components/Notification";
 
 export default function NoteDetail() {
@@ -23,7 +23,6 @@ export default function NoteDetail() {
     const [message, setMessage] = useState('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    // Initialize realtime connection
     useEffect(() => {
         if (id) {
             realtimeInit({
@@ -82,6 +81,7 @@ export default function NoteDetail() {
     return (
         <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
+            <Navbar2/>
             <form onSubmit={handleUpdateNote} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <input 
                     className="border border-black p-[0.45rem] text-[0.9rem] font-[550] outline-0"
@@ -91,7 +91,7 @@ export default function NoteDetail() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                 />
                 <textarea 
-                    className="resize-none md:h-[600px] h-[300px] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
+                    className="resize-none md:h-[600px] h-[65vh] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)}
                     value={content} 
                     placeholder="content"

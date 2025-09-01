@@ -10,29 +10,32 @@ import ActivityForm from "../components/ActivityForm";
 export default function ToDo() {
     const activityTable = 'activity_list';
     const { user } = useAuth();
-    const { insertData, updateData, deleteData, initTableData, realtimeInit } = useSupabaseTable<Activity>();
-    const { data = [], error } = initTableData({
+    const { realtimeInit, initTableData, insertData, updateData, deleteData } = useSupabaseTable<Activity>();
+    
+    const { data = [], error, isLoading } = initTableData({
         tableName: activityTable,
         uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
         additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery,
     });
-    const insertMutation = insertData();
-    const updateMutation = updateData();
-    const deleteMutation = deleteData();
 
     useEffect(() => {
         if (user?.id) {
             realtimeInit({
                 tableName: activityTable,
                 uniqueQueryKey: [user.id],
-                additionalQuery: (addQuery) => addQuery.eq('user_id', user.id),
+                additionalQuery: (query) => query.eq('user_id', user.id),
             });
         }
+
+        return () => {};
     }, [user?.id, realtimeInit]);
-    
+
+    const insertMutation = insertData();
+    const updateMutation = updateData();
+    const deleteMutation = deleteData();
+
     const [message, setMessage] = useState<string>('');
     const [activity, setActivity] = useState<string>('');
-    const [newActivity, setNewActivity] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showForm, setShowForm] = useState<boolean>(false);
     const [selectId, setSelectId] = useState<string | null>(null);
@@ -43,7 +46,6 @@ export default function ToDo() {
 
         try { 
             if (!user?.id) throw new Error('User not found!');
-
             if (trimmedActivity === '') throw new Error('Missing required data!');
 
             await insertMutation.mutateAsync({
@@ -53,83 +55,75 @@ export default function ToDo() {
                     user_id: user.id
                 }
             });
-        } catch (error: any) {
-            setShowMessage(true);
-            setMessage(error.message);
-        } finally {
+            
             setActivity('');
             setShowForm(false);
+        } catch (error: any) {
+            setMessage(error.message);
+            setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, activity, insertData]);
+    }, [user, activity, insertMutation]);
 
     const deleteSelectedActivity = useCallback(async (actId: string): Promise<void> => {
         try {
-            if (data.length > 0) {            
-                await deleteMutation.mutateAsync({ 
-                    tableName: activityTable, 
-                    column: 'id', 
-                    values: actId 
-                });
-            } 
+            await deleteMutation.mutateAsync({ 
+                tableName: activityTable, 
+                column: 'id', 
+                values: actId 
+            });
         } catch (error: any) {
-            setShowMessage(true);
             setMessage(error.message);
+            setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, data, deleteData]);
+    }, [deleteMutation]);
 
-    const updateSelectedActivity = useCallback(async (actId: string, newActivity: string) => {
+    const updateSelectedActivity = async (actId: string, act_name: string ): Promise<void> => {
         try {
             if (!actId) throw new Error('Activity not found!');
 
             await updateMutation.mutateAsync({
                 tableName: activityTable,
-                newData: {
-                    act_name: newActivity
-                },
                 column: 'id',
-                values: actId
+                values: actId,
+                newData: {
+                    act_name: act_name
+                }
             });
             setSelectId(null);
-            setNewActivity('');
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
         }
-    }, [user, data, newActivity, updateData]);
+    };
 
-    const deleteAllList = useCallback(async() : Promise<void> =>  {
+    const deleteAllList = useCallback(async(): Promise<void> =>  {
         try {            
+            if (!user?.id) throw new Error('User not found!');
+            
             await deleteMutation.mutateAsync({
                 tableName: activityTable,
                 column: 'user_id',
-                values: user?.id
+                values: user.id
             });
         } catch (error: any) {
-            setShowMessage(true);
             setMessage(error.message);
+            setShowMessage(true);
             setTimeout(() => setShowMessage(false), 3000);
         } 
-    }, [user, data, deleteData]);
+    }, [user, deleteMutation]);
 
-    const selectActivity = useCallback((id: string, currentActivity: string) => {
-        setSelectId(id);
-        setNewActivity(currentActivity);
+    const selectActivity = useCallback((id: string) => {
+        setSelectId(prev => prev === id ? null : id);
     }, []);
 
-    const handleCancelEdit = useCallback(() => {
-        setSelectId(null);
-        setNewActivity('');
-    }, []);
-
-    const openForm = () => setShowForm(true);
-
-    function closeForm(): void {
+    const openForm = useCallback(() => setShowForm(true), []);
+    const closeForm = useCallback(() => {
         setShowForm(false);
         setActivity('');
-    }
+    }, []);
 
     if (error) {
         const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
@@ -138,57 +132,61 @@ export default function ToDo() {
         return <div className="p-[1rem] text-center text-red-500">{errorMessage}</div>;
     }
 
-    return (
-        <>
-            <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
-                <Navbar1/>
-                <Navbar2/>
-                {showForm ? 
-                    <ActivityForm 
-                        onSend={addActivity}
-                        actName={activity} 
-                        onChangeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActivity(event.target.value)}
-                        onClose={closeForm}
-                    /> 
-                : null}
-                <div className="flex flex-col gap-[1rem] max-sm:pb-[1rem] w-full">
-                    <div className="flex gap-[0.5rem] p-[1rem] border border-black rounded-lg">
-                        <button 
-                            type="button" 
-                            className="bg-black border-0 rounded-lg text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]" 
-                            onClick={deleteAllList}
-                        >
-                            <i className="fa-solid fa-trash-can"></i>
-                            <span>Delete All</span>
-                        </button>
-                        <button 
-                            type="button" 
-                            className="bg-black border-0 rounded-lg text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]" 
-                            onClick={openForm}
-                        >
-                            <i className="fa-solid fa-plus"></i>
-                            <span>Add List</span>
-                        </button>
-                    </div>
-                    <main className="w-full flex flex-col border p-[1rem] gap-[1rem] border-black rounded-lg overflow-auto">
-                        <ActivityList 
-                            data={data} 
-                            selectedId={selectId} 
-                            onSelect={selectActivity} 
-                            onCancel={handleCancelEdit}
-                            onDelete={deleteSelectedActivity}
-                            onUpdate={updateSelectedActivity}
-                            newActivity={newActivity}
-                            onEditActivityChange={setNewActivity}
-                        />
-                    </main>
-                </div>
-                {showMessage ?
-                    <div className="flex justify-center items-center inset-0 fixed">
-                        <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
-                    </div>
-                : null}
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
             </div>
-        </>
+        );
+    }
+
+    return (
+        <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen">
+            <Navbar1/>
+            <Navbar2/>
+            {showForm ? 
+                <ActivityForm 
+                    onSend={addActivity}
+                    actName={activity} 
+                    onChangeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActivity(event.target.value)}
+                    onClose={closeForm}
+                /> 
+            : null}
+            <div className="flex flex-col gap-[1rem] max-sm:pb-[1rem] w-full">
+                <div className="flex gap-[0.5rem] p-[1rem] border border-black rounded-lg">
+                    <button 
+                        type="button" 
+                        className="bg-black border-0 rounded-lg text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]" 
+                        onClick={deleteAllList}
+                        disabled={deleteMutation.isPending}
+                    >
+                        <i className="fa-solid fa-trash-can"></i>
+                        <span>{deleteMutation.isPending ? 'Deleting...' : 'Delete All'}</span>
+                    </button>
+                    <button 
+                        type="button" 
+                        className="bg-black border-0 rounded-lg text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]" 
+                        onClick={openForm}
+                    >
+                        <i className="fa-solid fa-plus"></i>
+                        <span>Add List</span>
+                    </button>
+                </div>
+                <main className="w-full flex flex-col border p-[1rem] gap-[1rem] border-black rounded-lg overflow-auto">
+                    <ActivityList 
+                        data={data} 
+                        selectedId={selectId} 
+                        onSelect={selectActivity} 
+                        onDelete={deleteSelectedActivity}
+                        onUpdate={updateSelectedActivity}
+                    />
+                </main>
+            </div>
+            {showMessage ?
+                <div className="flex justify-center items-center inset-0 fixed">
+                    <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
+                </div>
+            : null}
+        </div>
     );
 }

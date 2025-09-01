@@ -1,26 +1,35 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import type { ActivityItemProps } from "../services/custom-types";
 
 const ActivityItem = memo((props: ActivityItemProps) => {
-    async function handleSave(event: React.FormEvent): Promise<void> {
+    const [newActivity, setNewActivity] = useState<string>(props.detail.act_name);
+
+    function handleSave(event: React.FormEvent): void {
         event.preventDefault();
-        await props.onUpdate(props.detail.id, props.detail.act_name);
+        const trimmedNewActivity = newActivity.trim();
+        props.onUpdate(props.detail.id, trimmedNewActivity);
+    }
+    
+    function closeEditMode(): void {
+        setNewActivity(props.detail.act_name);
+        props.onSelect(props.detail.id);
     }
 
     if (props.isSelected) {
         return (
-            <form onSubmit={handleSave} className="border flex flex-col gap-[0.7rem] border-black p-[0.7rem]">
+            <div className="border flex flex-col gap-[0.7rem] border-black p-[0.7rem]">
                 <input 
                     type="text"
                     placeholder="your goals"
-                    value={props.newActivity}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onEditActivityChange(event.target.value)}
+                    value={newActivity}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setNewActivity(event.target.value)}
                     className="font-[550] border border-black p-[0.4rem] text-[0.9rem]" 
                 />
                 <div>{`${props.detail.created_at.toLocaleString()}`}</div>
                 <div className="flex">
                     <button 
                         type="submit" 
+                        onClick={handleSave}
                         className="bg-white text-black text-[0.9rem] font-[550] cursor-pointer p-[0.3rem] border border-black w-[85px]"
                     >
                         <i className="fa-solid fa-check"></i>
@@ -28,12 +37,12 @@ const ActivityItem = memo((props: ActivityItemProps) => {
                     <button 
                         type="button" 
                         className="bg-black text-white text-[0.9rem] font-[550] cursor-pointer p-[0.3rem] border-0 w-[85px]" 
-                        onClick={props.onCancel}
+                        onClick={closeEditMode}
                     >
                         <i className="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-            </form>
+            </div>
         );
     } 
 
@@ -45,7 +54,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
                 <button 
                     type="button" 
                     className="bg-white text-black text-[0.9rem] font-[550] cursor-pointer p-[0.3rem] border border-black w-[85px]" 
-                    onClick={() => props.onSelect(props.detail.id, props.detail.act_name)}
+                    onClick={() => props.onSelect(props.detail.id)}
                 >
                     <i className="fa-solid fa-pen-nib"></i>
                 </button>

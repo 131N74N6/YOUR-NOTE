@@ -8,6 +8,7 @@ import NoteDetail from "./pages/NoteDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddNote from "./pages/AddNote";
 import AskAI from "./pages/AskAI";
+import Balance from "./pages/Balance";
 
 export default function App() {
     const initClient = new QueryClient();
@@ -23,6 +24,7 @@ export default function App() {
                         <Route path="/add-note" element={<ProtectedRoute><AddNote/></ProtectedRoute>}/>
                         <Route path="/ask-ai" element={<ProtectedRoute><AskAI/></ProtectedRoute>}/>
                         <Route path="/note-detail/:id" element={<ProtectedRoute><NoteDetail/></ProtectedRoute>}/>
+                        <Route path="/balance" element={<ProtectedRoute><Balance/></ProtectedRoute>}/>
                         <Route path="/" element={<Navigate to="/notes" replace/>} />
                         <Route path="*" element={<Navigate to="/signin" replace/>} />
                     </Routes>

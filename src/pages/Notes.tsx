@@ -13,7 +13,7 @@ export default function Notes() {
     const { realtimeInit, initTableData, deleteData } = useSupabaseTable<Note>();
     
     // Get the table data using React Query
-    const { data = [], error } = initTableData({
+    const { data = [], isLoading, error } = initTableData({
         tableName: noteTable,
         uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
         additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery
@@ -70,6 +70,14 @@ export default function Notes() {
             setTimeout(() => setShowMessage(false), 3000);
         }
     }, [deleteMutation, user?.id]);
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+        );
+    }
 
     if (error) {
         const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 

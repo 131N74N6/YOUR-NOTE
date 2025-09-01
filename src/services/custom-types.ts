@@ -55,23 +55,53 @@ export type Activity = {
 export type ActivityListProps = {
     data: Activity[];
     selectedId: string | null;
-    newActivity: string;
-    onSelect: (id: string, activity: string) => void;
-    onCancel: () => void;
-    onUpdate: (id: string, newActivity: string) => Promise<void>;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, act_name: string) => void;
     onDelete: (id: string) => Promise<void>;
-    onEditActivityChange: (newActivity: string) => void;
 }
 
 export type ActivityItemProps = {
     detail: Activity;
     isSelected: boolean;
-    newActivity: string;
-    onSelect: (id: string, activity: string) => void;
-    onCancel: () => void;
-    onUpdate: (id: string, newActivity: string) => Promise<void>;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, act_name: string) => void;
     onDelete: (id: string) => Promise<void>;
-    onEditActivityChange: (newActivity: string) => void;
+}
+
+export type BalanceDetail = {
+    id: string;
+    amount: number;
+    type: string;
+    description: string;
+    user_id: string;
+    created_at: Date;
+}
+
+export type BalanceSummaryProps = {
+    username: string;
+    summary: BalanceSummaries;
+}
+
+export type BalanceListProps = {
+    data: BalanceDetail[];
+    selectedId: string | null;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, data: { amount: number; type: string; description: string }) => void;
+    onDelete: (id: string) => void;
+}
+
+export type BalanceItemProps = {
+    item: BalanceDetail;
+    isSelected: boolean;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, data: { amount: number; type: string; description: string }) => void;
+    onDelete: (id: string) => void;
+}
+
+export type BalanceSummaries = {
+    totalIncome: number;
+    totalExpense: number;
+    balanceDifference: number;
 }
 
 export type Note = {
