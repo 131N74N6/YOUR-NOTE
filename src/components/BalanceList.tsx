@@ -12,7 +12,7 @@ function BalanceList({ data, selectedId, onSelect, onUpdate, onDelete }: Balance
     }
 
     return (
-        <section className="border-[1.3px] border-black flex flex-col gap-[1rem] p-[1rem] text-[1rem] overflow-y-auto font-mono text-white font-[520]">
+        <section className="border-[1.3px] border-black grid md:grid-cols-2 grid-cols-1 gap-[1rem] p-[1rem] text-[1rem] overflow-y-auto font-mono text-white font-[520]">
             {data.map((item) => (
                 <BalanceItem
                     key={item.id}

@@ -21,6 +21,13 @@ export default function AddNote() {
     const [message, setMessage] = useState('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showMessage]);
+
     async function handleAddNote(event: React.FormEvent): Promise<void> {
         event.preventDefault();
         setLoading(true);
@@ -51,13 +58,6 @@ export default function AddNote() {
         }
     }
 
-    useEffect(() => {
-        if (showMessage) {
-            const timer = setTimeout(() => setShowMessage(false), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [showMessage]);
-
     if (error) {
         const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
             ? "Check your internet connection" 
@@ -76,7 +76,7 @@ export default function AddNote() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                 />
                 <textarea 
-                    className="resize-none md:h-[600px] h-[65vh] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
+                    className="resize-none md:h-screen h-[68.4vh] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)}
                     placeholder="content" value={content}
                 ></textarea>

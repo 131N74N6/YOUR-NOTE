@@ -9,8 +9,7 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
     const realtimeChannelRef = useRef<RealtimeChannel | null>(null);
     const isInitializedRef = useRef(false);
 
-    // Cleanup function
-    const teardownStorage = useCallback(() => {
+    const teardownTable = useCallback(() => {
         if (realtimeChannelRef.current) {
             realtimeChannelRef.current.unsubscribe();
             realtimeChannelRef.current = null;
@@ -18,7 +17,6 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
         isInitializedRef.current = false;
     }, []);
 
-    // Transform data function
     const transformData = useCallback((data: any): B => {
         if (data && data.created_at && typeof data.created_at === 'string') {
             return { ...data, created_at: new Date(data.created_at) } as B;
@@ -26,7 +24,6 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
         return data as B;
     }, []);
 
-    // Fetch initial data
     const fetchData = useCallback(async (props: DatabaseProps<B>) => {
         let query = supabase.from(props.tableName).select(props.relationalQuery || '*');
 
@@ -39,9 +36,8 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
         return data.map(transformData);
     }, [transformData]);
 
-    // Realtime initialization
     const realtimeInit = useCallback(async (props: DatabaseProps<B>) => {
-        teardownStorage();
+        teardownTable();
         const queryKey = [props.tableName, props.uniqueQueryKey];
 
         realtimeChannelRef.current = supabase.channel(`db_${props.tableName}`);
@@ -49,7 +45,6 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
             'postgres_changes',
             { event: '*', schema: 'public', table: props.tableName },
             async (payload: RealtimePostgresChangesPayload<B>) => {
-                const queryKey = [props.tableName, props.uniqueQueryKey];
                 switch (payload.eventType) {
                     case 'INSERT': {
                         let query = supabase
@@ -91,17 +86,17 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
 
                         const transformedData = transformData(data);
                         
-                        queryClient.setQueryData<B[]>(queryKey, (oldData = []) => 
-                            oldData.map(item => item.id === transformedData.id ? transformedData : item)
-                        );
+                        queryClient.setQueryData<B[]>(queryKey, (oldData = []) => {
+                            return oldData.map(item => item.id === transformedData.id ? transformedData : item)
+                        });
                         break;
                     }
                     case 'DELETE': {
                         const deletedId = payload.old.id;
                         
-                        queryClient.setQueryData<B[]>(queryKey, (oldData = []) => 
-                            oldData.filter(item => item.id !== deletedId)
-                        );
+                        queryClient.setQueryData<B[]>(queryKey, (oldData = []) => {
+                            return oldData.filter(item => item.id !== deletedId)
+                        });
                         break;
                     }
                 }
@@ -113,16 +108,14 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
             }
         );
 
-        // Subscribe to the channel
         realtimeChannelRef.current.subscribe();
         isInitializedRef.current = true;
 
-        // Fetch initial data
         const data = await fetchData(props);
         queryClient.setQueryData(queryKey, data);
         
         if (props.callback) props.callback(data);
-    }, [fetchData, queryClient, teardownStorage, transformData]);
+    }, [fetchData, queryClient, teardownTable, transformData]);
 
     const initTableData = (props: DatabaseProps<B>) => {
         return useQuery({
@@ -205,14 +198,13 @@ export const useSupabaseTable = <B extends { id: string; created_at?: Date | str
         });
     }
 
-    // Effect for cleanup when component unmounts
     useEffect(() => {
-        return () => teardownStorage();
-    }, [teardownStorage]);
+        return () => teardownTable();
+    }, [teardownTable]);
 
     return {
         realtimeInit,
-        teardownStorage,
+        teardownTable,
         initTableData,
         insertData,
         upsertData,

@@ -97,7 +97,7 @@ export default function NoteDetail() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                 />
                 <textarea 
-                    className="resize-none md:h-[600px] h-[65vh] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
+                    className="resize-none md:h-screen h-[68.4vh] border border-black p-[0.5rem] text-[1rem] font-[550] outline-0"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)}
                     value={content} 
                     placeholder="content"
