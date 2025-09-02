@@ -71,10 +71,22 @@ export type ActivityItemProps = {
 export type BalanceDetail = {
     id: string;
     amount: number;
-    type: string;
+    type: "income" | "expense";
     description: string;
     user_id: string;
     created_at: Date;
+}
+
+export type BalanceFormProps = {
+    amount: string;
+    type: "income" | "expense";
+    description: string;
+    onChangeAmount: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onPickIncome: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onPickExpense: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChangeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSend: (event: React.FormEvent) => Promise<void>;
+    onClose: () => void;
 }
 
 export type BalanceSummaryProps = {
@@ -86,7 +98,7 @@ export type BalanceListProps = {
     data: BalanceDetail[];
     selectedId: string | null;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, data: { amount: number; type: string; description: string }) => void;
+    onUpdate: (id: string, data: { amount: number; type: "income" | "expense"; description: string }) => void;
     onDelete: (id: string) => void;
 }
 
@@ -94,7 +106,7 @@ export type BalanceItemProps = {
     item: BalanceDetail;
     isSelected: boolean;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, data: { amount: number; type: string; description: string }) => void;
+    onUpdate: (id: string, data: { amount: number; type: "income" | "expense"; description: string }) => void;
     onDelete: (id: string) => void;
 }
 
@@ -122,8 +134,9 @@ export type NavbarProps = {
 }
 
 export type NotificationProps = {
-    class_name: string;
     message: string;
+    onClose: () => void;
+    className?: string;
 }
 
 export type AIResponse = {

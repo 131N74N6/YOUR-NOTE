@@ -56,7 +56,7 @@ export default function AskAI() {
         <div className="flex md:flex-row flex-col p-[1rem] gap-[1rem] h-screen">
             <Navbar1/>
             <Navbar2/>
-            <form onSubmit={sendPrompt} className="md:w-[75%] w-full p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
+            <form onSubmit={sendPrompt} className="w-full md:w-3/4 p-[1rem] border border-black rounded-lg flex flex-col gap-[1rem]">
                 <div className="md:h-[75%] h-[45vh] p-[0.5rem] border border-black overflow-auto">
                     {loading ? 'Wait a moment...' : result ? result : error ? error : 'Result will appear here...'}
                 </div>

@@ -3,7 +3,7 @@ import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import Notification from "../components/Notification";
+import BalanceNotification from "../components/BalanceNotification";
 
 export default function NoteDetail() {
     const navigate = useNavigate();
@@ -59,9 +59,15 @@ export default function NoteDetail() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }
+
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showMessage]);
 
     if (!id) {
         return <div className="p-[1rem] text-center text-red-500">Note Not Found</div>;
@@ -104,11 +110,13 @@ export default function NoteDetail() {
                     {updateMutation.isPending ? 'Saving...' : 'Save'}
                 </button>
             </form>
-            {showMessage &&
-                <div className="flex justify-center items-center inset-0 fixed">
-                    <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
-                </div>
-            }
+            {showMessage ?
+                <BalanceNotification 
+                    message={message}
+                    onClose={() => setShowMessage(false)}
+                    className="border border-black p-[0.5rem] text-[1rem] w-[280px]"
+                />
+            : null}
         </div>
     );
 }

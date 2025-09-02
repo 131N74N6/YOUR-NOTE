@@ -1,43 +1,26 @@
-import { useState } from 'react';
+import { memo } from 'react';
+import type { BalanceFormProps } from '../services/custom-types';
 
-interface BalanceFormProps {
-    onSubmit: (data: { amount: number; type: string; description: string }) => void;
-    onClose: () => void;
-}
-
-const BalanceForm = (props: BalanceFormProps) => {
-    const [amount, setAmount] = useState('');
-    const [description, setDescription] = useState('');
-    const [type, setType] = useState<string>('income');
-
-    function handleSubmit(event: React.FormEvent): void {
-        event.preventDefault();
-        
-        const amountValue = parseFloat(amount);
-        if (isNaN(amountValue) || amountValue <= 0) return;
-        
-        props.onSubmit({ amount: amountValue, type, description: description.trim() || '-' });
-    };
-
+function BalanceForm(props: BalanceFormProps) {
     return (
         <form 
-        onSubmit={handleSubmit}
-        className="fixed inset-0 flex items-center justify-center z-20 bg-[rgba(0,0,0,0.3)]"
+            onSubmit={props.onSend}
+            className="fixed inset-0 flex items-center justify-center z-20 bg-[rgba(0,0,0,0.3)]"
         >
             <div className="bg-white border-[2px] flex flex-col gap-[1.3rem] border-black p-[2rem] rounded-lg w-full max-w-md">
                 <input
                     type="text"
                     placeholder="Enter balance..."
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={props.amount}
+                    onChange={props.onChangeAmount}
                     className="border-[1.5px] border-black p-[0.45rem] text-[0.95rem] font-mono font-[550] outline-0 text-black"
                 />
                 
                 <input
                     type="text"
                     placeholder="Enter description..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={props.description}
+                    onChange={props.onChangeDescription}
                     className="border-[1.5px] border-black p-[0.45rem] text-[0.95rem] font-mono font-[550] outline-0 text-black"
                 />
                 
@@ -48,8 +31,8 @@ const BalanceForm = (props: BalanceFormProps) => {
                             id="income"
                             name="category"
                             value="income"
-                            checked={type === 'income'}
-                            onChange={() => setType('income')}
+                            checked={props.type === 'income'}
+                            onChange={props.onPickIncome}
                         />
                         <label htmlFor="income" className="text-black">Income</label>
                     </div>
@@ -60,8 +43,8 @@ const BalanceForm = (props: BalanceFormProps) => {
                             id="expense"
                             name="category"
                             value="expense"
-                            checked={type === 'expense'}
-                            onChange={() => setType('expense')}
+                            checked={props.type === 'expense'}
+                            onChange={props.onPickExpense}
                         />
                         <label htmlFor="expense" className="text-black">Expense</label>
                     </div>
@@ -88,4 +71,4 @@ const BalanceForm = (props: BalanceFormProps) => {
     );
 }
 
-export default BalanceForm;
+export default memo(BalanceForm);

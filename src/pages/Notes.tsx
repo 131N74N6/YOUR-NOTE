@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
-import Notification from "../components/Notification";
+import BalanceNotification from "../components/BalanceNotification";
 import type { Note } from "../services/custom-types";
 import { useAuth } from "../services/useAuth";
 import { useSupabaseTable } from "../services/useSupabaseTable";
@@ -12,14 +12,12 @@ export default function Notes() {
     const { user } = useAuth();
     const { realtimeInit, initTableData, deleteData } = useSupabaseTable<Note>();
     
-    // Get the table data using React Query
     const { data = [], isLoading, error } = initTableData({
         tableName: noteTable,
         uniqueQueryKey: user?.id ? [user.id] : ['no-user'],
         additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery
     });
 
-    // Initialize realtime connection
     useEffect(() => {
         if (user?.id) {
             realtimeInit({
@@ -28,14 +26,8 @@ export default function Notes() {
                 additionalQuery: (query) => query.eq('user_id', user.id),
             });
         }
-
-        // Cleanup on unmount
-        return () => {
-            // Note: The teardown is handled internally by useSupabaseTable
-        };
     }, [user?.id, realtimeInit]);
 
-    // Get the delete mutation
     const deleteMutation = deleteData();
 
     const [message, setMessage] = useState<string>('');
@@ -51,7 +43,6 @@ export default function Notes() {
         } catch (error: any) {
             setShowMessage(true);
             setMessage(error.message);
-            setTimeout(() => setShowMessage(false), 3000);
         } 
     }, [deleteMutation]);
 
@@ -67,9 +58,15 @@ export default function Notes() {
         } catch (error: any) {
             setShowMessage(true);
             setMessage(error.message);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }, [deleteMutation, user?.id]);
+
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showMessage]);
 
     if (isLoading) {
         return (
@@ -90,7 +87,7 @@ export default function Notes() {
         <div className="flex flex-col md:flex-row p-[1rem] gap-[1rem] h-screen relative z-10">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col gap-[1rem] max-sm:pb-[1rem]">
+            <div className="w-full md:w-3/4 flex flex-col gap-[1rem] max-sm:pb-[1rem]">
                 <div className="flex gap-[0.5rem] p-[1rem] border border-black rounded-lg">
                     <button 
                         type="button" 
@@ -108,7 +105,7 @@ export default function Notes() {
                         <span>Add Note</span>
                     </Link>
                 </div>
-                <main className="w-full flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-[1rem] p-[1rem] border border-black rounded-lg overflow-auto">
+                <main className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-[1rem] p-[1rem] border border-black rounded-lg overflow-auto">
                     {data.length > 0 ? data.map((note) => (
                         <NoteList 
                             key={`note_${note.id}`}
@@ -126,11 +123,13 @@ export default function Notes() {
                     </div>}
                 </main>
             </div>
-            {showMessage &&
-                <div className="flex justify-center items-center inset-0 fixed z-20">
-                    <Notification message={message} class_name="border bg-white border-black p-[0.5rem] text-[1rem] w-[280px]"/>
-                </div>
-            }
+            {showMessage ?
+                <BalanceNotification 
+                    message={message}
+                    onClose={() => setShowMessage(false)}
+                    className="border border-black p-[0.5rem] text-[1rem] w-[280px]"
+                />
+            : null}
         </div>
     );
 }

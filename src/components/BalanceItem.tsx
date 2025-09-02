@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
-const BalanceItem = ({ item, isSelected, onSelect, onUpdate, onDelete }: BalanceItemProps) => {
+function BalanceItem({ item, isSelected, onSelect, onUpdate, onDelete }: BalanceItemProps) {
     const [editAmount, setEditAmount] = useState(item.amount.toString());
     const [editType, setEditType] = useState(item.type);
     const [editDescription, setEditDescription] = useState(item.description);
@@ -51,7 +51,7 @@ const BalanceItem = ({ item, isSelected, onSelect, onUpdate, onDelete }: Balance
                             checked={editType === 'income'}
                             onChange={() => setEditType('income')}
                         />
-                        <label htmlFor={`income-${item.id}`}>Income</label>
+                        <label htmlFor={`income-${item.id}`} className='text-black'>Income</label>
                     </div>
                 
                     <div className="flex items-center gap-1">
@@ -63,7 +63,7 @@ const BalanceItem = ({ item, isSelected, onSelect, onUpdate, onDelete }: Balance
                             checked={editType === 'expense'}
                             onChange={() => setEditType('expense')}
                         />
-                        <label htmlFor={`expense-${item.id}`}>Expense</label>
+                        <label htmlFor={`expense-${item.id}`} className='text-black'>Expense</label>
                     </div>
                 </div>
                 
@@ -123,4 +123,4 @@ const BalanceItem = ({ item, isSelected, onSelect, onUpdate, onDelete }: Balance
     );
 };
 
-export default BalanceItem;
+export default memo(BalanceItem);

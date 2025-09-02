@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import type { BalanceListProps } from '../services/custom-types';
 import BalanceItem from './BalanceItem';
 
-const BalanceList = ({ data, selectedId, onSelect, onUpdate, onDelete }: BalanceListProps) => {
+function BalanceList({ data, selectedId, onSelect, onUpdate, onDelete }: BalanceListProps) {
     if (data.length === 0) {
         return (
             <section className="flex p-[1rem] text-[1rem] font-mono text-red font-[520] items-center justify-center">
@@ -26,4 +27,4 @@ const BalanceList = ({ data, selectedId, onSelect, onUpdate, onDelete }: Balance
     );
 };
 
-export default BalanceList;
+export default memo(BalanceList);

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Note } from "../services/custom-types";
 import { useSupabaseTable } from "../services/useSupabaseTable";
 import { useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useAuth } from "../services/useAuth";
-import Notification from "../components/Notification";
+import BalanceNotification from "../components/BalanceNotification";
 
 export default function AddNote() {
     const navigate = useNavigate();
@@ -48,10 +48,15 @@ export default function AddNote() {
         } finally {
             setTitle('');
             setContent('');
-            setLoading(false);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }
+
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showMessage]);
 
     if (error) {
         const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
@@ -84,9 +89,11 @@ export default function AddNote() {
                 </button>
             </form>
             {showMessage ?
-                <div className="flex justify-center items-center inset-0 fixed">
-                    <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
-                </div>
+                <BalanceNotification 
+                    message={message}
+                    onClose={() => setShowMessage(false)}
+                    className="border border-black p-[0.5rem] text-[1rem] w-[280px]"
+                />
             : null}
         </div>
     );

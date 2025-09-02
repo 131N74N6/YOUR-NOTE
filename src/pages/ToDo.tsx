@@ -1,10 +1,10 @@
-import ActivityList from "../components/ActivityList";
+import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import type { Activity } from "../services/custom-types";
 import { useAuth } from "../services/useAuth";
 import { useSupabaseTable } from "../services/useSupabaseTable";
-import Notification from "../components/Notification";
-import { useCallback, useEffect, useState } from "react";
+import type { Activity } from "../services/custom-types";
+import BalanceNotification from "../components/BalanceNotification";
+import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
 
 export default function ToDo() {
@@ -26,8 +26,6 @@ export default function ToDo() {
                 additionalQuery: (query) => query.eq('user_id', user.id),
             });
         }
-
-        return () => {};
     }, [user?.id, realtimeInit]);
 
     const insertMutation = insertData();
@@ -40,7 +38,7 @@ export default function ToDo() {
     const [showForm, setShowForm] = useState<boolean>(false);
     const [selectId, setSelectId] = useState<string | null>(null);
 
-    const addActivity = useCallback(async (event: React.FormEvent): Promise<void> => {
+    const addActivity = useCallback(async(event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedActivity = activity.trim();
 
@@ -61,11 +59,10 @@ export default function ToDo() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }, [user, activity, insertMutation]);
 
-    const deleteSelectedActivity = useCallback(async (actId: string): Promise<void> => {
+    const deleteSelectedActivity = useCallback(async(actId: string): Promise<void> => {
         try {
             await deleteMutation.mutateAsync({ 
                 tableName: activityTable, 
@@ -75,11 +72,10 @@ export default function ToDo() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 3000);
         }
     }, [deleteMutation]);
 
-    const updateSelectedActivity = async (actId: string, act_name: string ): Promise<void> => {
+    const updateSelectedActivity = async(actId: string, act_name: string ): Promise<void> => {
         try {
             if (!actId) throw new Error('Activity not found!');
 
@@ -87,17 +83,14 @@ export default function ToDo() {
                 tableName: activityTable,
                 column: 'id',
                 values: actId,
-                newData: {
-                    act_name: act_name
-                }
+                newData: { act_name: act_name }
             });
             setSelectId(null);
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 3000);
         }
-    };
+    }
 
     const deleteAllList = useCallback(async(): Promise<void> =>  {
         try {            
@@ -111,7 +104,6 @@ export default function ToDo() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 3000);
         } 
     }, [user, deleteMutation]);
 
@@ -120,10 +112,18 @@ export default function ToDo() {
     }, []);
 
     const openForm = useCallback(() => setShowForm(true), []);
+
     const closeForm = useCallback(() => {
         setShowForm(false);
         setActivity('');
     }, []);
+
+    useEffect(() => {
+        if (showForm) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return clearInterval(timer);
+        }
+    }, [showForm]);
 
     if (error) {
         const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
@@ -152,7 +152,7 @@ export default function ToDo() {
                     onClose={closeForm}
                 /> 
             : null}
-            <div className="flex flex-col gap-[1rem] max-sm:pb-[1rem] w-full">
+            <div className="flex flex-col gap-[1rem] max-sm:pb-[1rem] w-full md:w-3/4">
                 <div className="flex gap-[0.5rem] p-[1rem] border border-black rounded-lg">
                     <button 
                         type="button" 
@@ -183,9 +183,11 @@ export default function ToDo() {
                 </main>
             </div>
             {showMessage ?
-                <div className="flex justify-center items-center inset-0 fixed">
-                    <Notification message={message} class_name="border border-black p-[0.5rem] text-[1rem] w-[280px]"/>
-                </div>
+                <BalanceNotification 
+                    message={message}
+                    onClose={() => setShowMessage(false)}
+                    className="border border-black p-[0.5rem] text-[1rem] w-[280px]"
+                />
             : null}
         </div>
     );

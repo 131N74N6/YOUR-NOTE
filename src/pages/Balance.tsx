@@ -34,91 +34,97 @@ export default function Balance() {
     const updateMutation = updateData();
     const deleteMutation = deleteData();
     
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState<string>('');
     const [showMessage, setShowMessage] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+    const [amount, setAmount] = useState<string>('');
+    const [type, setType] = useState<'income' | 'expense'>('income');
+    const [description, setDescription] = useState<string>('');
     
     const balanceSummary = useMemo((): BalanceSummaries => {
         let totalIncome = 0;
         let totalExpense = 0;
         
         balanceData.forEach(item => {
-        if (item.type === 'income') {
-            totalIncome += item.amount;
-        } else {
-            totalExpense += item.amount;
-        }
+            if (item.type === 'income') {
+                totalIncome += item.amount;
+            } else {
+                totalExpense += item.amount;
+            }
         });
         
         return {
-        totalIncome,
-        totalExpense,
-        balanceDifference: totalIncome - totalExpense
+            totalIncome,
+            totalExpense,
+            balanceDifference: totalIncome - totalExpense
         };
     }, [balanceData]);
     
-    // Sort data based on selected order
     const sortedData = useMemo(() => {
         const data = [...balanceData];
         
         if (sortOrder === 'oldest') {
-        return data.sort((a, b) => 
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-        );
+            return data.sort((a, b) => 
+                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
         } else {
-        return data.sort((a, b) => 
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+            return data.sort((a, b) => 
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
         }
     }, [balanceData, sortOrder]);
     
-    // Handlers
-    const handleAddBalance = useCallback(async (data: {
-        amount: number;
-        type: string;
-        description: string;
-    }) => {
+    const addBalance = useCallback(async(event: React.FormEvent) => {
+        event.preventDefault();
+        const trimmedAmount = Number(amount.trim());
+        const trimmedDesc = description.trim();
+
         try {
-        if (!user?.id) throw new Error('User not found');
-        
-        await insertMutation.mutateAsync({
-            tableName: financeTable,
-            newData: {
-            ...data,
-            user_id: user.id
-            }
-        });
-        
-        setShowForm(false);
+            if (!user?.id) throw new Error('User not found');
+            
+            await insertMutation.mutateAsync({
+                tableName: financeTable,
+                newData: {
+                    amount: trimmedAmount,
+                    type: type,
+                    description: trimmedDesc,
+                    user_id: user.id
+                }
+            });
+            
+            setShowForm(false);
+            setAmount('');
+            setType('income');
+            setDescription('');
         } catch (error: any) {
-        setMessage(error.message);
-        setShowMessage(true);
+            setMessage(error.message);
+            setShowMessage(true);
         }
     }, [user, insertMutation]);
     
-    const handleUpdateBalance = useCallback(async (id: string, data: {
+    const handleUpdateBalance = useCallback(async(id: string, data: {
         amount: number;
-        type: string;
+        type: "income" | "expense";
         description: string;
     }) => {
         try {
-        await updateMutation.mutateAsync({
-            tableName: financeTable,
-            values: id,
-            column: 'id',
-            newData: data
-        });
-        
-        setSelectedId(null);
+            await updateMutation.mutateAsync({
+                tableName: financeTable,
+                values: id,
+                column: 'id',
+                newData: data
+            });
+            
+            setSelectedId(null);
         } catch (error: any) {
-        setMessage(error.message);
-        setShowMessage(true);
+            setMessage(error.message);
+            setShowMessage(true);
         }
     }, [updateMutation]);
     
-    const handleDeleteBalance = useCallback(async (id: string) => {
+    const handleDeleteBalance = useCallback(async(id: string) => {
         try {
         await deleteMutation.mutateAsync({
             tableName: financeTable,
@@ -126,12 +132,12 @@ export default function Balance() {
             values: id
         });
         } catch (error: any) {
-        setMessage(error.message);
-        setShowMessage(true);
+            setMessage(error.message);
+            setShowMessage(true);
         }
     }, [deleteMutation]);
     
-    const handleDeleteAll = useCallback(async () => {
+    const handleDeleteAll = useCallback(async() => {
         try {
             if (!user?.id) throw new Error('User not found');
             
@@ -153,10 +159,6 @@ export default function Balance() {
     const handleSortChange = useCallback((order: 'newest' | 'oldest') => {
         setSortOrder(order);
     }, []);
-    
-    function openForm(): void {
-        setShowForm(true);
-    }
 
     // Close BalanceNotification after 3 seconds
     useEffect(() => {
@@ -181,7 +183,7 @@ export default function Balance() {
         <div className="bg-white h-screen p-[1rem] relative z-10 flex flex-col md:flex-row gap-[1rem]">
             <Navbar1/>
             <Navbar2/>
-            <section className="flex flex-col gap-[1rem] w-full">
+            <section className="flex flex-col gap-[1rem] w-full md:w-3/4">
                 <section className="border-[1.3px] border-black p-[1rem]">
                     <BalanceSummary 
                         username={user?.email || 'User'}
@@ -220,7 +222,7 @@ export default function Balance() {
                     <button 
                         type="button" 
                         className="bg-black border-0 rounded-lg text-white cursor-pointer text-[0.9rem] p-[0.4rem] font-[550]" 
-                        onClick={openForm}
+                        onClick={() => setShowForm(true)}
                     >
                         <i className="fa-solid fa-plus"></i>
                         <span>Add Balance</span>
@@ -239,8 +241,15 @@ export default function Balance() {
             
             {showForm ? 
                 <BalanceForm 
-                    onSubmit={handleAddBalance}
+                    onSend={addBalance}
+                    amount={amount}
+                    onChangeAmount={(event: React.ChangeEvent<HTMLInputElement>) => setAmount(event.target.value)}
+                    description={description}
+                    onChangeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
                     onClose={() => setShowForm(false)}
+                    type={type}
+                    onPickExpense={() => setType('expense')}
+                    onPickIncome={() => setType('income')}
                 />
             : null}
             

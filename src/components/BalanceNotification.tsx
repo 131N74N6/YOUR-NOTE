@@ -1,12 +1,7 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
+import type { NotificationProps } from '../services/custom-types';
 
-interface NotificationProps {
-    message: string;
-    onClose: () => void;
-    className?: string;
-}
-
-const BalanceNotification = ({ message, onClose, className = '' }: NotificationProps) => {
+function BalanceNotification({ message, onClose, className = '' }: NotificationProps) {
     useEffect(() => {
         const timer = setTimeout(onClose, 3000);
         return () => clearTimeout(timer);
@@ -21,4 +16,4 @@ const BalanceNotification = ({ message, onClose, className = '' }: NotificationP
     );
 };
 
-export default BalanceNotification;
+export default memo(BalanceNotification);
