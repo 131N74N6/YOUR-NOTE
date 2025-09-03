@@ -64,7 +64,7 @@ export default function SignIn() {
                     });
                 }
             }
-            navigate('/home', { replace: true });
+            navigate('/notes', { replace: true });
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
