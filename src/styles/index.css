@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+input#income:checked+label[for='income'], 
+input#income:checked+label[for='income'] {
+    background-color: white;
+    color: black;
+} 
+
+::-webkit-scrollbar {
+    display: none;
+}

@@ -9,7 +9,7 @@ export default function SignIn() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) navigate('/balances', { replace: true });
+        if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
     async function handleSignIn(event: React.FormEvent) {

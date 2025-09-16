@@ -10,7 +10,7 @@ export default function SignUp() {
     const { signUp, user } = useAuth();
 
     useEffect(() => {
-        if (user) navigate('/balances', { replace: true });
+        if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
     async function handleSignUp(event: React.FormEvent) {

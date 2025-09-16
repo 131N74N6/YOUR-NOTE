@@ -7,6 +7,10 @@ export function Navbar1() {
 
     return (
         <nav className="md:w-1/4 md:flex border border-white shrink-0 hidden flex-col gap-[1.25rem] p-[1rem] backdrop-blur-sm backdrop-brightness-75 rounded-[1rem]">
+            <Link to={'/home'} className="flex items-center gap-[0.5rem] font-[550] text-[1.2rem] text-white">
+                <i className="fa-solid fa-home"></i>
+                <span>Home</span>
+            </Link>
             <Link to={'/activities'} className="flex items-center gap-[0.5rem] font-[550] text-[1.2rem] text-white">
                 <i className="fa-solid fa-check-to-slot"></i>
                 <span>ToDo</span>

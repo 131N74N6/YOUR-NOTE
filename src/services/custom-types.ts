@@ -32,6 +32,18 @@ export type IActivity = {
     user_id: string;
 }
 
+export type BalanceFormProps = {
+    onSave: (event: React.FormEvent) => void;
+    onClose: () => void;
+    amount: number;
+    changeAmount:(event: React.ChangeEvent<HTMLInputElement>) => void;
+    balance_type: 'income' | 'expense';
+    changeToIncome:() => void;
+    changeToExpense:() => void;
+    description: string;
+    changeDescription:(event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 export type IBalance = {
     id: string;
     created_at: Date;
@@ -41,10 +53,45 @@ export type IBalance = {
     user_id: string;
 }
 
+export type BalanceListProps = {
+    data: IBalance[];
+    selectedId: string | null;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, 
+        data: { 
+            amount: number; 
+            balance_type: 'income' | 'expense'; 
+            description: string 
+        }
+    ) => void;
+    onDelete: (id: string) => void;
+}
+
+export type BalanceItemProps = {
+    data: IBalance;
+    isSelected: boolean;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, 
+        data: { 
+            amount: number; 
+            balance_type: 'income' | 'expense'; 
+            description: string 
+        }
+    ) => void;
+    onDelete: (id: string) => void;
+}
+
 export type INote = {
     id: string;
     created_at: Date;
     note_title: string;
     note_content: string;
     user_id: string;
+}
+
+export type PaginationProps = {
+    currentPage: number;
+    totalPages: number;
+    onNext: () => void;
+    onPrev: () => void;
 }
