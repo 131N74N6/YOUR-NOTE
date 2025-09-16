@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Balances from "./pages/Balances";
@@ -6,18 +6,21 @@ import Notes from "./pages/Notes";
 import Activites from "./pages/Activites";
 import ChatBot from "./pages/ChatBot";
 import './styles/index.css';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
     return (
         <>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<SignIn/>}/>
+                    <Route path="/sign-in" element={<SignIn/>}/>
                     <Route path="/sign-up" element={<SignUp/>}/>
-                    <Route path="/balances" element={<Balances/>}/>
-                    <Route path="/notes" element={<Notes/>}/>
-                    <Route path="/activities" element={<Activites/>}/>
-                    <Route path="/chat-bot" element={<ChatBot/>}/>
+                    <Route path="/balances" element={<ProtectedRoute><Balances/></ProtectedRoute>}/>
+                    <Route path="/notes" element={<ProtectedRoute><Notes/></ProtectedRoute>}/>
+                    <Route path="/activities" element={<ProtectedRoute><Activites/></ProtectedRoute>}/>
+                    <Route path="/chat-bot" element={<ProtectedRoute><ChatBot/></ProtectedRoute>}/>
+                    <Route path="/" element={<Navigate to={'/balances'} replace/>}/>
+                    <Route path="*" element={<Navigate to={'/sign-in'} replace/>}/>
                 </Routes>
             </BrowserRouter>
         </>

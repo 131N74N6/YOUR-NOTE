@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import { db, emailAuth } from "./firebase-config";
 import { doc, setDoc } from "firebase/firestore";
@@ -25,6 +25,8 @@ export default function useAuth() {
     const signUp = useCallback(async(email: string, username: string, password: string) => {
         setLoading(true);
         try {
+            if (!email.trim() || !username.trim() || !password.trim()) throw new Error('Missing required data');
+
             const userCredential = await createUserWithEmailAndPassword(emailAuth, email, password);
             const user = userCredential.user;
 
@@ -38,9 +40,35 @@ export default function useAuth() {
 
             return { data: user, error: null }
         } catch (error: any) {
-            
+            setError(error.message);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
-    return { signUp }
+    const signIn = useCallback(async(email: string, password: string) => {
+        setLoading(true);
+        try {
+            if (!email.trim() || !password.trim()) throw new Error('Missing required data');
+            
+            const userCredential = await signInWithEmailAndPassword(emailAuth, email, password);
+            return { data: userCredential.user, error: null }
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const quit = useCallback(async() => {
+        try {
+            await signOut(emailAuth);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return { error, loading, quit, signIn, signUp, user }
 }

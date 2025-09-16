@@ -1,35 +1,55 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../services/useAuth";
 
 export default function SignIn() {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const { user, signIn } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) navigate('/balances', { replace: true });
+    }, [user, navigate]);
+
+    async function handleSignIn(event: React.FormEvent) {
+        event.preventDefault();
+        await signIn(email, password);
+    }
+
     return (
         <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
-            <form className="border border-black backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-[320px]">
-                <div className="font-[650] text-[1.5rem] text-center text-black">Hello</div>
+            <form onClick={handleSignIn} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-[320px]">
+                <div className="font-[650] text-[1.5rem] text-center text-white">Hello</div>
                 
                 <div className="flex flex-col gap-[0.5rem]">
-                    <label htmlFor="email" className="text-black font-[600]">Email</label>
+                    <label htmlFor="email" className="text-white font-[600]">Email</label>
                     <input 
                         type="email" 
                         id="email" 
-                        className="p-[0.45rem] text-[0.9rem] text-black outline-0 border border-gray-800 font-[600] rounded" 
+                        value={email}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                        className="p-[0.45rem] text-[0.9rem] text-white outline-0 border border-white font-[600] rounded" 
                         placeholder="your@gmail.com"
                         required
                     />
                 </div>
                 
                 <div className="flex flex-col gap-[0.5rem]">
-                    <label htmlFor="password" className="font-[600] text-black">Password</label>
+                    <label htmlFor="password" className="font-[600] text-white">Password</label>
                     <input 
                         type="password" 
                         id="password" 
-                        className="p-[0.45rem] text-[0.9rem] text-black outline-0 border border-gray-800 font-[600] rounded" 
+                        value={password}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                        className="p-[0.45rem] text-[0.9rem] text-white outline-0 border border-white font-[600] rounded" 
                         placeholder="your_password"
                         required
                     />
                 </div>
                 
                 <div className="text-center text-sm">
-                    <span className="text-black">Don't have an account?</span> <Link className="text-blue-800 hover:underline" to={'/sign-up'}>Sign Up</Link>
+                    <span className="text-white">Don't have an account?</span> <Link className="text-blue-200 hover:underline" to={'/sign-up'}>Sign Up</Link>
                 </div>
                 
                 {/* {showMessage && (
@@ -40,7 +60,7 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
+                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-white hover:text-black transition-colors"
                 >
                     Sign In
                 </button>
