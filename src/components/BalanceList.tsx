@@ -2,10 +2,12 @@ import { memo } from "react";
 import type { BalanceListProps } from "../services/custom-types";
 import BalanceItem from "./BalanceItem";
 
-function BalanceList(props: BalanceListProps) {
+const BalanceList = memo((props: BalanceListProps) => {
     if (props.data.length === 0) {
         return (
-            <div className="text-white font-[500]">No Balance Added</div>
+            <section className="flex flex-col gap-[1rem] p-[1rem] text-[1rem] overflow-y-auto items-center justify-center">
+                <span className="text-white font-[600] text-[1rem]">No balance added currently...</span>
+            </section>
         );
     }
     
@@ -23,6 +25,6 @@ function BalanceList(props: BalanceListProps) {
             ))}
         </div>
     );
-}
+});
 
-export default memo(BalanceList);
+export default BalanceList;

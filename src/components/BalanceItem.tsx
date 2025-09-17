@@ -1,21 +1,21 @@
 import { memo, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
-function BalanceItem(props: BalanceItemProps) {
+const BalanceItem = memo((props: BalanceItemProps) => {
     const [editAmount, setEditAmount] = useState<string>(props.selected_data.amount.toString());
-    const [editType, setEditType] = useState(props.selected_data.balance_type);
-    const [editDescription, setEditDescription] = useState(props.selected_data.description);
+    const [editType, setEditType] = useState<'income' | 'expense'>(props.selected_data.balance_type);
+    const [editDescription, setEditDescription] = useState<string>(props.selected_data.description);
 
-    const handleSave = () => {
+    const handleSave = (event: React.FormEvent) => {
+        event.preventDefault();
         const amount = parseFloat(editAmount);
-        if (isNaN(amount) || amount <= 0) alert('Please enter a valid amount');
-        return;
+        if (isNaN(amount) || amount <= 0) return;
     }
 
     props.onUpdate(props.selected_data.id, {
-        amount: Number(editAmount),
+        amount: Number(editAmount.trim()),
         balance_type: editType,
-        description: editDescription
+        description: editDescription.trim()
     });
 
     const handleCancel = () => {
@@ -43,7 +43,12 @@ function BalanceItem(props: BalanceItemProps) {
                     className="border border-white p-[0.45rem] text-white text-[0.9rem] outline-0"
                 />
                 <div className="flex gap-[0.6rem]">
-                    <label htmlFor="income" className={`radio-label ${editType === 'income' ? 'bg-white text-black' : 'text-white'}`}>Income</label>
+                    <label 
+                        htmlFor="income" 
+                        className={`radio-label ${editType === 'income' ? 'bg-white text-black' : 'text-white'}`}
+                    >
+                        Income
+                    </label>
                     <input 
                         type="radio" 
                         id="income" 
@@ -51,7 +56,12 @@ function BalanceItem(props: BalanceItemProps) {
                         onChange={() => setEditType('income')}
                         checked={editType === 'income'}
                     />
-                    <label htmlFor="expense" className={`radio-label ${editType === 'expense' ? 'bg-white text-black' : 'text-white'}`}>Expense</label>
+                    <label 
+                        htmlFor="expense" 
+                        className={`radio-label ${editType === 'expense' ? 'bg-white text-black' : 'text-white'}`}
+                    >
+                        Expense
+                    </label>
                     <input 
                         type="radio" 
                         id="expense" 
@@ -76,7 +86,7 @@ function BalanceItem(props: BalanceItemProps) {
                     </button>
                 </div>
             </form>
-        )
+        );
     }
 
     return (
@@ -103,6 +113,6 @@ function BalanceItem(props: BalanceItemProps) {
             </div>
         </div>
     );
-}
+});
 
-export default memo(BalanceItem);
+export default BalanceItem;

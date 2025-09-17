@@ -41,7 +41,7 @@ export default function Balances() {
             }
         });
 
-        resetForm();
+        closeForm();
     }, [user, amount, amountType, description, insertData, collectionName]);
 
     const handleSelectItem = useCallback((id: string): void => {
@@ -49,17 +49,11 @@ export default function Balances() {
     }, []);
 
     const deleteAllBalance = useCallback(async (): Promise<void> => {
-        await deleteData({
-            collection_name: collectionName,
-            filters: [['user_id', '==', user?.uid]],
-        });
+        await deleteData({ collection_name: collectionName, filters: [['user_id', '==', user?.uid]] });
     }, [balanceData, user]);
 
     const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
-        await deleteData({
-            collection_name: collectionName,
-            values: id
-        });
+        await deleteData({ collection_name: collectionName, values: id });
     }, []);
 
     const updateSelectedBalance = useCallback(async (id: string, data: { 
@@ -67,11 +61,18 @@ export default function Balances() {
         balance_type: 'income' | 'expense'; 
         description: string;
     }): Promise<void> => {
-        await updateData({ collection_name: collectionName, new_data: data, values: id });
-        setSelectedId(null);
-    }, [user]);
+        try {
+            if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
+            if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');
+            await updateData({ collection_name: collectionName, new_data: data, values: id });
+        } catch (error: any) {
+            console.error(error.message);
+        } finally {
+            setSelectedId(null);
+        }
+    }, []);
 
-    const resetForm = useCallback(() => {
+    const closeForm = useCallback(() => {
         setAmount('');
         setAmountType('income');
         setDescription('');
@@ -83,7 +84,7 @@ export default function Balances() {
     if (error) return <div>Error</div>
 
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
+        <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
@@ -114,7 +115,7 @@ export default function Balances() {
                             description={description}
                             changeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
                             onSave={saveBalances}
-                            onClose={() => setOpenForm(false)}
+                            onClose={closeForm}
                         /> 
                     : null}
                     <BalanceList
@@ -126,6 +127,6 @@ export default function Balances() {
                     />
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

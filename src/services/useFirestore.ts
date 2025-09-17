@@ -1,4 +1,5 @@
-import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, Query, query, setDoc, updateDoc, where, type DocumentData } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, Query, query, setDoc, updateDoc, where } from "firebase/firestore";
+import type { DocumentData, FirestoreError, QuerySnapshot } from "firebase/firestore";
 import type { IDeleteData, IInsertData, IRealTime, IUpdateData } from "./custom-types";
 import { db } from "./firebase-config";
 import { useEffect, useState } from "react";
@@ -39,13 +40,13 @@ export default function useFirestore<BINTANG extends { id: string }>() {
             order_by_options.forEach(([field, direction]) => q = query(q, orderBy(field, direction)));
             
             const unsubscribe = onSnapshot(q, 
-                (snapshot) => {
+                (snapshot: QuerySnapshot<DocumentData, DocumentData>) => {
                     const newData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as BINTANG[];
                     setData(newData);
                     setLoading(false);
                 },
-                (err) => {
-                    setError(err.message);
+                (error: FirestoreError) => {
+                    setError(error.message);
                     setLoading(false);
                 }
             );

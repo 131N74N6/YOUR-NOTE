@@ -25,8 +25,9 @@ export type IUpdateData<T> = {
 
 export type ActivityFormProps = {
     act_name: string;
+    schedule: string;
     changeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    user_id: string;
+    makeSchedule: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onClose: () => void;
     onSave: (event: React.FormEvent) => void;
 }
@@ -43,15 +44,15 @@ export type ActivityItemProps = {
     selected_act: IActivity;
     is_selected: boolean;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, changedActName: string) => void;
+    onUpdate: (id: string, changeAct: { activity_name: string; schedule: string; }) => void;
     onDelete: (id: string) => void;
 }
 
 export type ActivityListProps = {
-    selectedId: string;
+    selectedId: string | null;
     act_data: IActivity[];
     onSelect: (id: string) => void;
-    onUpdate: (id: string, changedActName: string) => void;
+    onUpdate: (id: string, changeAct: { activity_name: string; schedule: string; }) => void;
     onDelete: (id: string) => void;
 }
 
