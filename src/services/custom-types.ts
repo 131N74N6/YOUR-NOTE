@@ -15,7 +15,6 @@ export type IRealTime = {
     collection_name: string; 
     filters: [string, WhereFilterOp, any][]; 
     order_by_options?: [string, OrderByDirection][];
-    items_each_page: number;
 }
 
 export type IUpdateData<T> = {
@@ -24,24 +23,48 @@ export type IUpdateData<T> = {
     new_data: Partial<Omit<T, 'id' | 'created_at'>>;
 }
 
+export type ActivityFormProps = {
+    act_name: string;
+    changeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    user_id: string;
+    onClose: () => void;
+    onSave: (event: React.FormEvent) => void;
+}
+
 export type IActivity = {
     id: string;
     created_at: Date;
     activity_name: string;
-    schedule: Date;
+    schedule: string;
     user_id: string;
+}
+
+export type ActivityItemProps = {
+    selected_act: IActivity;
+    is_selected: boolean;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, changedActName: string) => void;
+    onDelete: (id: string) => void;
+}
+
+export type ActivityListProps = {
+    selectedId: string;
+    act_data: IActivity[];
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, changedActName: string) => void;
+    onDelete: (id: string) => void;
 }
 
 export type BalanceFormProps = {
     onSave: (event: React.FormEvent) => void;
     onClose: () => void;
     amount: number;
-    changeAmount:(event: React.ChangeEvent<HTMLInputElement>) => void;
+    changeAmount: (event: React.ChangeEvent<HTMLInputElement>) => void;
     balance_type: 'income' | 'expense';
-    changeToIncome:() => void;
-    changeToExpense:() => void;
+    changeToIncome: () => void;
+    changeToExpense: () => void;
     description: string;
-    changeDescription:(event: React.ChangeEvent<HTMLInputElement>) => void;
+    changeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export type IBalance = {
@@ -68,7 +91,7 @@ export type BalanceListProps = {
 }
 
 export type BalanceItemProps = {
-    data: IBalance;
+    selected_data: IBalance;
     isSelected: boolean;
     onSelect: (id: string) => void;
     onUpdate: (id: string, 

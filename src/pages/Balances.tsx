@@ -1,5 +1,4 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import Pagination from "../components/Pagination";
 import BalanceList from "../components/BalanceList";
 import { useCallback, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
@@ -19,82 +18,88 @@ export default function Balances() {
     const collectionName = 'balances';
     const { deleteData, insertData, realTimeInit, updateData } = useFirestore<IBalance>();
 
-    const { currentPage, data: balanceData, error, loading, nextPage, prevPage, totalPages } = realTimeInit({
+    const { data: balanceData, error, loading } = realTimeInit({
         collection_name: collectionName,
         filters: user ? [['user_id', '==', user.uid]] : [],
-        order_by_options: [['created_at', 'desc']],
-        items_each_page: 10
+        order_by_options: [['created_at', 'desc']]
     });
 
-    async function saveBalances(event: React.FormEvent): Promise<void> {
+    const saveBalances = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
+        const trimmedAmount = Number(amount.trim());
+        const trimmedDescription = description.trim();
+
         if (!user) return;
+
         await insertData({
             collection_name: collectionName,
             new_data: {
-                amount: Number(amount),
+                amount: trimmedAmount,
                 balance_type: amountType,
-                description: description.trim(),
+                description: trimmedDescription,
                 user_id: user.uid
             }
         });
-        setOpenForm(false);
-    }
+
+        resetForm();
+    }, [user, amount, amountType, description, insertData, collectionName]);
 
     const handleSelectItem = useCallback((id: string): void => {
         setSelectedId(prev => prev === id ? null : id);
     }, []);
 
-    async function deleteAllBalance(): Promise<void> {
+    const deleteAllBalance = useCallback(async (): Promise<void> => {
         await deleteData({
             collection_name: collectionName,
             filters: [['user_id', '==', user?.uid]],
-        })
-    }
+        });
+    }, [balanceData, user]);
 
-    async function deleteSelectedBalance(id: string): Promise<void> {
+    const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
         await deleteData({
             collection_name: collectionName,
             values: id
         });
-    }
+    }, []);
 
-    async function updateSelectedBalance(id: string, data: { 
+    const updateSelectedBalance = useCallback(async (id: string, data: { 
         amount: number; 
         balance_type: 'income' | 'expense'; 
         description: string;
-    }): Promise<void> {
+    }): Promise<void> => {
         await updateData({ collection_name: collectionName, new_data: data, values: id });
-    }
+        setSelectedId(null);
+    }, [user]);
+
+    const resetForm = useCallback(() => {
+        setAmount('');
+        setAmountType('income');
+        setDescription('');
+        setOpenForm(false);
+    }, []);
 
     if (loading) return <Loading/>
 
     if (error) return <div>Error</div>
 
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
+        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
-                <Pagination
-                    currentPage={currentPage}
-                    onNext={nextPage}
-                    onPrev={prevPage}
-                    totalPages={totalPages}
-                />
                 <div className="p-[1rem] h-[90%] flex flex-col gap-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                     <div className="flex gap-[0.7rem]">
                         <button 
                             onClick={() => setOpenForm(true)}
                             type="button" 
-                            className="bg-white cursor-pointer text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                         >
                             Add Balances
                         </button>
                         <button 
                             onClick={deleteAllBalance}
                             type="button" 
-                            className="bg-white cursor-pointer text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                         >
                             Delete All Balances
                         </button>
@@ -106,7 +111,7 @@ export default function Balances() {
                             balance_type={amountType}
                             changeToExpense={() => setAmountType('expense')}
                             changeToIncome={() => setAmountType('income')}
-                            description={description.trim()}
+                            description={description}
                             changeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
                             onSave={saveBalances}
                             onClose={() => setOpenForm(false)}
