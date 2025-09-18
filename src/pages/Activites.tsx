@@ -5,6 +5,7 @@ import type { IActivity } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
+import Loading from "../components/Loading";
 
 export default function Activites() {
     const collectionName = 'activities';
@@ -15,7 +16,7 @@ export default function Activites() {
     const { user } = useAuth();
 
     const { deleteData, insertData, realTimeInit, updateData } = useFirestore<IActivity>();
-    const { data: actData } = realTimeInit({
+    const { data: actData, loading } = realTimeInit({
         collection_name: collectionName,
         filters: user ? [['user_id', '==', user.uid]] : [],
         order_by_options: [['created_at', 'desc']]
@@ -71,6 +72,8 @@ export default function Activites() {
         setSchedule('');
         setOpenForm(false);
     }, []);
+
+    if (loading) return <Loading/>
 
     return (
         <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">

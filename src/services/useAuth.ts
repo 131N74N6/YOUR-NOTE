@@ -50,7 +50,6 @@ export default function useAuth() {
         setLoading(true);
         try {
             if (!email.trim() || !password.trim()) throw new Error('Missing required data');
-            
             const userCredential = await signInWithEmailAndPassword(emailAuth, email, password);
             return { data: userCredential.user, error: null }
         } catch (error: any) {

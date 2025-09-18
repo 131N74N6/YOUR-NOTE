@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
 const BalanceItem = memo((props: BalanceItemProps) => {
@@ -6,24 +6,23 @@ const BalanceItem = memo((props: BalanceItemProps) => {
     const [editType, setEditType] = useState<'income' | 'expense'>(props.selected_data.balance_type);
     const [editDescription, setEditDescription] = useState<string>(props.selected_data.description);
 
-    const handleSave = (event: React.FormEvent) => {
-        event.preventDefault();
-        const amount = parseFloat(editAmount);
-        if (isNaN(amount) || amount <= 0) return;
-    }
-
-    props.onUpdate(props.selected_data.id, {
-        amount: Number(editAmount.trim()),
-        balance_type: editType,
-        description: editDescription.trim()
-    });
-
-    const handleCancel = () => {
+    useEffect(() => {
         setEditAmount(props.selected_data.amount.toString());
         setEditType(props.selected_data.balance_type);
         setEditDescription(props.selected_data.description);
-        props.onSelect(props.selected_data.id);
+    }, [props.selected_data, props.isSelected]);
+
+    const handleSave = async (event: React.FormEvent): Promise<void> => {
+        event.preventDefault();
+
+        props.onUpdate(props.selected_data.id, {
+            amount: Number(editAmount.trim()),
+            balance_type: editType,
+            description: editDescription.trim()
+        });
     }
+
+    const handleCancel = () => props.onSelect(props.selected_data.id);
 
     if (props.isSelected) {
         return (

@@ -1,6 +1,6 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import BalanceList from "../components/BalanceList";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
 import useFirestore from "../services/useFirestore";
@@ -67,9 +67,7 @@ export default function Balances() {
             await updateData({ collection_name: collectionName, new_data: data, values: id });
         } catch (error: any) {
             console.error(error.message);
-        } finally {
-            setSelectedId(null);
-        }
+        } 
     }, []);
 
     const closeForm = useCallback(() => {
@@ -77,6 +75,10 @@ export default function Balances() {
         setAmountType('income');
         setDescription('');
         setOpenForm(false);
+    }, []);
+
+    useEffect(() => {
+        return () => setSelectedId(null);
     }, []);
 
     if (loading) return <Loading/>

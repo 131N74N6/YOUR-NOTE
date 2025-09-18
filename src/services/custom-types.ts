@@ -113,6 +113,16 @@ export type INote = {
     user_id: string;
 }
 
+export type NoteItemProps = {
+    note: INote;
+    onDelete: (id: string) => void;
+}
+
+export type NoteListProps = {
+    notes: INote[];
+    onDelete: (id: string) => void;
+}
+
 export type PaginationProps = {
     currentPage: number;
     totalPages: number;
