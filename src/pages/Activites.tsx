@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useFirestore from "../services/useFirestore";
 import type { IActivity } from "../services/custom-types";
@@ -22,7 +22,7 @@ export default function Activites() {
         order_by_options: [['created_at', 'desc']]
     })
 
-    const saveActName = useCallback(async (event: React.FormEvent) => {
+    const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedActName = actName.trim();
 
@@ -44,14 +44,14 @@ export default function Activites() {
         setSelectedId(prev => prev === id ? null : id);
     }, []);
 
-    const deleteSelcetedAct = useCallback(async (id: string) => {
+    const deleteSelcetedAct = useCallback(async (id: string): Promise<void> => {
         await deleteData({
             collection_name: collectionName,
             values: id
         });
     }, []);
 
-    const deleteAllAct = useCallback(async () => {
+    const deleteAllAct = useCallback(async (): Promise<void> => {
         await deleteData({
             collection_name: collectionName,
             filters: [['user_id', '==', user?.uid]]
@@ -61,19 +61,34 @@ export default function Activites() {
     const updateSelectedAct = useCallback(async (id: string, changeAct: {
         activity_name: string;
         schedule: string;
-    }) => {
-        await updateData({
-            collection_name: collectionName,
-            new_data: changeAct,
-            values: id
-        });
+    }): Promise<void> => {
+        try {
+            if (!changeAct.activity_name.trim()) throw new Error('Missing required data');
+            
+            await updateData({
+                collection_name: collectionName,
+                new_data: changeAct,
+                values: id
+            });
+        } catch (error: any) {
+            console.error(error.message);
+        } finally {
+            setSelectedId(null);
+        }
     }, []);
 
-    const closeForm = useCallback(() => {
+    const closeForm = useCallback((): void => {
         setActName('');
         setSchedule('');
         setOpenForm(false);
     }, []);
+    
+    useEffect((): void => {
+        if (!user) {
+            closeForm();
+            setSelectedId(null);
+        }
+    }, [user, closeForm]);
 
     if (loading) return <Loading/>
 
@@ -81,6 +96,16 @@ export default function Activites() {
         <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
+            {openForm ? 
+                <ActivityForm
+                    act_name={actName}
+                    changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
+                    schedule={schedule}
+                    makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
+                    onClose={closeForm}
+                    onSave={saveActName}
+                />
+            : null}
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
                 <div className="p-[1rem] flex flex-col gap-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                     <div className="flex gap-[0.7rem]">
@@ -99,16 +124,6 @@ export default function Activites() {
                             Delete All Activities
                         </button>
                     </div>
-                    {openForm ? 
-                        <ActivityForm
-                            act_name={actName}
-                            changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
-                            schedule={schedule}
-                            makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
-                            onClose={closeForm}
-                            onSave={saveActName}
-                        />
-                    : null}
                     <ActivityList
                         act_data={actData}
                         onDelete={deleteSelcetedAct}

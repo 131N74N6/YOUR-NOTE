@@ -3,7 +3,7 @@ import type { ActivityFormProps } from "../services/custom-types";
 
 const ActivityForm = memo((props: ActivityFormProps) => {
     return (
-        <form onSubmit={props.onSave} className="flex justify-center items-center fixed inset-0 z-20 border border-white">
+        <form onSubmit={props.onSave} className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)]">
             <div className="bg-[#1a1a1a] flex flex-col gap-[1rem] p-[1rem] w-[300px] h-[300px] border border-white">
                 <input 
                     type="text" 

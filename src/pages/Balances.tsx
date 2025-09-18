@@ -1,6 +1,6 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import BalanceList from "../components/BalanceList";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
 import useFirestore from "../services/useFirestore";
@@ -66,17 +66,27 @@ export default function Balances() {
             if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
             if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');
             await updateData({ collection_name: collectionName, new_data: data, values: id });
+            
         } catch (error: any) {
             console.error(error.message);
-        } 
+        } finally {
+            setSelectedId(null);
+        }
     }, []);
 
-    const closeForm = useCallback(() => {
+    const closeForm = useCallback((): void => {
         setAmount('');
         setAmountType('income');
         setDescription('');
         setOpenForm(false);
     }, []);
+
+    useEffect((): void => {
+        if (!user) {
+            closeForm();
+            setSelectedId(null);
+        }
+    }, [user, closeForm]);
 
     if (loading) return <Loading/>
 
@@ -86,6 +96,19 @@ export default function Balances() {
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
+            {openForm ? 
+                <BalanceForm 
+                    amount={Number(amount)}
+                    changeAmount={(event: React.ChangeEvent<HTMLInputElement>) => setAmount(event.target.value)}
+                    balance_type={amountType}
+                    changeToExpense={() => setAmountType('expense')}
+                    changeToIncome={() => setAmountType('income')}
+                    description={description}
+                    changeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
+                    onSave={saveBalances}
+                    onClose={closeForm}
+                /> 
+            : null}
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
                 <div className="p-[1rem] h-[90%] flex flex-col gap-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                     <div className="flex gap-[0.7rem]">
@@ -104,19 +127,6 @@ export default function Balances() {
                             Delete All Balances
                         </button>
                     </div>
-                    {openForm ? 
-                        <BalanceForm 
-                            amount={Number(amount)}
-                            changeAmount={(event: React.ChangeEvent<HTMLInputElement>) => setAmount(event.target.value)}
-                            balance_type={amountType}
-                            changeToExpense={() => setAmountType('expense')}
-                            changeToIncome={() => setAmountType('income')}
-                            description={description}
-                            changeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
-                            onSave={saveBalances}
-                            onClose={closeForm}
-                        /> 
-                    : null}
                     <BalanceList
                         data={balanceData}
                         onDelete={deleteSelectedBalance}

@@ -4,6 +4,11 @@ export type ErrorPage = {
     message: string;
 }
 
+export type IGetSelectedData = {
+    collection_name: string;
+    values: string;
+}
+
 export type IInsertData<T> = {
     collection_name: string;
     new_data: Omit<T, 'id' | 'created_at'>;

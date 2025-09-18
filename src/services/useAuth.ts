@@ -8,7 +8,7 @@ export default function useAuth() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
+    useEffect((): () => void => {
         setLoading(true);
         const unSubscribe = onAuthStateChanged(emailAuth, (user) => {
             setUser(user);
@@ -22,7 +22,7 @@ export default function useAuth() {
         return () => unSubscribe();
     }, []);
 
-    const signUp = useCallback(async(email: string, username: string, password: string) => {
+    const signUp = useCallback(async (email: string, username: string, password: string) => {
         setLoading(true);
         try {
             if (!email.trim() || !username.trim() || !password.trim()) throw new Error('Missing required data');
@@ -46,7 +46,7 @@ export default function useAuth() {
         }
     }, []);
 
-    const signIn = useCallback(async(email: string, password: string) => {
+    const signIn = useCallback(async (email: string, password: string) => {
         setLoading(true);
         try {
             if (!email.trim() || !password.trim()) throw new Error('Missing required data');
@@ -59,7 +59,7 @@ export default function useAuth() {
         }
     }, []);
 
-    const quit = useCallback(async() => {
+    const quit = useCallback(async () => {
         try {
             await signOut(emailAuth);
         } catch (error: any) {
