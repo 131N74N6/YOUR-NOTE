@@ -25,7 +25,9 @@ export default function Activites() {
     const saveActName = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
         const trimmedActName = actName.trim();
+
         if (!user) return;
+        if (!trimmedActName || !schedule) throw new Error('Missing required data');
 
         await insertData({
             collection_name: collectionName,

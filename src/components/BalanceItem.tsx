@@ -2,20 +2,26 @@ import { memo, useEffect, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
 const BalanceItem = memo((props: BalanceItemProps) => {
-    const [editAmount, setEditAmount] = useState<string>(props.selected_data.amount.toString());
-    const [editType, setEditType] = useState<'income' | 'expense'>(props.selected_data.balance_type);
-    const [editDescription, setEditDescription] = useState<string>(props.selected_data.description);
+    const [editAmount, setEditAmount] = useState<string>('');
+    const [editType, setEditType] = useState<'income' | 'expense'>('income');
+    const [editDescription, setEditDescription] = useState<string>('');
 
     useEffect(() => {
-        setEditAmount(props.selected_data.amount.toString());
-        setEditType(props.selected_data.balance_type);
-        setEditDescription(props.selected_data.description);
+        if (props.isSelected) {            
+            setEditAmount(props.selected_data.amount.toString());
+            setEditType(props.selected_data.balance_type);
+            setEditDescription(props.selected_data.description);
+        } else {
+            setEditAmount('');
+            setEditType('income');
+            setEditDescription('');
+        }
     }, [props.selected_data, props.isSelected]);
 
     const handleSave = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
 
-        props.onUpdate(props.selected_data.id, {
+        await props.onUpdate(props.selected_data.id, {
             amount: Number(editAmount.trim()),
             balance_type: editType,
             description: editDescription.trim()
@@ -86,32 +92,32 @@ const BalanceItem = memo((props: BalanceItemProps) => {
                 </div>
             </form>
         );
+    } else {
+        return (
+            <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
+                <div className="flex flex-col gap-[0.3rem]">                                
+                    <p className="text-white font-[500] text-[0.9rem]">Amount: {props.selected_data.amount}</p>
+                    <p className="text-white font-[500] text-[0.9rem]">Description: {props.selected_data.description}</p>
+                    <p className="text-white font-[500] text-[0.9rem]">Type: {props.selected_data.balance_type}</p>
+                    <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_data.created_at).toLocaleString()}</p>
+                </div>
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
+                        onClick={() => props.onSelect(props.selected_data.id)}
+                    >
+                        Select
+                    </button>
+                    <button 
+                        className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
+                        onClick={() => props.onDelete(props.selected_data.id)}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        );
     }
-
-    return (
-        <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
-            <div className="flex flex-col gap-[0.3rem]">                                
-                <p className="text-white font-[500] text-[0.9rem]">Amount: {props.selected_data.amount}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Description: {props.selected_data.description}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Type: {props.selected_data.balance_type}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_data.created_at).toLocaleString()}</p>
-            </div>
-            <div className="flex gap-[0.7rem]">
-                <button 
-                    className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onSelect(props.selected_data.id)}
-                >
-                    Select
-                </button>
-                <button 
-                    className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onDelete(props.selected_data.id)}
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    );
 });
 
 export default BalanceItem;

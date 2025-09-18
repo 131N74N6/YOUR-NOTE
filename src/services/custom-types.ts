@@ -47,17 +47,23 @@ export type IActivity = {
 export type ActivityItemProps = {
     selected_act: IActivity;
     is_selected: boolean;
-    onSelect: (id: string) => void;
-    onUpdate: (id: string, changeAct: { activity_name: string; schedule: string; }) => void;
     onDelete: (id: string) => void;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, changeAct: { 
+        activity_name: string; 
+        schedule: string; 
+    }) => Promise<void>;
 }
 
 export type ActivityListProps = {
     selectedId: string | null;
     act_data: IActivity[];
-    onSelect: (id: string) => void;
-    onUpdate: (id: string, changeAct: { activity_name: string; schedule: string; }) => void;
     onDelete: (id: string) => void;
+    onSelect: (id: string) => void;
+    onUpdate: (id: string, changeAct: { 
+        activity_name: string; 
+        schedule: string; 
+    }) => Promise<void>;
 }
 
 export type BalanceFormProps = {
@@ -91,7 +97,7 @@ export type BalanceListProps = {
             balance_type: 'income' | 'expense'; 
             description: string 
         }
-    ) => void;
+    ) => Promise<void>;
     onDelete: (id: string) => void;
 }
 
@@ -105,7 +111,7 @@ export type BalanceItemProps = {
             balance_type: 'income' | 'expense'; 
             description: string 
         }
-    ) => void;
+    ) => Promise<void>;
     onDelete: (id: string) => void;
 }
 

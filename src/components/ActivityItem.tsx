@@ -2,24 +2,29 @@ import { memo, useEffect, useState } from "react";
 import type { ActivityItemProps } from "../services/custom-types";
 
 const ActivityItem = memo((props: ActivityItemProps) => {
-    const [editActName, setEditActName] = useState<string>(props.selected_act.activity_name);
-    const [editSchedule, setEditSchedule] = useState<string>(props.selected_act.schedule);
+    const [editActName, setEditActName] = useState<string>('');
+    const [editSchedule, setEditSchedule] = useState<string>('');
 
     useEffect(() => {
-        setEditActName(props.selected_act.activity_name);
-        setEditSchedule(props.selected_act.schedule);
+        if (props.is_selected) {            
+            setEditActName(props.selected_act.activity_name);
+            setEditSchedule(props.selected_act.schedule);
+        } else {
+            setEditActName('');
+            setEditSchedule('');
+        }
     }, [props.is_selected, props.selected_act]);
 
     const handleSave = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         
-        props.onUpdate(props.selected_act.id, {
+        await props.onUpdate(props.selected_act.id, {
             activity_name: editActName.trim(),
             schedule: editSchedule,
         });
     }
 
-    const handleCancel = (): void => props.onSelect(props.selected_act.id)
+    const handleCancel = (): void => props.onSelect(props.selected_act.id);
 
     if (props.is_selected) {
         return (
@@ -44,31 +49,31 @@ const ActivityItem = memo((props: ActivityItemProps) => {
                 </div>
             </form>
         );
+    } else {
+        return (
+            <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
+                <div className="flex flex-col gap-[0.3rem]">                                
+                    <p className="text-white font-[500] text-[0.9rem]">Act: {props.selected_act.activity_name}</p>
+                    <p className="text-white font-[500] text-[0.9rem]">Schedule: {new Date(props.selected_act.schedule).toLocaleString()}</p>
+                    <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_act.created_at).toLocaleString()}</p>
+                </div>
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
+                        onClick={() => props.onSelect(props.selected_act.id)}
+                    >
+                        Select
+                    </button>
+                    <button 
+                        className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
+                        onClick={() => props.onDelete(props.selected_act.id)}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        );
     }
-
-    return (
-        <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
-            <div className="flex flex-col gap-[0.3rem]">                                
-                <p className="text-white font-[500] text-[0.9rem]">Act: {props.selected_act.activity_name}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Schedule: {new Date(props.selected_act.schedule).toLocaleString()}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_act.created_at).toLocaleString()}</p>
-            </div>
-            <div className="flex gap-[0.7rem]">
-                <button 
-                    className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onSelect(props.selected_act.id)}
-                >
-                    Select
-                </button>
-                <button 
-                    className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onDelete(props.selected_act.id)}
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    );
 });
 
 export default ActivityItem;
