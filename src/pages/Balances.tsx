@@ -6,6 +6,7 @@ import useAuth from "../services/useAuth";
 import useFirestore from "../services/useFirestore";
 import type { IBalance } from "../services/custom-types";
 import Loading from "../components/Loading";
+import ErrorMessage from "./Error";
 
 export default function Balances() {
     const [amount, setAmount] = useState<string>('');
@@ -83,7 +84,7 @@ export default function Balances() {
 
     if (loading) return <Loading/>
 
-    if (error) return <div>Error</div>
+    if (error) return <ErrorMessage message="400 | Failed to get data"/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">

@@ -76,7 +76,7 @@ export default function Activites() {
     if (loading) return <Loading/>
 
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
+        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">

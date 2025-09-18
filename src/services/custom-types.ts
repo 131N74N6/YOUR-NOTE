@@ -1,5 +1,9 @@
 import type { OrderByDirection, WhereFilterOp } from "firebase/firestore";
 
+export type ErrorPage = {
+    message: string;
+}
+
 export type IInsertData<T> = {
     collection_name: string;
     new_data: Omit<T, 'id' | 'created_at'>;
