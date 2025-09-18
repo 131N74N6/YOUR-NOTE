@@ -109,32 +109,30 @@ export default function Balances() {
                     onClose={closeForm}
                 /> 
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
-                <div className="p-[1rem] h-[90%] flex flex-col gap-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
-                    <div className="flex gap-[0.7rem]">
-                        <button 
-                            onClick={() => setOpenForm(true)}
-                            type="button" 
-                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                        >
-                            Add Balances
-                        </button>
-                        <button 
-                            onClick={deleteAllBalance}
-                            type="button" 
-                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                        >
-                            Delete All Balances
-                        </button>
-                    </div>
-                    <BalanceList
-                        data={balanceData}
-                        onDelete={deleteSelectedBalance}
-                        onSelect={handleSelectItem}
-                        onUpdate={updateSelectedBalance}
-                        selectedId={selectedId}
-                    />
+            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        onClick={() => setOpenForm(true)}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Add Balances
+                    </button>
+                    <button 
+                        onClick={deleteAllBalance}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Delete All Balances
+                    </button>
                 </div>
+                <BalanceList
+                    data={balanceData}
+                    onDelete={deleteSelectedBalance}
+                    onSelect={handleSelectItem}
+                    onUpdate={updateSelectedBalance}
+                    selectedId={selectedId}
+                />
             </div>
         </main>
     );

@@ -93,7 +93,7 @@ export default function Activites() {
     if (loading) return <Loading/>
 
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
+        <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
             {openForm ? 
@@ -106,33 +106,31 @@ export default function Activites() {
                     onSave={saveActName}
                 />
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full">
-                <div className="p-[1rem] flex flex-col gap-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
-                    <div className="flex gap-[0.7rem]">
-                        <button 
-                            onClick={() => setOpenForm(true)}
-                            type="button" 
-                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                        >
-                            Add Activity
-                        </button>
-                        <button 
-                            onClick={deleteAllAct}
-                            type="button" 
-                            className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                        >
-                            Delete All Activities
-                        </button>
-                    </div>
-                    <ActivityList
-                        act_data={actData}
-                        onDelete={deleteSelcetedAct}
-                        onSelect={handleSelectAct}
-                        onUpdate={updateSelectedAct}
-                        selectedId={selectedId}
-                    />
+            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        onClick={() => setOpenForm(true)}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Add Activity
+                    </button>
+                    <button 
+                        onClick={deleteAllAct}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Delete All Activities
+                    </button>
                 </div>
+                <ActivityList
+                    act_data={actData}
+                    onDelete={deleteSelcetedAct}
+                    onSelect={handleSelectAct}
+                    onUpdate={updateSelectedAct}
+                    selectedId={selectedId}
+                />
             </div>
-        </div>
+        </main>
     );
 }

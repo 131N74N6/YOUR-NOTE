@@ -11,5 +11,5 @@ export default function ProtectedRoute(props: IProtectedRoute) {
     const { loading, user } = useAuth();
     if (loading) return <Loading/>
 
-    return user ? <>{props.children}</> : <Navigate to={'/signin'}/>
+    return user ? <>{props.children}</> : <Navigate to={'/sign-in'}/>
 }

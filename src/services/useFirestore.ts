@@ -40,12 +40,12 @@ export default function useFirestore<BINTANG extends { id: string }>() {
             order_by_options.forEach(([field, direction]) => q = query(q, orderBy(field, direction)));
             
             const unsubscribe = onSnapshot(q, 
-                (snapshot: QuerySnapshot<DocumentData, DocumentData>) => {
+                (snapshot: QuerySnapshot<DocumentData, DocumentData>): void => {
                     const newData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as BINTANG[];
                     setData(newData);
                     setLoading(false);
                 },
-                (error: FirestoreError) => {
+                (error: FirestoreError): void => {
                     setError(error.message);
                     setLoading(false);
                 }

@@ -1,4 +1,5 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import type { User } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import { db, emailAuth } from "./firebase-config";
 import { doc, setDoc } from "firebase/firestore";
