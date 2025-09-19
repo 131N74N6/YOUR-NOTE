@@ -5,7 +5,7 @@ import NoteItem from "./NoteItem";
 const NoteList = memo((props: NoteListProps) => {
     if (props.notes.length === 0) {
         return (
-            <section className="flex flex-col gap-[1rem] p-[1rem] text-[1rem] overflow-y-auto items-center justify-center">
+            <section className="flex h-full items-center justify-center">
                 <span className="text-white font-[600] text-[1rem]">No notes added currently...</span>
             </section>
         );

@@ -5,7 +5,7 @@ import BalanceItem from "./BalanceItem";
 const BalanceList = memo((props: BalanceListProps) => {
     if (props.data.length === 0) {
         return (
-            <section className="flex gap-[1rem] p-[1rem] text-[1rem] overflow-y-auto items-center justify-center">
+            <section className="flex h-full items-center justify-center">
                 <span className="text-white font-[600] text-[1rem]">No balance added currently...</span>
             </section>
         );

@@ -1,6 +1,22 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import AnswerField from "../components/AnswerField";
+
+// Define types for API response
+interface OpenRouterMessage {
+    role: string;
+    content: string;
+    refusal?: string;
+    reasoning?: string;
+}
+
+interface OpenRouterChoice {
+    message: OpenRouterMessage;
+}
+
+interface OpenRouterResponse {
+    choices: OpenRouterChoice[];
+}
 
 export default function ChatBot() {
     const [question, setQuestion] = useState<string>('');
@@ -12,46 +28,71 @@ export default function ChatBot() {
         event.preventDefault();
         const trimmedQuestion = question.trim();
 
+        if (!trimmedQuestion) {
+            setError('Question cannot be empty');
+            return;
+        }
+
         try {            
             setLoading(true);
-
-            if (!trimmedQuestion) throw new Error('Question cannot be empty');
+            setError('');
+            setAnswer('');
 
             const request = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`,
-                    "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
-                    "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
+                    "HTTP-Referer": "<YOUR_SITE_URL>",
+                    "X-Title": "<YOUR_SITE_NAME>",
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     "model": "deepseek/deepseek-chat-v3.1:free",
-                    "messages": [{ "role": "user", "content": `${question}` }]
+                    "messages": [{ "role": "user", "content": trimmedQuestion }]
                 })
             });
 
-            if (!request.ok) throw new Error('Failed to get answer');
+            if (!request.ok) {
+                const errorData = await request.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP error! status: ${request.status}`);
+            }
 
-            if (request.status === 500) throw new Error('Something went wrong!');
-
-            const response = await request.json();
-            setAnswer(response.choices[0].message);
-            setError('');
+            const response: OpenRouterResponse = await request.json();
+            
+            // Extract content from the response
+            if (response.choices && response.choices.length > 0) {
+                const messageContent = response.choices[0].message.content;
+                if (typeof messageContent === 'string') {
+                    setAnswer(messageContent);
+                } else {
+                    throw new Error('Invalid response format from API');
+                }
+            } else {
+                throw new Error('No response from AI');
+            }
         } catch (error: any) {
-            setError(error.message);
+            console.error('API Error:', error);
+            setError(error.message || 'Something went wrong. Please try again.');
         } finally {
             setLoading(false);
-            setQuestion('');
         }
     }, [question]);
 
     const clearResult = useCallback((): void => {
-        setQuestion('');
         setAnswer('');
         setError('');
+        setQuestion('');
     }, []);
-    
+
+    // Cleanup on component unmount
+    useEffect(() => {
+        return () => {
+            setAnswer('');
+            setError('');
+            setQuestion('');
+        };
+    }, []);
+
     return (
         <main className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
             <Navbar1/>
@@ -62,15 +103,17 @@ export default function ChatBot() {
                     value={question}
                     title="user-question"
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setQuestion(event.target.value)}
-                    className="resize-0 border h-1/4 outline-0 border-white p-[0.7rem] text-white font-[500] rounded-[0.5rem]"
+                    className="resize-0 border h-1/4 outline-0 border-white p-[0.7rem] text-white font-[500] rounded-[0.5rem] bg-transparent placeholder-gray-300"
+                    placeholder="Type your question here..."
+                    disabled={loading}
                 ></textarea>
                 <div className="flex flex-col">
                     <button 
-                        disabled={loading} 
+                        disabled={loading || !question.trim()} 
                         type="submit" 
-                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                     >
-                        Send
+                        {loading ? 'Sending...' : 'Send'}
                     </button>
                 </div>
             </form>
