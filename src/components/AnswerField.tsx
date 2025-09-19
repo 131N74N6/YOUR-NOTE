@@ -27,13 +27,10 @@ const AnswerField = memo((props: BotAnswer) => {
         }
     }, [props.answer, copyTimeout]);
 
-    // Cleanup timeout on unmount
     useEffect(() => {
         return () => {
-            if (copyTimeout) {
-                clearTimeout(copyTimeout);
-            }
-        };
+            if (copyTimeout) clearTimeout(copyTimeout);
+        }
     }, [copyTimeout]);
 
     return (

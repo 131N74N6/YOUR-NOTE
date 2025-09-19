@@ -2,7 +2,6 @@ import { useCallback, useState, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import AnswerField from "../components/AnswerField";
 
-// Define types for API response
 interface OpenRouterMessage {
     role: string;
     content: string;

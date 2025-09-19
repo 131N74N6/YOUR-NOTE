@@ -1,6 +1,9 @@
-import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, Query, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { 
+    average, collection, deleteDoc, doc, getAggregateFromServer, getCountFromServer, getDocs, 
+    onSnapshot, orderBy, Query, query, setDoc, sum, updateDoc, where 
+} from "firebase/firestore";
 import type { DocumentData, FirestoreError, QuerySnapshot } from "firebase/firestore";
-import type { IDeleteData, IInsertData, IRealTime, IUpdateData } from "./custom-types";
+import type { IDeleteData, IInsertData, IRealTime, IUpdateData, SummarizeData } from "./custom-types";
 import { db } from "./firebase-config";
 import { useEffect, useState } from "react";
 
@@ -24,6 +27,27 @@ export default function useFirestore<BINTANG extends { id: string }>() {
         
             await Promise.all(deletePromises);
         }
+    }
+
+    async function summarize(props: SummarizeData) {
+        const collRef = collection(db, props.collection_name);
+        const q = query(collRef, where(props.field1, props.sign, props.values));
+        const total = await getAggregateFromServer(q, { total: sum(props.field2) });
+        return total.data().total;
+    }
+
+    async function getAverages(props: SummarizeData) {
+        const collRef = collection(db, props.collection_name);
+        const q = query(collRef, where(props.field1, props.sign, props.values));
+        const avg = await getAggregateFromServer(q, { total: average(props.field2) });
+        return avg.data().total;
+    }
+
+    async function countData(props: SummarizeData) {
+        const collRef = collection(db, props.collection_name);
+        const q = query(collRef, where(props.field1, props.sign, props.values));
+        const totalData = await getCountFromServer(q);
+        return totalData.data().count;
     }
 
     function realTimeInit(props: IRealTime) {
@@ -62,5 +86,5 @@ export default function useFirestore<BINTANG extends { id: string }>() {
         await updateDoc(docRef, { ...props.new_data } as DocumentData);
     }
 
-    return { insertData, deleteData, realTimeInit, updateData }
+    return { countData, deleteData, insertData, getAverages, realTimeInit, summarize, updateData }
 }

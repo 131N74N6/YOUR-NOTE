@@ -144,3 +144,11 @@ export type PaginationProps = {
     onNext: () => void;
     onPrev: () => void;
 }
+
+export type SummarizeData = {
+    collection_name: string;
+    field1: string;
+    field2: string;
+    sign: WhereFilterOp;
+    values: string;
+}
