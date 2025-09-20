@@ -27,6 +27,9 @@ export default function useAuth() {
         setLoading(true);
         try {
             if (!email.trim() || !username.trim() || !password.trim()) throw new Error('Missing required data');
+            if (!email.trim()) throw new Error('email is required!');
+            if (!username.trim()) throw new Error('username is required!');
+            if (password.trim().length < 6) throw new Error('password is too weak');
 
             const userCredential = await createUserWithEmailAndPassword(emailAuth, email, password);
             const user = userCredential.user;
@@ -51,6 +54,9 @@ export default function useAuth() {
         setLoading(true);
         try {
             if (!email.trim() || !password.trim()) throw new Error('Missing required data');
+            if (!email.trim()) throw new Error('email is required!');
+            if (password.trim().length < 6) throw new Error('password is too weak');
+            
             const userCredential = await signInWithEmailAndPassword(emailAuth, email, password);
             return { data: userCredential.user, error: null }
         } catch (error: any) {

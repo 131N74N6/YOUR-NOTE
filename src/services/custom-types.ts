@@ -152,3 +152,10 @@ export type SummarizeData = {
     sign: WhereFilterOp;
     values: string;
 }
+
+export type ITotalData = {
+    collection_name: string;
+    field1: string;
+    sign: WhereFilterOp;
+    values: string;
+}

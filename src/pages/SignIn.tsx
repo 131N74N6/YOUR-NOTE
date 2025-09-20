@@ -5,15 +5,24 @@ import useAuth from "../services/useAuth";
 export default function SignIn() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const { user, signIn } = useAuth();
+    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const { user, signIn, error } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
+    useEffect(() => {
+        if (showMessage) {
+            const timeout = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [showMessage]);
+
     async function handleSignIn(event: React.FormEvent) {
         event.preventDefault();
+        if (error) setShowMessage(true);
         await signIn(email, password);
     }
 
@@ -52,11 +61,11 @@ export default function SignIn() {
                     <span className="text-white">Don't have an account?</span> <Link className="text-blue-200 hover:underline" to={'/sign-up'}>Sign Up</Link>
                 </div>
                 
-                {/* {showMessage && (
+                {showMessage && (
                     <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {message}
+                        {error}
                     </div>
-                )} */}
+                )}
                 
                 <button 
                     type="submit" 

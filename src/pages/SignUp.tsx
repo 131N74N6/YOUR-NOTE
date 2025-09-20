@@ -6,15 +6,24 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
+    const [showMessage, setShowMessage] = useState<boolean>(false);
     const navigate = useNavigate();
-    const { signUp, user } = useAuth();
+    const { signUp, user, error } = useAuth();
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
+    useEffect(() => {
+        if (showMessage) {
+            const timeout = setTimeout(() => setShowMessage(false), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [showMessage]);
+
     async function handleSignUp(event: React.FormEvent) {
         event.preventDefault();
+        if (error) setShowMessage(true);
         await signUp(email, username, password);
     }
 
@@ -56,11 +65,11 @@ export default function SignUp() {
                     />
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-200 hover:underline" to={'/sign-in'}>Sign In</Link></div>
-                {/* {showMessage ? 
+                {showMessage ? 
                     <div className="text-red-400 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {message}
+                        {error}
                     </div>
-                : null} */}
+                : null}
                 <button 
                     type="submit" 
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-white hover:text-black transition-colors"

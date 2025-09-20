@@ -2,18 +2,18 @@ import { useCallback, useState, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import AnswerField from "../components/AnswerField";
 
-interface OpenRouterMessage {
+type OpenRouterMessage = {
     role: string;
     content: string;
     refusal?: string;
     reasoning?: string;
 }
 
-interface OpenRouterChoice {
+type OpenRouterChoice = {
     message: OpenRouterMessage;
 }
 
-interface OpenRouterResponse {
+type OpenRouterResponse = {
     choices: OpenRouterChoice[];
 }
 

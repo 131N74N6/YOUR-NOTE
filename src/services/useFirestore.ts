@@ -3,7 +3,7 @@ import {
     onSnapshot, orderBy, Query, query, setDoc, sum, updateDoc, where 
 } from "firebase/firestore";
 import type { DocumentData, FirestoreError, QuerySnapshot } from "firebase/firestore";
-import type { IDeleteData, IInsertData, IRealTime, IUpdateData, SummarizeData } from "./custom-types";
+import type { IDeleteData, IInsertData, IRealTime, ITotalData, IUpdateData, SummarizeData } from "./custom-types";
 import { db } from "./firebase-config";
 import { useEffect, useState } from "react";
 
@@ -43,7 +43,7 @@ export default function useFirestore<BINTANG extends { id: string }>() {
         return avg.data().total;
     }
 
-    async function countData(props: SummarizeData) {
+    async function countData(props: ITotalData) {
         const collRef = collection(db, props.collection_name);
         const q = query(collRef, where(props.field1, props.sign, props.values));
         const totalData = await getCountFromServer(q);
