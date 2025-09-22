@@ -1,5 +1,6 @@
 import { db } from "./database/mongodb";
 import express from "express";
+import cors from 'cors';
 import balanceRoutes from "./routes/balance.router";
 import noteRoutes from "./routes/note.route";
 import activityRoutes from "./routes/activity.router";
@@ -8,6 +9,7 @@ import userRoutes from "./routes/user.router";
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use('/activities', activityRoutes);
 app.use('/balances', balanceRoutes);
 app.use('/notes', noteRoutes);

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useCallback, useState } from "react";
 import useAuth from "../services/useAuth";
-import useFirestore from "../services/useFirestore";
+import useFirestore from "../services/useApiCalls";
 import type { INote } from "../services/custom-types";
 
 export default function NoteForm() {

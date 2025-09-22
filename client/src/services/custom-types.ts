@@ -1,12 +1,15 @@
-import type { OrderByDirection, WhereFilterOp } from "firebase/firestore";
+export type IDeleteApi = IGetApi;
 
 export type IGetApi = {
-    api_method: string;
     api_url: string;
 }
 
 export type IPostApi<I> = {
-    api_method: string;
+    api_url: string;
+    api_data: I;
+}
+
+export type IPutApi<I> = {
     api_url: string;
     api_data: I;
 }
@@ -22,34 +25,6 @@ export type ErrorPage = {
     message: string;
 }
 
-export type IGetSelectedData = {
-    collection_name: string;
-    values: string;
-}
-
-export type IInsertData<T> = {
-    collection_name: string;
-    new_data: Omit<T, 'id' | 'created_at'>;
-}
-
-export type IDeleteData = {
-    collection_name: string;
-    values?: string;
-    filters?: [string, WhereFilterOp, any][];
-}
-
-export type IRealTime = {
-    collection_name: string; 
-    filters: [string, WhereFilterOp, any][]; 
-    order_by_options?: [string, OrderByDirection][];
-}
-
-export type IUpdateData<T> = {
-    collection_name: string;
-    values: string;
-    new_data: Partial<Omit<T, 'id' | 'created_at'>>;
-}
-
 export type ActivityFormProps = {
     act_name: string;
     schedule: string;
@@ -61,8 +36,8 @@ export type ActivityFormProps = {
 
 export type IActivity = {
     id: string;
-    created_at: Date;
     activity_name: string;
+    created_at: Date;
     schedule: string;
     user_id: string;
 }
@@ -154,26 +129,4 @@ export type NoteItemProps = {
 export type NoteListProps = {
     notes: INote[];
     onDelete: (id: string) => void;
-}
-
-export type PaginationProps = {
-    currentPage: number;
-    totalPages: number;
-    onNext: () => void;
-    onPrev: () => void;
-}
-
-export type SummarizeData = {
-    collection_name: string;
-    field1: string;
-    field2: string;
-    sign: WhereFilterOp;
-    values: string;
-}
-
-export type ITotalData = {
-    collection_name: string;
-    field1: string;
-    sign: WhereFilterOp;
-    values: string;
 }

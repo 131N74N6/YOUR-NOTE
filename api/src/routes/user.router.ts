@@ -2,6 +2,9 @@ import { Request, Response, Router } from "express";
 import { User } from "../models/user.model";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const userRoutes = Router();
 
@@ -18,7 +21,7 @@ userRoutes.post('/sign-in', async (req: Request, res: Response) => {
 
         const token = jwt.sign(
             { id: findUserByEmail._id, email: findUserByEmail.email },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'your jwt key',
             { expiresIn: '1h' }
         );
 

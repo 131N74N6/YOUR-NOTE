@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import useFirestore from "../services/useFirestore";
+import useFirestore from "../services/useApiCalls";
 import type { INote } from "../services/custom-types";
 import Loading from "../components/Loading";
 

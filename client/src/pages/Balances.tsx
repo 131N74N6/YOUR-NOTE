@@ -3,7 +3,7 @@ import BalanceList from "../components/BalanceList";
 import { useCallback, useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
-import useFirestore from "../services/useFirestore";
+import useApiCalls from "../services/useApiCalls";
 import type { IBalance } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ErrorMessage from "./Error";
@@ -17,7 +17,7 @@ export default function Balances() {
 
     const { user } = useAuth();
     const collectionName = 'balances';
-    const { deleteData, insertData, realTimeInit, updateData } = useFirestore<IBalance>();
+    const { deleteData, insertData, realTimeInit, updateData } = useApiCalls<IBalance>();
 
     const { data: balanceData, error, loading } = realTimeInit({
         collection_name: collectionName,

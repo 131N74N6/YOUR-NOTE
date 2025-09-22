@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import useFirestore from "../services/useFirestore";
+import useFirestore from "../services/useApiCalls";
 import useAuth from "../services/useAuth";
 
 type ICalculation = {
