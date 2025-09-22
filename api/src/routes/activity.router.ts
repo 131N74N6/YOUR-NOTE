@@ -6,16 +6,18 @@ import {
 
 const activityRoutes = Router();
 
-activityRoutes.delete('/', deleteAllActivities);
+// delete all by user id
+activityRoutes.delete('/erase-all/:id', deleteAllActivities);
 
-activityRoutes.delete('/:id', deleteSelectedActivity);
+activityRoutes.delete('/erase/:id', deleteSelectedActivity);
 
-activityRoutes.get('/', getAllActivities);
+// get all by user id
+activityRoutes.get('/get-all/:id', getAllActivities);
 
-activityRoutes.get('/:id', getSelectedActivity);
+activityRoutes.get('/selected/:id', getSelectedActivity);
 
-activityRoutes.post('/', insertNewActivity);
+activityRoutes.post('/add', insertNewActivity);
 
-activityRoutes.put('/:id', updateSelectedActivity);
+activityRoutes.put('/change/:id', updateSelectedActivity);
 
 export default activityRoutes;

@@ -3,7 +3,8 @@ import { Notes } from "../models/note.model";
 
 async function deleteAllNotes(req: Request, res: Response) {
     try {
-        await Notes.deleteMany();
+        const getUserId = req.params.id;
+        await Notes.deleteMany({ user_id: getUserId });
         res.status(201).json({ message: 'Successfully deleted all notes' });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
@@ -20,9 +21,10 @@ async function deleteSelectedNote(req: Request, res: Response) {
     }
 }
 
-async function getAllNotes(_: Request, res: Response) {
+async function getAllNotes(req: Request, res: Response) {
     try {
-        const noteList = await Notes.find();
+        const getUserId = req.params.id;
+        const noteList = await Notes.find({ user_id: getUserId });
         res.json(noteList);
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });

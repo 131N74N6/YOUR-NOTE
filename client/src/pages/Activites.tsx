@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import useFirestore from "../services/useApiCalls";
+import useApiCalls from "../services/useApiCalls";
 import type { IActivity } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import ActivityList from "../components/ActivityList";
@@ -8,54 +8,51 @@ import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
 
 export default function Activites() {
-    const collectionName = 'activities';
     const [actName, setActName] = useState<string>('');
     const [schedule, setSchedule] = useState<string>('');
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { user } = useAuth();
 
-    const { deleteData, insertData, realTimeInit, updateData } = useFirestore<IActivity>();
-    const { data: actData, loading } = realTimeInit({
-        collection_name: collectionName,
-        filters: user ? [['user_id', '==', user.uid]] : [],
-        order_by_options: [['created_at', 'desc']]
-    })
+    const { data: actData, loading, deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
+
+    useEffect(() => {
+        if (!user) return;
+        const get = async () => await getData({ api_url: `http://localhost:1234/activities/get-all/${user.id}` });
+        get();
+    }, []);
 
     const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedActName = actName.trim();
+        const getCurrentDate = new Date();
 
         if (!user) return;
         if (!trimmedActName || !schedule) throw new Error('Missing required data');
 
         await insertData({
-            collection_name: collectionName,
-            new_data: {
+            api_url: 'http://localhost:1234/activities/add',
+            api_data: {
                 activity_name: trimmedActName,
+                created_at: getCurrentDate.toISOString(),
                 schedule: new Date(schedule).toISOString(),
-                user_id: user.uid
+                user_id: user.id
             }
         });
         closeForm();
-    }, [user, actName, schedule, insertData]);
+    }, [user, actName, schedule]);
 
     const handleSelectAct = useCallback((id: string): void => {
         setSelectedId(prev => prev === id ? null : id);
     }, []);
 
     const deleteSelcetedAct = useCallback(async (id: string): Promise<void> => {
-        await deleteData({
-            collection_name: collectionName,
-            values: id
-        });
+        await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
     }, []);
 
     const deleteAllAct = useCallback(async (): Promise<void> => {
-        await deleteData({
-            collection_name: collectionName,
-            filters: [['user_id', '==', user?.uid]]
-        });
+        if (!user) return;
+        await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.id}` });
     }, [actData, user]);
 
     const updateSelectedAct = useCallback(async (id: string, changeAct: {
@@ -66,9 +63,8 @@ export default function Activites() {
             if (!changeAct.activity_name.trim()) throw new Error('Missing required data');
             
             await updateData({
-                collection_name: collectionName,
-                new_data: changeAct,
-                values: id
+                api_url: `http://localhost:1234/activities/change/${id}`,
+                api_data: changeAct
             });
         } catch (error: any) {
             console.error(error.message);

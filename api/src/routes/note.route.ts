@@ -6,16 +6,16 @@ import {
 
 const noteRoutes = Router();
 
-noteRoutes.delete('/', deleteAllNotes);
+noteRoutes.delete('/erase-all/:id', deleteAllNotes);
 
-noteRoutes.delete('/:id', deleteSelectedNote);
+noteRoutes.delete('/erase/:id', deleteSelectedNote);
 
-noteRoutes.get('/', getAllNotes);
+noteRoutes.get('/get-all/:id', getAllNotes);
 
-noteRoutes.get('/:id', getSelectedNote);
+noteRoutes.get('/selected/:id', getSelectedNote);
 
-noteRoutes.post('/', insertNewNote);
+noteRoutes.post('/add', insertNewNote);
 
-noteRoutes.put('/:id', updateSelectedNote);
+noteRoutes.put('/change:id', updateSelectedNote);
 
 export default noteRoutes;

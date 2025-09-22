@@ -6,12 +6,12 @@ export type IGetApi = {
 
 export type IPostApi<I> = {
     api_url: string;
-    api_data: I;
+    api_data: Omit<I, 'id'>;
 }
 
 export type IPutApi<I> = {
     api_url: string;
-    api_data: I;
+    api_data: Partial<Omit<I, 'id'>>;
 }
 
 export type User = {
@@ -37,7 +37,7 @@ export type ActivityFormProps = {
 export type IActivity = {
     id: string;
     activity_name: string;
-    created_at: Date;
+    created_at: string;
     schedule: string;
     user_id: string;
 }
@@ -78,7 +78,7 @@ export type BalanceFormProps = {
 
 export type IBalance = {
     id: string;
-    created_at: Date;
+    created_at: string;
     description: string;
     balance_type: 'income' | 'expense';
     amount: number;
@@ -115,7 +115,7 @@ export type BalanceItemProps = {
 
 export type INote = {
     id: string;
-    created_at: Date;
+    created_at: string;
     note_title: string;
     note_content: string;
     user_id: string;

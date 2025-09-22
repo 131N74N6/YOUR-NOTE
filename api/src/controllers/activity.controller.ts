@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
 import { Activity } from "../models/activity.model";
 
-async function deleteAllActivities(req: Request, res: Response) {
+async function deleteAllActivities(req: Request, res: Response): Promise<void> {
     try {
-        await Activity.deleteMany();
+        const getUserId = req.params.id;
+        await Activity.deleteMany({ user_id: getUserId });
         res.status(201).json({ message: 'Successfully deleted all' });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
     }
 }
 
-async function deleteSelectedActivity(req: Request, res: Response) {
+async function deleteSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         await Activity.deleteOne({ _id: getActId });
@@ -20,16 +21,17 @@ async function deleteSelectedActivity(req: Request, res: Response) {
     }
 }
 
-async function getAllActivities(_: Request, res: Response) {
+async function getAllActivities(req: Request, res: Response): Promise<void> {
     try {
-        const activityList = await Activity.find();
+        const getUserId = req.params.id;
+        const activityList = await Activity.find({ user_id: getUserId });
         res.json(activityList);
     } catch (error) {
         res.status(500).send({ message: 'Something went wrong' });
     }
 }
 
-async function getSelectedActivity(req: Request, res: Response) {
+async function getSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         const getActivity = await Activity.find({ _id: getActId });
@@ -39,7 +41,7 @@ async function getSelectedActivity(req: Request, res: Response) {
     }
 }
 
-async function insertNewActivity(req: Request, res: Response) {
+async function insertNewActivity(req: Request, res: Response): Promise<void> {
     try {
         const newActivity = new Activity(req.body)
         await newActivity.save();
@@ -49,7 +51,7 @@ async function insertNewActivity(req: Request, res: Response) {
     }
 }
 
-async function updateSelectedActivity(req: Request, res: Response) {
+async function updateSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         await Activity.updateOne({ _id: getActId }, { 

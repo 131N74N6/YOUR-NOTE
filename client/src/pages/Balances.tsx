@@ -6,7 +6,6 @@ import useAuth from "../services/useAuth";
 import useApiCalls from "../services/useApiCalls";
 import type { IBalance } from "../services/custom-types";
 import Loading from "../components/Loading";
-import ErrorMessage from "./Error";
 
 export default function Balances() {
     const [amount, setAmount] = useState<string>('');
@@ -14,47 +13,50 @@ export default function Balances() {
     const [description, setDescription] = useState<string>('');
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>('');
-
     const { user } = useAuth();
-    const collectionName = 'balances';
-    const { deleteData, insertData, realTimeInit, updateData } = useApiCalls<IBalance>();
+    
+    const { data: balanceData, loading, deleteData, insertData, getData, updateData } = useApiCalls<IBalance>();
 
-    const { data: balanceData, error, loading } = realTimeInit({
-        collection_name: collectionName,
-        filters: user ? [['user_id', '==', user.uid]] : [],
-        order_by_options: [['created_at', 'desc']]
-    });
+    useEffect(() => {
+        const get = async () => getData({ 
+            api_url: `http://localhost:1234/balances/get-all/${user?.id}` 
+        });
+        get();
+    }, []);
 
     const saveBalances = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedAmount = Number(amount.trim());
         const trimmedDescription = description.trim();
+        const getCurrentDate = new Date();
 
         if (!user) return;
 
         await insertData({
-            collection_name: collectionName,
-            new_data: {
+            api_url: 'http://localhost:1234/balances/add',
+            api_data: {
                 amount: trimmedAmount,
                 balance_type: amountType,
+                created_at: getCurrentDate.toISOString(),
                 description: trimmedDescription,
-                user_id: user.uid
+                user_id: user.id
             }
         });
 
         closeForm();
-    }, [user, amount, amountType, description, insertData, collectionName]);
+    }, [user, amount, amountType, description]);
 
     const handleSelectItem = useCallback((id: string): void => {
         setSelectedId(prev => prev === id ? null : id);
     }, []);
 
     const deleteAllBalance = useCallback(async (): Promise<void> => {
-        await deleteData({ collection_name: collectionName, filters: [['user_id', '==', user?.uid]] });
+        if (!user) return;
+        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.id}` });
     }, [balanceData, user]);
 
     const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
-        await deleteData({ collection_name: collectionName, values: id });
+        await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
     }, []);
 
     const updateSelectedBalance = useCallback(async (id: string, data: { 
@@ -65,8 +67,11 @@ export default function Balances() {
         try {
             if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
             if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');
-            await updateData({ collection_name: collectionName, new_data: data, values: id });
-            
+
+            await updateData({ 
+                api_url: `http://localhost:1234/balances/change/${id}`,
+                api_data: data
+            });
         } catch (error: any) {
             console.error(error.message);
         } finally {
@@ -89,8 +94,6 @@ export default function Balances() {
     }, [user, closeForm]);
 
     if (loading) return <Loading/>
-
-    if (error) return <ErrorMessage message="400 | Failed to get data"/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">

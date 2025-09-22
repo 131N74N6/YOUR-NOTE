@@ -2,30 +2,31 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useCallback, useState } from "react";
 import useAuth from "../services/useAuth";
-import useFirestore from "../services/useApiCalls";
+import useApiCalls from "../services/useApiCalls";
 import type { INote } from "../services/custom-types";
 
 export default function NoteForm() {
     const [title, setTitle] = useState<string>('');
     const [content, setContent] = useState<string>('');
     const { user } = useAuth();
-    const { insertData } = useFirestore<INote>();
-    const collectionName = 'notes';
+    const { insertData } = useApiCalls<INote>();
 
     const addNote = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
         const trimmedContent = content.trim();
         const trimmedTitle = title.trim();
+        const getCurrentDate = new Date();
 
         if (!user) return;
         if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
 
         await insertData({
-            collection_name: collectionName,
-            new_data: {
+            api_url: 'http://localhost:1234/balances/add',
+            api_data: {
+                created_at: getCurrentDate.toISOString(),
                 note_content: trimmedContent,
                 note_title: trimmedTitle,
-                user_id: user.uid
+                user_id: user.id
             }
         });
 

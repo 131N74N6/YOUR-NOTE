@@ -2,27 +2,23 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
 import useAuth from "../services/useAuth";
-import useFirestore from "../services/useApiCalls";
+import useApiCalls from "../services/useApiCalls";
 import Loading from "../components/Loading";
 import { useCallback } from "react";
 import type { INote } from "../services/custom-types";
 
 export default function Notes() {
-    const collectionName = 'notes';
-    const { deleteData, realTimeInit } = useFirestore<INote>();
+    const { data: noteData, deleteData, getData, loading } = useApiCalls<INote>();
     const { user } = useAuth();
-    const { data: noteData, loading } = realTimeInit({
-        collection_name: collectionName,
-        filters: user ? [['user_id', '==', user.uid]] : [],
-        order_by_options: [['created_at', 'desc']]
-    });
+    const {  } = getData({ api_url: `http://localhost:1234/notes/get-all/${user?.id}` });
 
     const deleteAllNotes = useCallback(async () => {
-        await deleteData({ collection_name: collectionName, filters: [['user_id', '==', user?.uid]] });
+        if (!user) return;
+        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.id}` });
     }, [noteData, user]);
 
     const deleteSelectedNote = useCallback(async (id: string) => {
-        await deleteData({ collection_name: collectionName, values: id });
+        await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
     }, []);
     
     if (loading) return <Loading/>

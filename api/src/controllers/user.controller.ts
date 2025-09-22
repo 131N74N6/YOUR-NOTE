@@ -18,7 +18,7 @@ async function signIn(req: Request, res: Response) {
         if (!isPasswordMatch) return res.status(401).json({ message: 'Incorrect email or password' });
 
         const token = jwt.sign(
-            { id: findUserByEmail._id, email: findUserByEmail.email },
+            { id: findUserByEmail._id, email: findUserByEmail.email, username: findUserByEmail.username },
             process.env.JWT_SECRET || 'your jwt key',
             { expiresIn: '1h' }
         );

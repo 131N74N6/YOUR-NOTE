@@ -34,7 +34,7 @@ export function Navbar1() {
             <div className="flex-grow"></div>
             <div className="flex items-center gap-[0.5rem] font-[550] text-[1.2rem] text-white">
                 <i className="fa-solid fa-user"></i>
-                <span>{user?.displayName}</span>
+                <span>{user ? user.username : ''}</span>
             </div>
         </nav>
     );
@@ -48,7 +48,7 @@ export function Navbar2() {
         <nav className="md:hidden w-full flex justify-between shrink-0 backdrop-blur-sm backdrop-brightness-75 p-[0.7rem] rounded-[0.7rem] border border-white">
             <div className="flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
                 <i className="fa-solid fa-user text-white"></i>
-                <span className="text-white">{user?.displayName}</span>
+                <span className="text-white">{user ? user.username : ''}</span>
             </div>
             <button type="button" className="cursor-pointer text-left" onClick={signOut}>
                 <i className="fa-solid fa-door-open text-white"></i>

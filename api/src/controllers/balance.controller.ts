@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { Balances } from '../models/balance.model';
 
-async function deleteAllBalances(_: Request, res: Response) {
+async function deleteAllBalances(req: Request, res: Response) {
     try {
-        await Balances.deleteMany();
+        const getUserId = req.params.id;
+        await Balances.deleteMany({ user_id: getUserId });
         res.status(201).json({ message: 'Successfully deleted all balances' });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
@@ -20,9 +21,10 @@ async function deleteSelectedBalance(req: Request, res: Response) {
     }
 }
 
-async function getAllBalances(_: Request, res: Response) {
+async function getAllBalances(req: Request, res: Response) {
     try {
-        const balanceList = await Balances.find();
+        const getUserId = req.params.id;
+        const balanceList = await Balances.find({ user_id: getUserId });
         res.json(balanceList);
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
