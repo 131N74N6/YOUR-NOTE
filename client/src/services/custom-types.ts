@@ -1,5 +1,23 @@
 import type { OrderByDirection, WhereFilterOp } from "firebase/firestore";
 
+export type IGetApi = {
+    api_method: string;
+    api_url: string;
+}
+
+export type IPostApi<I> = {
+    api_method: string;
+    api_url: string;
+    api_data: I;
+}
+
+export type User = {
+    id: string;
+    email: string;
+    username: string;
+    token: string;
+}
+
 export type ErrorPage = {
     message: string;
 }
