@@ -7,7 +7,7 @@ const BalanceItem = memo((props: BalanceItemProps) => {
     const [editDescription, setEditDescription] = useState<string>('');
 
     useEffect((): void => {
-        if (props.isSelected) {            
+        if (props.isSelected) {
             setEditAmount(props.selected_data.amount.toString());
             setEditType(props.selected_data.balance_type);
             setEditDescription(props.selected_data.description);
