@@ -19,7 +19,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
     useEffect((): void => {
         if (props.is_selected) {            
             setEditActName(props.selected_act.activity_name);
-            setEditSchedule(isoToLocalDateTime(props.selected_act.schedule));
+            setEditSchedule(isoToLocalDateTime(props.selected_act.schedule_at));
         } 
     }, [props.is_selected, props.selected_act]);
 
@@ -28,7 +28,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         
         await props.onUpdate(props.selected_act.id, {
             activity_name: editActName.trim(),
-            schedule: editSchedule,
+            schedule_at: editSchedule,
         });
     }
 
@@ -65,7 +65,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
             <div className="flex flex-col gap-[0.3rem]">                                
                 <p className="text-white font-[500] text-[0.9rem]">Act: {props.selected_act.activity_name}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Schedule: {new Date(props.selected_act.schedule).toLocaleString()}</p>
+                <p className="text-white font-[500] text-[0.9rem]">Schedule: {new Date(props.selected_act.schedule_at).toLocaleString()}</p>
                 <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_act.created_at).toLocaleString()}</p>
             </div>
             <div className="flex gap-[0.7rem]">

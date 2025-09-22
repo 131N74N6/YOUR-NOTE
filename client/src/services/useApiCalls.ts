@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { IDeleteApi, IGetApi, IPostApi } from "./custom-types";
+import type { IDeleteApi, IGetApi, IPostApi, IPutApi } from "./custom-types";
 import useAuth from "./useAuth";
 
 export default function useApiCalls<BINTANG>() {
@@ -88,7 +88,7 @@ export default function useApiCalls<BINTANG>() {
         }
     }
 
-    async function updateData(props: IPostApi<BINTANG>) {
+    async function updateData(props: IPutApi<BINTANG>) {
         setLoading(true);
         try {
             const request = await fetch(props.api_url, { 

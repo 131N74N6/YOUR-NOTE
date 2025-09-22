@@ -27,7 +27,7 @@ export type ErrorPage = {
 
 export type ActivityFormProps = {
     act_name: string;
-    schedule: string;
+    schedule_at: string;
     changeActName: (event: React.ChangeEvent<HTMLInputElement>) => void;
     makeSchedule: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onClose: () => void;
@@ -38,7 +38,7 @@ export type IActivity = {
     id: string;
     activity_name: string;
     created_at: string;
-    schedule: string;
+    schedule_at: string;
     user_id: string;
 }
 
@@ -49,7 +49,7 @@ export type ActivityItemProps = {
     onSelect: (id: string) => void;
     onUpdate: (id: string, changeAct: { 
         activity_name: string; 
-        schedule: string; 
+        schedule_at: string; 
     }) => Promise<void>;
 }
 
@@ -60,7 +60,7 @@ export type ActivityListProps = {
     onSelect: (id: string) => void;
     onUpdate: (id: string, changeAct: { 
         activity_name: string; 
-        schedule: string; 
+        schedule_at: string; 
     }) => Promise<void>;
 }
 

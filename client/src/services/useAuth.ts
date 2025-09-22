@@ -48,11 +48,12 @@ export default function useAuth() {
             if (request.status === 401) throw new Error(response.message);
 
             const signedInUser: User = { 
-                id: '', email, 
-                username: response.username, 
+                id: response.id, 
+                email, 
+                username: response.username,
                 token: response.token 
-            }
-            
+            };
+
             setUser(signedInUser);
             localStorage.setItem('user', JSON.stringify(signedInUser));
             

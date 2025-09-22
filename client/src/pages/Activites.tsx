@@ -18,9 +18,11 @@ export default function Activites() {
 
     useEffect(() => {
         if (!user) return;
-        const get = async () => await getData({ api_url: `http://localhost:1234/activities/get-all/${user.id}` });
+        const get = async () => await getData({ 
+            api_url: `http://localhost:1234/activities/get-all/${user.id}` 
+        });
         get();
-    }, []);
+    }, [user?.id, actData]);
 
     const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -35,7 +37,7 @@ export default function Activites() {
             api_data: {
                 activity_name: trimmedActName,
                 created_at: getCurrentDate.toISOString(),
-                schedule: new Date(schedule).toISOString(),
+                schedule_at: new Date(schedule).toISOString(),
                 user_id: user.id
             }
         });
@@ -57,7 +59,7 @@ export default function Activites() {
 
     const updateSelectedAct = useCallback(async (id: string, changeAct: {
         activity_name: string;
-        schedule: string;
+        schedule_at: string;
     }): Promise<void> => {
         try {
             if (!changeAct.activity_name.trim()) throw new Error('Missing required data');
@@ -96,7 +98,7 @@ export default function Activites() {
                 <ActivityForm
                     act_name={actName}
                     changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
-                    schedule={schedule}
+                    schedule_at={schedule}
                     makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
                     onClose={closeForm}
                     onSave={saveActName}

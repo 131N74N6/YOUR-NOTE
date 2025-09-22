@@ -15,7 +15,7 @@ const ActivityForm = memo((props: ActivityFormProps) => {
                 <input 
                     type="datetime-local" 
                     className="border border-white p-[0.45rem] text-white text-[0.9rem] outline-0"
-                    value={props.schedule}
+                    value={props.schedule_at}
                     onChange={props.makeSchedule}
                 />
                 <div className="flex gap-[0.7rem]">
