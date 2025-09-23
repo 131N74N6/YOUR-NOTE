@@ -1,5 +1,5 @@
 import type { User } from "./custom-types";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
@@ -12,7 +12,7 @@ export default function useAuth() {
         setLoading(false);
     }, []);
 
-    const signUp = useCallback(async (created_at: string, email: string, username: string, password: string) => {
+    async function signUp(created_at: string, email: string, username: string, password: string) {
         setLoading(true);
         setError(null);
         try {
@@ -32,9 +32,9 @@ export default function useAuth() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }
 
-    const signIn = useCallback(async (email: string, password: string) => {
+    async function signIn(email: string, password: string) {
         setLoading(true);
         try {
             const request = await fetch('http://localhost:1234/users/sign-in', {
@@ -63,12 +63,12 @@ export default function useAuth() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }
 
-    const quit = useCallback(async () => {
+    async function quit() {
         setUser(null);
         localStorage.removeItem('user');
-    }, []);
+    }
 
     return { error, loading, quit, signIn, signUp, user }
 }

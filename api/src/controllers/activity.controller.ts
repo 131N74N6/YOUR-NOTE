@@ -56,8 +56,8 @@ async function updateSelectedActivity(req: Request, res: Response): Promise<void
         const getActId = req.params.id;
         await Activity.updateOne({ _id: getActId }, { 
             $set: { 
-                act_name: req.body.editActName,
-                schedule_at: req.body.editScheduleAt
+                act_name: req.body.activity_name,
+                schedule_at: req.body.schedule_at
             }
         });
         res.status(201).json({ message: 'Successfully updated activity' });
