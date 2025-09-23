@@ -23,8 +23,9 @@ export default function SignUp() {
 
     async function handleSignUp(event: React.FormEvent) {
         event.preventDefault();
+        const getCurrentDate = new Date();
         if (error) setShowMessage(true);
-        await signUp(email, username, password);
+        await signUp(getCurrentDate.toISOString(), email, username, password);
     }
 
     return (

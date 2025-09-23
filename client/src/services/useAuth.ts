@@ -12,14 +12,14 @@ export default function useAuth() {
         setLoading(false);
     }, []);
 
-    const signUp = useCallback(async (email: string, username: string, password: string) => {
+    const signUp = useCallback(async (created_at: string, email: string, username: string, password: string) => {
         setLoading(true);
         setError(null);
         try {
             const request = await fetch('http://localhost:1234/users/sign-up', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, password, username }),
+                body: JSON.stringify({ created_at, email, password, username }),
             });
 
             const response = await request.json();

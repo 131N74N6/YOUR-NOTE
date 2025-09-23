@@ -31,7 +31,7 @@ async function signIn(req: Request, res: Response) {
 
 async function signUp(req: Request, res: Response) {
     try {
-        const { email, password, username } = req.body;
+        const { created_at, email, password, username } = req.body;
         const alreadyExits = await User.findOne({ email });
 
         if (alreadyExits) return res.status(409).json({ message: 'User already exist' });
@@ -39,6 +39,7 @@ async function signUp(req: Request, res: Response) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
+            created_at,
             email,
             password: hashedPassword,
             username
