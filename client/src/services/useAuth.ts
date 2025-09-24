@@ -26,7 +26,8 @@ export default function useAuth() {
 
             const response = await request.json();
 
-            if (request.status === 409) throw new Error(response.message);
+            if (request.status === 400) throw new Error(response.message);
+            else if (request.status === 409) throw new Error(response.message);
 
             return { response, error: null };
         } catch (err: any) {
@@ -47,15 +48,16 @@ export default function useAuth() {
             
             const response: IUser = await request.json();
 
-            if (request.status === 401) throw new Error(response.message);
+            if (request.status === 400) throw new Error(response.message);
+            else if (request.status === 401) throw new Error(response.message);
 
             const signedInUser: IUser = { 
                 message: response.message,
                 token: response.token,
-                user: {
-                    id: response.user.id,
-                    email: response.user.email,
-                    username: response.user.username,
+                info: {
+                    id: response.info.id,
+                    email: response.info.email,
+                    username: response.info.username,
                 }
             };
 

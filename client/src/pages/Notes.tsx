@@ -2,25 +2,45 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/useApiCalls";
+import useApiCalls from "../services/useModifyData";
 import Loading from "../components/Loading";
 import { useCallback } from "react";
 import type { INote } from "../services/custom-types";
+import useSWR, { useSWRConfig } from "swr";
 
 export default function Notes() {
-    const { deleteData, getData } = useApiCalls<INote>();
     const { user } = useAuth();
-    const { data: noteData, isLoading } = getData<INote>({ 
-        api_url: `http://localhost:1234/notes/get-all/${user?.user.id}` 
-    });
+    const token = user?.token;
+
+    const { deleteData } = useApiCalls<INote>();
+    const { mutate } = useSWRConfig();
+
+    const fetcher = async () => {
+        if (!user) return;
+        const request = await fetch(`http://localhost:1234/notes/get-all/${user.info.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const response = await request.json();
+        return response;
+    }
+
+    const { data: noteData, isLoading } = useSWR<INote[]>(`notes-${user?.info.id}`, fetcher);
 
     const deleteAllNotes = useCallback(async () => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
+        mutate(`notes-${user.info.id}`);
     }, [noteData, user]);
 
     const deleteSelectedNote = useCallback(async (id: string) => {
+        if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
+        mutate(`notes-${user.info.id}`);
     }, []);
     
     if (isLoading) return <Loading/>

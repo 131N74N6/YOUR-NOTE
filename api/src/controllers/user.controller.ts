@@ -32,8 +32,8 @@ async function signIn(req: Request, res: Response) {
         res.status(200).json({ 
             message: 'Sign in success', 
             token,
-            user: {
-                id: findUserByEmail._id.toString(),
+            info: {
+                id: findUserByEmail._id,
                 email: findUserByEmail.email,
                 username: findUserByEmail.username
             }
@@ -47,6 +47,8 @@ async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
         const alreadyExits = await User.findOne({ email });
+
+        if (!email || !password ||!username) return res.status(400).json({ message: 'Email, username, and password are required' });
 
         if (alreadyExits) return res.status(409).json({ message: 'User already exist' });
         

@@ -1,5 +1,4 @@
-import useSWR from "swr";
-import type { IDeleteApi, IGetApi, IPostApi, IPutApi } from "./custom-types";
+import type { IDeleteApi, IPostApi, IPutApi } from "./custom-types";
 import useAuth from "./useAuth";
 
 export default function useApiCalls<BINTANG>() {
@@ -21,30 +20,10 @@ export default function useApiCalls<BINTANG>() {
         else throw new Error(response.message);
     }
 
-    function getData<BINTANG>(props: IGetApi): { data: BINTANG[] | undefined; isLoading: boolean; } {
-        async function fetcher() {            
-            const request = await fetch(props.api_url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            const response = await request.json();
-                
-            if (request.ok) return response;
-            else throw new Error(response.message);
-        }
-
-        const { data, isLoading } = useSWR<BINTANG[]>(props.api_url, fetcher);
-        return { data, isLoading }
-    }
-
-
     async function insertData(props: IPostApi<BINTANG>) {
         const request = await fetch(props.api_url, { 
-            method: 'POST', body: JSON.stringify(props.api_data),
+            method: 'POST', 
+            body: JSON.stringify(props.api_data),
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -59,7 +38,8 @@ export default function useApiCalls<BINTANG>() {
 
     async function updateData(props: IPutApi<BINTANG>) {
         const request = await fetch(props.api_url, { 
-            method: 'PUT', body: JSON.stringify(props.api_data),
+            method: 'PUT', 
+            body: JSON.stringify(props.api_data),
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -72,5 +52,5 @@ export default function useApiCalls<BINTANG>() {
         else throw new Error(response.message);
     }
 
-    return { deleteData, getData, insertData, updateData }
+    return { deleteData, insertData, updateData }
 }

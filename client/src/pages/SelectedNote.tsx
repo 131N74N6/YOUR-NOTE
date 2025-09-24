@@ -1,43 +1,40 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import useFirestore from "../services/useApiCalls";
+import useApiCalls from "../services/useModifyData";
 import type { INote } from "../services/custom-types";
-import Loading from "../components/Loading";
 
 export default function SelectedNote() {
-    const { id } = useParams();
+    const { _id } = useParams();
     const navigate = useNavigate();
 
-    const { getData, updateData } = useFirestore<INote>();
-
-    const { data: selectedNote, isLoading } = getData<INote>({
-        api_url: `http://localhost:1234/activities/selected/${id}`
-    });
+    const { updateData } = useApiCalls<INote>();
 
     const [editTitle, setEditTitle] = useState<string>('');
     const [editContent, setEditContent] = useState<string>('');
-    console.log(id);
+
+    async function getSelectedNote() {
+        const request = await fetch(`http://localhost:1234/notes/selected/${_id}`);
+        const selectedNote: INote[] = await request.json();
+        setEditContent(selectedNote[0].note_content);
+        setEditTitle(selectedNote[0].note_title);
+    }
 
     useEffect(() => {
-        if (selectedNote && selectedNote.length > 0) {
-            const note = selectedNote[0];
-            setEditContent(note.note_content || '');
-            setEditTitle(note.note_title || '');
-        } 
-    }, [selectedNote, isLoading, id, navigate]);
+        getSelectedNote();
+    }, [_id, navigate]);
 
     const saveEditedNote = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
-            if (!id) throw new Error('Note not found');
+            if (!_id) throw new Error('Note not found');
 
             const trimmedTitle = editTitle.trim();
             const trimmedContent = editContent.trim();
             
             await updateData({ 
-                api_url: `http://localhost:1234/activities/change/${id}`,
+                api_url: `http://localhost:1234/activities/change/${_id}`,
                 api_data: {
                     note_content: trimmedContent,
                     note_title: trimmedTitle,
@@ -48,9 +45,7 @@ export default function SelectedNote() {
         } finally {
             navigate('/notes');
         }
-    }, [editContent, editTitle, id]);
-
-    if (isLoading) return <Loading/>
+    }, [editContent, editTitle, _id]);
 
     return (
         <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">

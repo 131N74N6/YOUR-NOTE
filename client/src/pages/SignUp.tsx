@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../services/useAuth";
 
@@ -15,18 +15,26 @@ export default function SignUp() {
     }, [user, navigate]);
 
     useEffect(() => {
-        if (showMessage) {
+        if (error) {
+            setShowMessage(true);
             const timeout = setTimeout(() => setShowMessage(false), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error, showMessage]);
+    }, [error]);
 
-    async function handleSignUp(event: React.FormEvent) {
+    const handleSignUp = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
+        const trimmedEmail = email.trim();
+        const trimmedUsername = username.trim();
         const getCurrentDate = new Date();
-        if (error) setShowMessage(true);
-        await signUp(getCurrentDate.toISOString(), email, username, password);
-    }
+
+        if (!trimmedEmail || !password || !trimmedUsername) {
+            setShowMessage(true);
+            return;
+        }
+
+        await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUsername, password);
+    }, [email, password, username]);
 
     return (
         <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">

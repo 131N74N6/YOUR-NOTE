@@ -2,13 +2,14 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useCallback, useState } from "react";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/useApiCalls";
+import useApiCalls from "../services/useModifyData";
 import type { INote } from "../services/custom-types";
 
 export default function NoteForm() {
     const [title, setTitle] = useState<string>('');
     const [content, setContent] = useState<string>('');
     const { user } = useAuth();
+    
     const { insertData } = useApiCalls<INote>();
 
     const addNote = useCallback(async (event: React.FormEvent) => {
@@ -26,7 +27,7 @@ export default function NoteForm() {
                 created_at: getCurrentDate.toISOString(),
                 note_content: trimmedContent,
                 note_title: trimmedTitle,
-                user_id: user.id
+                user_id: user.info.id
             }
         });
 

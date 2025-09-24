@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import useApiCalls from "../services/useApiCalls";
+import useApiCalls from "../services/useModifyData";
 import type { IActivity } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
+import useSWR, { useSWRConfig } from "swr";
 
 export default function Activites() {
     const [actName, setActName] = useState<string>('');
@@ -13,11 +14,26 @@ export default function Activites() {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { user } = useAuth();
+    const token = user?.token;
 
-    const { deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
-    const { data: actData, isLoading } = getData<IActivity>({ 
-        api_url: `http://localhost:1234/activities/get-all/${user?.user.id}` 
-    });
+    const { deleteData, insertData, updateData } = useApiCalls<IActivity>();
+    const { mutate } = useSWRConfig();
+
+    const fetcher = async () => {
+        if (!user) return;
+        const request = await fetch(`http://localhost:1234/activities/get-all/${user.info.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const response = await request.json();
+        return response;
+    }
+
+    const { data: actData, isLoading } = useSWR<IActivity[]>(`activities-${user?.info.id}`, fetcher);
 
     const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -33,9 +49,10 @@ export default function Activites() {
                 act_name: trimmedActName,
                 created_at: getCurrentDate.toISOString(),
                 schedule_at: new Date(schedule).toISOString(),
-                user_id: user.user.id
+                user_id: user.info.id
             }
         });
+        mutate(`activities-${user.info.id}`);
         closeForm();
     }, [user, actName, schedule]);
 
@@ -44,18 +61,22 @@ export default function Activites() {
     }, []);
 
     const deleteSelcetedAct = useCallback(async (id: string): Promise<void> => {
+        if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
+        mutate(`activities-${user.info.id}`);
     }, []);
 
     const deleteAllAct = useCallback(async (): Promise<void> => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
+        mutate(`activities-${user.info.id}`);
     }, [actData, user]);
 
     const updateSelectedAct = useCallback(async (id: string, changeAct: {
         act_name: string;
         schedule_at: string;
     }): Promise<void> => {
+        if (!user) return;
         try {
             if (!changeAct.act_name.trim()) throw new Error('Missing required data');
             

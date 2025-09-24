@@ -17,7 +17,7 @@ export type IPutApi<I> = {
 export interface IUser {
     message: string;
     token: string;
-    user: {
+    info: {
         id: string;
         email: string;
         username: string;

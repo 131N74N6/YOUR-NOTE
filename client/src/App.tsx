@@ -22,7 +22,7 @@ export default function App() {
                     <Route path="/balances" element={<ProtectedRoute><Balances/></ProtectedRoute>}/>
                     <Route path="/notes" element={<ProtectedRoute><Notes/></ProtectedRoute>}/>
                     <Route path="/add-note" element={<ProtectedRoute><NoteForm/></ProtectedRoute>}/>
-                    <Route path="/note-detail/:id" element={<ProtectedRoute><SelectedNote/></ProtectedRoute>}/>
+                    <Route path="/note-detail/:_id" element={<ProtectedRoute><SelectedNote/></ProtectedRoute>}/>
                     <Route path="/activities" element={<ProtectedRoute><Activites/></ProtectedRoute>}/>
                     <Route path="/chat-bot" element={<ProtectedRoute><ChatBot/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to={'/home'} replace/>}/>

@@ -3,9 +3,10 @@ import BalanceList from "../components/BalanceList";
 import { useCallback, useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/useApiCalls";
+import useApiCalls from "../services/useModifyData";
 import type { IBalance } from "../services/custom-types";
 import Loading from "../components/Loading";
+import useSWR, { useSWRConfig } from "swr";
 
 export default function Balances() {
     const [amount, setAmount] = useState<string>('');
@@ -14,12 +15,26 @@ export default function Balances() {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>('');
     const { user } = useAuth();
+    const token = user?.token;
     
-    const { deleteData, insertData, getData, updateData } = useApiCalls<IBalance>();
+    const { deleteData, insertData, updateData } = useApiCalls<IBalance>();
+    const { mutate } = useSWRConfig();
 
-    const { data: balanceData, isLoading } = getData<IBalance>({ 
-        api_url: `http://localhost:1234/balances/get-all/${user?.user.id}` 
-    });
+    const fetcher = async () => {
+        if (!user) return;
+        const request = await fetch(`http://localhost:1234/balances/get-all/${user.info.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const response = await request.json();
+        return response;
+    }
+
+    const { data: balanceData, isLoading } = useSWR<IBalance[]>(`balances-${user?.info.id}`, fetcher);
 
     const saveBalances = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -36,10 +51,10 @@ export default function Balances() {
                 balance_type: amountType,
                 created_at: getCurrentDate.toISOString(),
                 description: trimmedDescription,
-                user_id: user.user.id
+                user_id: user.info.id
             }
         });
-
+        mutate(`balances-${user.info.id}`);
         closeForm();
     }, [user, amount, amountType, description]);
 
@@ -49,11 +64,14 @@ export default function Balances() {
 
     const deleteAllBalance = useCallback(async (): Promise<void> => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
+        mutate(`balances-${user.info.id}`);
     }, [balanceData, user]);
 
     const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
+        if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
+        mutate(`balances-${user.info.id}`);
     }, []);
 
     const updateSelectedBalance = useCallback(async (id: string, data: { 
@@ -61,6 +79,7 @@ export default function Balances() {
         balance_type: 'income' | 'expense'; 
         description: string;
     }): Promise<void> => {
+        if (!user) return;
         try {
             if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
             if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');

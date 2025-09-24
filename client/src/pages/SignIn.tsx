@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../services/useAuth";
 
@@ -18,17 +18,23 @@ export default function SignIn() {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error, showMessage]);
+    }, [showMessage]);
 
-    async function handleSignIn(event: React.FormEvent) {
+    const handleSignIn = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
-        if (error) setShowMessage(true);
-        await signIn(email, password);
-    }
+        const trimmedEmail = email.trim();
+
+        if (error) {
+            setShowMessage(true);
+            return;
+        }
+
+        await signIn(trimmedEmail, password);
+    }, [email, password]);
 
     return (
         <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
-            <form onClick={handleSignIn} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-[320px]">
+            <form onSubmit={handleSignIn} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-[320px]">
                 <div className="font-[650] text-[1.5rem] text-center text-white">Hello</div>
                 
                 <div className="flex flex-col gap-[0.5rem]">
@@ -40,7 +46,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-white outline-0 border border-white font-[600] rounded" 
                         placeholder="your@gmail.com"
-                        required
                     />
                 </div>
                 
@@ -53,7 +58,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-white outline-0 border border-white font-[600] rounded" 
                         placeholder="your_password"
-                        required
                     />
                 </div>
                 
@@ -69,7 +73,7 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-white hover:text-black transition-colors"
+                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer rounded hover:bg-white hover:text-black transition-colors"
                 >
                     Sign In
                 </button>
