@@ -28,7 +28,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         
         await props.onUpdate(props.selected_act._id, {
             act_name: editActName.trim(),
-            schedule_at: editSchedule,
+            schedule_at: new Date(editSchedule).toISOString(),
         });
     }
 

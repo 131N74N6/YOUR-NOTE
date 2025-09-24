@@ -11,8 +11,19 @@ const NoteItem = memo((props: NoteItemProps) => {
                 <p className="text-white">{props.note.note_content}</p>
             </div>
             <div className="flex gap-[0.4em]">
-                <Link className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px] text-center" to={`/note-detail/${props.note._id}`}>Select</Link>
-                <button className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" type="button">Delete</button>
+                <Link 
+                    className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px] text-center" 
+                    to={`/note-detail/${props.note._id}`}
+                >
+                    Select
+                </Link>
+                <button 
+                    className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
+                    type="button" 
+                    onClick={() => props.onDelete(props.note._id)}
+                >
+                    Delete
+                </button>
             </div>
         </div>
     );

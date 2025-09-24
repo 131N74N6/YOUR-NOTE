@@ -22,7 +22,7 @@ export default function NoteForm() {
         if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
 
         await insertData({
-            api_url: 'http://localhost:1234/balances/add',
+            api_url: 'http://localhost:1234/notes/add',
             api_data: {
                 created_at: getCurrentDate.toISOString(),
                 note_content: trimmedContent,
