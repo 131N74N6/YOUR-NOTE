@@ -18,7 +18,7 @@ export default function SignIn() {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [showMessage]);
+    }, [error, showMessage]);
 
     async function handleSignIn(event: React.FormEvent) {
         event.preventDefault();

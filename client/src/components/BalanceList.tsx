@@ -15,8 +15,8 @@ const BalanceList = memo((props: BalanceListProps) => {
         <div className="grid md:grid-cols-2 gap-[1rem] grid-cols-1 overflow-y-auto">
             {props.data.map((balance) => (
                 <BalanceItem
-                    key={`blnc_${balance.id}`}
-                    isSelected={props.selectedId === balance.id}
+                    key={`blnc_${balance._id}`}
+                    isSelected={props.selectedId === balance._id}
                     selected_data={balance}
                     onDelete={props.onDelete}
                     onSelect={props.onSelect}

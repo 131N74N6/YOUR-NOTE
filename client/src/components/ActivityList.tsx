@@ -15,12 +15,12 @@ function ActivityList(props: ActivityListProps) {
         <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem] overflow-y-auto">
             {props.act_data.map((act) => (
                 <ActivityItem
-                    is_selected={props.selectedId === act.id}
+                    is_selected={props.selectedId === act._id}
                     onDelete={props.onDelete}
                     onSelect={props.onSelect}
                     onUpdate={props.onUpdate}
                     selected_act={act}
-                    key={`act_${act.id}`}
+                    key={`act_${act._id}`}
                 />
             ))}
         </div>

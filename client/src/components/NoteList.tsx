@@ -14,7 +14,7 @@ const NoteList = memo((props: NoteListProps) => {
     return (
         <div className="grid lg:grid-cols-3 gap-[0.7rem] md:grid-cols-2 grid-cols-1">
             {props.notes.map((note) => (
-                <NoteItem key={`note_${note.id}`} note={note} onDelete={props.onDelete}/>
+                <NoteItem key={`note_${note._id}`} note={note} onDelete={props.onDelete}/>
             ))}
         </div>
     );

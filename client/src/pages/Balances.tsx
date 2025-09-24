@@ -15,14 +15,11 @@ export default function Balances() {
     const [selectedId, setSelectedId] = useState<string | null>('');
     const { user } = useAuth();
     
-    const { data: balanceData, loading, deleteData, insertData, getData, updateData } = useApiCalls<IBalance>();
+    const { deleteData, insertData, getData, updateData } = useApiCalls<IBalance>();
 
-    useEffect(() => {
-        const get = async () => getData({ 
-            api_url: `http://localhost:1234/balances/get-all/${user?.id}` 
-        });
-        get();
-    }, []);
+    const { data: balanceData, isLoading } = getData<IBalance>({ 
+        api_url: `http://localhost:1234/balances/get-all/${user?.user.id}` 
+    });
 
     const saveBalances = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -39,7 +36,7 @@ export default function Balances() {
                 balance_type: amountType,
                 created_at: getCurrentDate.toISOString(),
                 description: trimmedDescription,
-                user_id: user.id
+                user_id: user.user.id
             }
         });
 
@@ -52,7 +49,7 @@ export default function Balances() {
 
     const deleteAllBalance = useCallback(async (): Promise<void> => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.user.id}` });
     }, [balanceData, user]);
 
     const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
@@ -93,7 +90,7 @@ export default function Balances() {
         }
     }, [user, closeForm]);
 
-    if (loading) return <Loading/>
+    if (isLoading) return <Loading/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
@@ -130,7 +127,7 @@ export default function Balances() {
                     </button>
                 </div>
                 <BalanceList
-                    data={balanceData}
+                    data={balanceData ? balanceData : []}
                     onDelete={deleteSelectedBalance}
                     onSelect={handleSelectItem}
                     onUpdate={updateSelectedBalance}

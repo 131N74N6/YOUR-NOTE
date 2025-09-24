@@ -19,7 +19,7 @@ export default function SignUp() {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [showMessage]);
+    }, [error, showMessage]);
 
     async function handleSignUp(event: React.FormEvent) {
         event.preventDefault();

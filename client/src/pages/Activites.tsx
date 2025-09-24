@@ -14,15 +14,10 @@ export default function Activites() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { user } = useAuth();
 
-    const { data: actData, loading, deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
-
-    useEffect(() => {
-        if (!user) return;
-        const get = async () => await getData({ 
-            api_url: `http://localhost:1234/activities/get-all/${user.id}` 
-        });
-        get();
-    }, [user?.id, actData]);
+    const { deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
+    const { data: actData, isLoading } = getData<IActivity>({ 
+        api_url: `http://localhost:1234/activities/get-all/${user?.user.id}` 
+    });
 
     const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -35,10 +30,10 @@ export default function Activites() {
         await insertData({
             api_url: 'http://localhost:1234/activities/add',
             api_data: {
-                activity_name: trimmedActName,
+                act_name: trimmedActName,
                 created_at: getCurrentDate.toISOString(),
                 schedule_at: new Date(schedule).toISOString(),
-                user_id: user.id
+                user_id: user.user.id
             }
         });
         closeForm();
@@ -54,15 +49,15 @@ export default function Activites() {
 
     const deleteAllAct = useCallback(async (): Promise<void> => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.user.id}` });
     }, [actData, user]);
 
     const updateSelectedAct = useCallback(async (id: string, changeAct: {
-        activity_name: string;
+        act_name: string;
         schedule_at: string;
     }): Promise<void> => {
         try {
-            if (!changeAct.activity_name.trim()) throw new Error('Missing required data');
+            if (!changeAct.act_name.trim()) throw new Error('Missing required data');
             
             await updateData({
                 api_url: `http://localhost:1234/activities/change/${id}`,
@@ -88,7 +83,7 @@ export default function Activites() {
         }
     }, [user, closeForm]);
 
-    if (loading) return <Loading/>
+    if (isLoading) return <Loading/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
@@ -122,7 +117,7 @@ export default function Activites() {
                     </button>
                 </div>
                 <ActivityList
-                    act_data={actData}
+                    act_data={actData ? actData : []}
                     onDelete={deleteSelcetedAct}
                     onSelect={handleSelectAct}
                     onUpdate={updateSelectedAct}

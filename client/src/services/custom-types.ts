@@ -6,19 +6,22 @@ export type IGetApi = {
 
 export type IPostApi<I> = {
     api_url: string;
-    api_data: Omit<I, 'id'>;
+    api_data: Omit<I, '_id'>;
 }
 
 export type IPutApi<I> = {
     api_url: string;
-    api_data: Partial<Omit<I, 'id'>>;
+    api_data: Partial<Omit<I, '_id'>>;
 }
 
-export type User = {
-    id: string;
-    email: string;
-    username: string;
+export interface IUser {
+    message: string;
     token: string;
+    user: {
+        id: string;
+        email: string;
+        username: string;
+    }
 }
 
 export type ErrorPage = {
@@ -35,8 +38,8 @@ export type ActivityFormProps = {
 }
 
 export type IActivity = {
-    id: string;
-    activity_name: string;
+    _id: string;
+    act_name: string;
     created_at: string;
     schedule_at: string;
     user_id: string;
@@ -48,7 +51,7 @@ export type ActivityItemProps = {
     onDelete: (id: string) => void;
     onSelect: (id: string) => void;
     onUpdate: (id: string, changeAct: { 
-        activity_name: string; 
+        act_name: string; 
         schedule_at: string; 
     }) => Promise<void>;
 }
@@ -59,7 +62,7 @@ export type ActivityListProps = {
     onDelete: (id: string) => void;
     onSelect: (id: string) => void;
     onUpdate: (id: string, changeAct: { 
-        activity_name: string; 
+        act_name: string; 
         schedule_at: string; 
     }) => Promise<void>;
 }
@@ -77,7 +80,7 @@ export type BalanceFormProps = {
 }
 
 export type IBalance = {
-    id: string;
+    _id: string;
     created_at: string;
     description: string;
     balance_type: 'income' | 'expense';
@@ -114,7 +117,7 @@ export type BalanceItemProps = {
 }
 
 export type INote = {
-    id: string;
+    _id: string;
     created_at: string;
     note_title: string;
     note_content: string;

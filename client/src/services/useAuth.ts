@@ -1,10 +1,12 @@
-import type { User } from "./custom-types";
+import { useNavigate } from "react-router-dom";
+import type { IUser } from "./custom-types";
 import { useEffect, useState } from "react";
 
 export default function useAuth() {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect((): void => {
         const userToken = localStorage.getItem('user');
@@ -43,15 +45,18 @@ export default function useAuth() {
                 body: JSON.stringify({ email, password }),
             });
             
-            const response = await request.json();
+            const response: IUser = await request.json();
 
             if (request.status === 401) throw new Error(response.message);
 
-            const signedInUser: User = { 
-                id: response.id, 
-                email, 
-                username: response.username,
-                token: response.token 
+            const signedInUser: IUser = { 
+                message: response.message,
+                token: response.token,
+                user: {
+                    id: response.user.id,
+                    email: response.user.email,
+                    username: response.user.username,
+                }
             };
 
             setUser(signedInUser);
@@ -68,6 +73,7 @@ export default function useAuth() {
     async function quit() {
         setUser(null);
         localStorage.removeItem('user');
+        navigate('/sign-in');
     }
 
     return { error, loading, quit, signIn, signUp, user }

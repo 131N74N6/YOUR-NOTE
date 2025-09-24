@@ -17,7 +17,7 @@ const BalanceItem = memo((props: BalanceItemProps) => {
     const handleSave = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
 
-        await props.onUpdate(props.selected_data.id, {
+        await props.onUpdate(props.selected_data._id, {
             amount: Number(editAmount.trim()),
             balance_type: editType,
             description: editDescription.trim()
@@ -25,8 +25,8 @@ const BalanceItem = memo((props: BalanceItemProps) => {
     }
 
     const handleCancel = useCallback(() => {
-        props.onSelect(props.selected_data.id);
-    }, [props.onSelect, props.selected_data.id]);
+        props.onSelect(props.selected_data._id);
+    }, [props.onSelect, props.selected_data._id]);
 
     if (props.isSelected) {
         return (
@@ -103,13 +103,13 @@ const BalanceItem = memo((props: BalanceItemProps) => {
             <div className="flex gap-[0.7rem]">
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onSelect(props.selected_data.id)}
+                    onClick={() => props.onSelect(props.selected_data._id)}
                 >
                     Select
                 </button>
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onDelete(props.selected_data.id)}
+                    onClick={() => props.onDelete(props.selected_data._id)}
                 >
                     Delete
                 </button>

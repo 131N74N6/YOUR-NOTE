@@ -11,6 +11,8 @@ async function signIn(req: Request, res: Response) {
         const { email, password } = req.body;
         const findUserByEmail = await User.findOne({ email });
 
+        if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+
         if (!findUserByEmail) return res.status(401).json({ message: 'Incorrect email or password' });
 
         const isPasswordMatch = await bcrypt.compare(password, findUserByEmail.password);
@@ -18,12 +20,24 @@ async function signIn(req: Request, res: Response) {
         if (!isPasswordMatch) return res.status(401).json({ message: 'Incorrect email or password' });
 
         const token = jwt.sign(
-            { id: findUserByEmail._id, email: findUserByEmail.email, username: findUserByEmail.username },
+            { 
+                id: findUserByEmail._id, 
+                email: findUserByEmail.email, 
+                username: findUserByEmail.username 
+            },
             process.env.JWT_SECRET || 'your jwt key',
             { expiresIn: '1h' }
         );
 
-        res.status(200).json({ message: 'Sign in success', token });
+        res.status(200).json({ 
+            message: 'Sign in success', 
+            token,
+            user: {
+                id: findUserByEmail._id.toString(),
+                email: findUserByEmail.email,
+                username: findUserByEmail.username
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
     }

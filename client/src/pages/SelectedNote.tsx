@@ -7,13 +7,12 @@ import Loading from "../components/Loading";
 
 export default function SelectedNote() {
     const { id } = useParams();
-    const collectionName = 'notes';
     const navigate = useNavigate();
 
-    const { realTimeInit, updateData } = useFirestore<INote>();
-    const { data: selectedNote, loading } = realTimeInit({
-        collection_name: collectionName,
-        filters: id ? [['id', '==', id]] : []
+    const { getData, updateData } = useFirestore<INote>();
+
+    const { data: selectedNote, isLoading } = getData<INote>({
+        api_url: `http://localhost:1234/activities/selected/${id}`
     });
 
     const [editTitle, setEditTitle] = useState<string>('');
@@ -26,7 +25,7 @@ export default function SelectedNote() {
             setEditContent(note.note_content || '');
             setEditTitle(note.note_title || '');
         } 
-    }, [selectedNote, loading, id, navigate]);
+    }, [selectedNote, isLoading, id, navigate]);
 
     const saveEditedNote = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
@@ -36,14 +35,13 @@ export default function SelectedNote() {
 
             const trimmedTitle = editTitle.trim();
             const trimmedContent = editContent.trim();
-
-            await updateData({
-                collection_name: collectionName,
-                new_data: {
+            
+            await updateData({ 
+                api_url: `http://localhost:1234/activities/change/${id}`,
+                api_data: {
                     note_content: trimmedContent,
                     note_title: trimmedTitle,
-                },
-                values: id
+                }
             });
         } catch (error: any) {
             console.error(error.message);
@@ -52,7 +50,7 @@ export default function SelectedNote() {
         }
     }, [editContent, editTitle, id]);
 
-    if (loading) return <Loading/>
+    if (isLoading) return <Loading/>
 
     return (
         <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">

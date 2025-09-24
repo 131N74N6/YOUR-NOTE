@@ -8,20 +8,22 @@ import { useCallback } from "react";
 import type { INote } from "../services/custom-types";
 
 export default function Notes() {
-    const { data: noteData, deleteData, getData, loading } = useApiCalls<INote>();
+    const { deleteData, getData } = useApiCalls<INote>();
     const { user } = useAuth();
-    const {  } = getData({ api_url: `http://localhost:1234/notes/get-all/${user?.id}` });
+    const { data: noteData, isLoading } = getData<INote>({ 
+        api_url: `http://localhost:1234/notes/get-all/${user?.user.id}` 
+    });
 
     const deleteAllNotes = useCallback(async () => {
         if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.id}` });
+        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.user.id}` });
     }, [noteData, user]);
 
     const deleteSelectedNote = useCallback(async (id: string) => {
         await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
     }, []);
     
-    if (loading) return <Loading/>
+    if (isLoading) return <Loading/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
@@ -39,7 +41,7 @@ export default function Notes() {
                     </button>
                 </div>
                 <div className="overflow-y-auto">
-                    <NoteList notes={noteData} onDelete={deleteSelectedNote}/>
+                    <NoteList notes={noteData ? noteData : []} onDelete={deleteSelectedNote}/>
                 </div>
             </div>
         </main>
