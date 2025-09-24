@@ -20,7 +20,10 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         if (props.is_selected) {            
             setEditActName(props.selected_act.act_name);
             setEditSchedule(isoToLocalDateTime(props.selected_act.schedule_at));
-        } 
+        } else {
+            setEditActName('');
+            setEditSchedule('');
+        }
     }, [props.is_selected, props.selected_act]);
 
     const handleSave = async (event: React.FormEvent): Promise<void> => {

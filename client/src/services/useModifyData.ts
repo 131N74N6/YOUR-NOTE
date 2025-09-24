@@ -1,7 +1,7 @@
 import type { IDeleteApi, IPostApi, IPutApi } from "./custom-types";
 import useAuth from "./useAuth";
 
-export default function useApiCalls<BINTANG>() {
+export default function useApiCalls<HX>() {
     const { user } = useAuth();
     const token = user?.token;
 
@@ -20,7 +20,7 @@ export default function useApiCalls<BINTANG>() {
         else throw new Error(response.message);
     }
 
-    async function insertData(props: IPostApi<BINTANG>) {
+    async function insertData(props: IPostApi<HX>) {
         const request = await fetch(props.api_url, { 
             method: 'POST', 
             body: JSON.stringify(props.api_data),
@@ -36,7 +36,7 @@ export default function useApiCalls<BINTANG>() {
         else throw new Error(response.message);
     }
 
-    async function updateData(props: IPutApi<BINTANG>) {
+    async function updateData(props: IPutApi<HX>) {
         const request = await fetch(props.api_url, { 
             method: 'PUT', 
             body: JSON.stringify(props.api_data),

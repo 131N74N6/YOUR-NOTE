@@ -64,6 +64,7 @@ export default function Activites() {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
         mutate(`activities-${user.info.id}`);
+        if (selectedId === id) setSelectedId(null);
     }, []);
 
     const deleteAllAct = useCallback(async (): Promise<void> => {
@@ -87,6 +88,7 @@ export default function Activites() {
         } catch (error: any) {
             console.error(error.message);
         } finally {
+            mutate(`activities-${user.info.id}`);
             setSelectedId(null);
         }
     }, []);

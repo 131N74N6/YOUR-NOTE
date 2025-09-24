@@ -72,6 +72,7 @@ export default function Balances() {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
         mutate(`balances-${user.info.id}`);
+        if (selectedId === id) setSelectedId(null)
     }, []);
 
     const updateSelectedBalance = useCallback(async (id: string, data: { 
@@ -91,6 +92,7 @@ export default function Balances() {
         } catch (error: any) {
             console.error(error.message);
         } finally {
+            mutate(`balances-${user.info.id}`);
             setSelectedId(null);
         }
     }, []);

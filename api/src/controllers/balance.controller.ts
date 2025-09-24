@@ -54,11 +54,11 @@ async function insertNewBalance(req: Request, res: Response) {
 async function updateSelectedBalance(req: Request, res: Response) {
     try {
         const getBalanceById = req.params.id;
-        await Balances.updateOne({ _id: getBalanceById }, { 
+        await Balances.findByIdAndUpdate({ _id: getBalanceById }, { 
             $set: { 
-                amount: req.body.editAmount,
-                description: req.body.editDescription,
-                type: req.body.editType
+                amount: req.body.amount,
+                balance_type: req.body.balance_type,
+                description: req.body.description
             } 
         });
         res.status(201).json({ message: 'Successfully updated balance' });

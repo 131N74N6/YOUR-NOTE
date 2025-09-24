@@ -6,7 +6,7 @@ function ActivityList(props: ActivityListProps) {
     if (props.act_data.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
-                <span className="text-white font-[600] text-[1rem]">No Activity Added...</span>
+                <span className="text-white font-[600] text-[1rem]">No activity added currently...</span>
             </section>
         );
     }

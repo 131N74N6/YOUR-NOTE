@@ -60,9 +60,7 @@ export default function Notes() {
                         Delete All Notes
                     </button>
                 </div>
-                <div className="overflow-y-auto">
-                    <NoteList notes={noteData ? noteData : []} onDelete={deleteSelectedNote}/>
-                </div>
+                <NoteList notes={noteData ? noteData : []} onDelete={deleteSelectedNote}/>
             </div>
         </main>
     );

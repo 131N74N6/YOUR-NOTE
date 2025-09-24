@@ -11,7 +11,11 @@ const BalanceItem = memo((props: BalanceItemProps) => {
             setEditAmount(props.selected_data.amount.toString());
             setEditType(props.selected_data.balance_type);
             setEditDescription(props.selected_data.description);
-        } 
+        } else {
+            setEditAmount('');
+            setEditType('income');
+            setEditDescription('');
+        }
     }, [props.selected_data, props.isSelected]);
 
     const handleSave = async (event: React.FormEvent): Promise<void> => {
