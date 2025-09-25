@@ -1,6 +1,6 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import BalanceList from "../components/BalanceList";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
 import useApiCalls from "../services/useModifyData";
@@ -34,9 +34,11 @@ export default function Balances() {
         return response;
     }
 
-    const { data: balanceData, isLoading } = useSWR<IBalance[]>(`balances-${user?.info.id}`, fetcher);
+    const { data: balanceData, isLoading } = useSWR<IBalance[]>(`balances-${user?.info.id}`, fetcher, {
+        refreshInterval: 1000
+    });
 
-    const saveBalances = useCallback(async (event: React.FormEvent): Promise<void> => {
+    const saveBalances = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedAmount = Number(amount.trim());
         const trimmedDescription = description.trim();
@@ -56,26 +58,26 @@ export default function Balances() {
         });
         mutate(`balances-${user.info.id}`);
         closeForm();
-    }, [user, amount, amountType, description]);
+    }
 
-    const handleSelectItem = useCallback((id: string): void => {
+    const handleSelectItem = (id: string): void => {
         setSelectedId(prev => prev === id ? null : id);
-    }, []);
+    }
 
-    const deleteAllBalance = useCallback(async (): Promise<void> => {
+    const deleteAllBalance = async (): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
         mutate(`balances-${user.info.id}`);
-    }, [balanceData, user]);
+    }
 
-    const deleteSelectedBalance = useCallback(async (id: string): Promise<void> => {
+    const deleteSelectedBalance = async (id: string): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
         mutate(`balances-${user.info.id}`);
-        if (selectedId === id) setSelectedId(null)
-    }, []);
+        if (selectedId === id) setSelectedId(null);
+    }
 
-    const updateSelectedBalance = useCallback(async (id: string, data: { 
+    const updateSelectedBalance = async (id: string, data: { 
         amount: number; 
         balance_type: 'income' | 'expense'; 
         description: string;
@@ -95,14 +97,14 @@ export default function Balances() {
             mutate(`balances-${user.info.id}`);
             setSelectedId(null);
         }
-    }, []);
+    }
 
-    const closeForm = useCallback((): void => {
+    const closeForm = (): void => {
         setAmount('');
         setAmountType('income');
         setDescription('');
         setOpenForm(false);
-    }, []);
+    }
 
     useEffect((): void => {
         if (!user) {

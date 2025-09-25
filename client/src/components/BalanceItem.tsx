@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
-const BalanceItem = memo((props: BalanceItemProps) => {
+const BalanceItem = (props: BalanceItemProps) => {
     const [editAmount, setEditAmount] = useState<string>('');
     const [editType, setEditType] = useState<'income' | 'expense'>('income');
     const [editDescription, setEditDescription] = useState<string>('');
@@ -120,6 +120,6 @@ const BalanceItem = memo((props: BalanceItemProps) => {
             </div>
         </div>
     );
-});
+}
 
 export default BalanceItem;

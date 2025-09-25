@@ -1,11 +1,11 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ActivityItemProps } from "../services/custom-types";
 
-const ActivityItem = memo((props: ActivityItemProps) => {
+const ActivityItem = (props: ActivityItemProps) => {
     const [editActName, setEditActName] = useState<string>('');
     const [editSchedule, setEditSchedule] = useState<string>('');
 
-    const isoToLocalDateTime = useCallback((isoString: string): string => {
+    const isoToLocalDateTime = (isoString: string): string => {
         const date = new Date(isoString);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -14,7 +14,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         
         return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }, []);
+    }
 
     useEffect((): void => {
         if (props.is_selected) {            
@@ -35,9 +35,7 @@ const ActivityItem = memo((props: ActivityItemProps) => {
         });
     }
 
-    const handleCancel = useCallback((): void => {
-        props.onSelect(props.selected_act._id);
-    }, [props.onSelect, props.selected_act._id]);
+    const handleCancel = () => props.onSelect(props.selected_act._id);
 
     if (props.is_selected) {
         return (
@@ -87,6 +85,6 @@ const ActivityItem = memo((props: ActivityItemProps) => {
             </div>
         </div>
     );
-});
+}
 
 export default ActivityItem;

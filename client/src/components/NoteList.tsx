@@ -1,8 +1,7 @@
-import { memo } from "react";
 import type { NoteListProps } from "../services/custom-types";
 import NoteItem from "./NoteItem";
 
-const NoteList = memo((props: NoteListProps) => {
+const NoteList = (props: NoteListProps) => {
     if (props.notes.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
@@ -18,6 +17,6 @@ const NoteList = memo((props: NoteListProps) => {
             ))}
         </div>
     );
-});
+}
 
 export default NoteList;

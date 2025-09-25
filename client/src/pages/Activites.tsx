@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useApiCalls from "../services/useModifyData";
 import type { IActivity } from "../services/custom-types";
@@ -33,9 +33,11 @@ export default function Activites() {
         return response;
     }
 
-    const { data: actData, isLoading } = useSWR<IActivity[]>(`activities-${user?.info.id}`, fetcher);
+    const { data: actData, isLoading } = useSWR<IActivity[]>(`activities-${user?.info.id}`, fetcher, {
+        refreshInterval: 1000
+    });
 
-    const saveActName = useCallback(async (event: React.FormEvent): Promise<void> => {
+    const saveActName = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedActName = actName.trim();
         const getCurrentDate = new Date();
@@ -54,26 +56,26 @@ export default function Activites() {
         });
         mutate(`activities-${user.info.id}`);
         closeForm();
-    }, [user, actName, schedule]);
+    }
 
-    const handleSelectAct = useCallback((id: string): void => {
+    const handleSelectAct = (id: string): void => {
         setSelectedId(prev => prev === id ? null : id);
-    }, []);
+    }
 
-    const deleteSelcetedAct = useCallback(async (id: string): Promise<void> => {
+    const deleteSelcetedAct = async (id: string): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
         mutate(`activities-${user.info.id}`);
         if (selectedId === id) setSelectedId(null);
-    }, []);
+    }
 
-    const deleteAllAct = useCallback(async (): Promise<void> => {
+    const deleteAllAct = async (): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
         mutate(`activities-${user.info.id}`);
-    }, [actData, user]);
+    }
 
-    const updateSelectedAct = useCallback(async (id: string, changeAct: {
+    const updateSelectedAct = async (id: string, changeAct: {
         act_name: string;
         schedule_at: string;
     }): Promise<void> => {
@@ -91,13 +93,13 @@ export default function Activites() {
             mutate(`activities-${user.info.id}`);
             setSelectedId(null);
         }
-    }, []);
+    }
 
-    const closeForm = useCallback((): void => {
+    const closeForm = (): void => {
         setActName('');
         setSchedule('');
         setOpenForm(false);
-    }, []);
+    }
     
     useEffect((): void => {
         if (!user) {

@@ -3,12 +3,16 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useApiCalls from "../services/useModifyData";
 import type { INote } from "../services/custom-types";
+import useAuth from "../services/useAuth";
+import { useSWRConfig } from "swr";
 
 export default function SelectedNote() {
+    const { user } = useAuth();
     const { _id } = useParams();
     const navigate = useNavigate();
 
     const { updateData } = useApiCalls<INote>();
+    const { mutate } = useSWRConfig();
 
     const [editTitle, setEditTitle] = useState<string>('');
     const [editContent, setEditContent] = useState<string>('');
@@ -26,6 +30,7 @@ export default function SelectedNote() {
 
     const saveEditedNote = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
+        if (!user) return;
 
         try {
             if (!_id) throw new Error('Note not found');
@@ -34,7 +39,7 @@ export default function SelectedNote() {
             const trimmedContent = editContent.trim();
             
             await updateData({ 
-                api_url: `http://localhost:1234/activities/change/${_id}`,
+                api_url: `http://localhost:1234/notes/change/${_id}`,
                 api_data: {
                     note_content: trimmedContent,
                     note_title: trimmedTitle,
@@ -44,11 +49,12 @@ export default function SelectedNote() {
             console.error(error.message);
         } finally {
             navigate('/notes');
+            mutate(`notes-${user.info.id}`);
         }
     }, [editContent, editTitle, _id]);
 
     return (
-        <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
+        <main className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
             <form onSubmit={saveEditedNote} className="p-[1rem] md:w-3/4 w-full h-full flex flex-col gap-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
@@ -69,6 +75,6 @@ export default function SelectedNote() {
                     <button type="submit" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]">Save</button>
                 </div>
             </form>
-        </div>
+        </main>
     );
 }

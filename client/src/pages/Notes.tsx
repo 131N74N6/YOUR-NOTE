@@ -29,7 +29,9 @@ export default function Notes() {
         return response;
     }
 
-    const { data: noteData, isLoading } = useSWR<INote[]>(`notes-${user?.info.id}`, fetcher);
+    const { data: noteData, isLoading } = useSWR<INote[]>(`notes-${user?.info.id}`, fetcher, {
+        refreshInterval: 1000
+    });
 
     const deleteAllNotes = useCallback(async () => {
         if (!user) return;
@@ -41,7 +43,7 @@ export default function Notes() {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
         mutate(`notes-${user.info.id}`);
-    }, []);
+    }, [mutate]);
     
     if (isLoading) return <Loading/>
 

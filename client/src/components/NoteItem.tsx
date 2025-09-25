@@ -1,8 +1,7 @@
-import { memo } from "react";
 import type { NoteItemProps } from "../services/custom-types";
 import { Link } from "react-router-dom";
 
-const NoteItem = memo((props: NoteItemProps) => {
+const NoteItem = (props: NoteItemProps) => {
     return (
         <div className="flex flex-col gap-[0.45rem] p-[0.45rem] border border-white rounded-[0.45rem]">
             <div className="flex flex-col gap-[1rem] md:h-[270px] h-[168px] overflow-hidden">
@@ -27,6 +26,6 @@ const NoteItem = memo((props: NoteItemProps) => {
             </div>
         </div>
     );
-});
+}
 
 export default NoteItem;

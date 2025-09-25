@@ -1,8 +1,7 @@
-import { memo } from "react";
 import type { BalanceListProps } from "../services/custom-types";
 import BalanceItem from "./BalanceItem";
 
-const BalanceList = memo((props: BalanceListProps) => {
+const BalanceList = (props: BalanceListProps) => {
     if (props.data.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
@@ -25,6 +24,6 @@ const BalanceList = memo((props: BalanceListProps) => {
             ))}
         </div>
     );
-});
+}
 
 export default BalanceList;

@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import AnswerField from "../components/AnswerField";
 
@@ -23,7 +23,7 @@ export default function ChatBot() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
-    const sendQuestion = useCallback(async (event: React.FormEvent): Promise<void> => {
+    const sendQuestion = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         const trimmedQuestion = question.trim();
 
@@ -75,15 +75,14 @@ export default function ChatBot() {
         } finally {
             setLoading(false);
         }
-    }, [question]);
+    }
 
-    const clearResult = useCallback((): void => {
+    const clearResult = (): void => {
         setAnswer('');
         setError('');
         setQuestion('');
-    }, []);
+    }
 
-    // Cleanup on component unmount
     useEffect(() => {
         return () => {
             setAnswer('');

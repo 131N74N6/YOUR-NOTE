@@ -56,8 +56,8 @@ async function updateSelectedNote(req: Request, res: Response) {
         const getNoteById = req.params.id;
         await Notes.updateOne({ _id: getNoteById }, {  
             $set: {
-                note_content: req.body.editContent,
-                note_title: req.body.editTitle
+                note_content: req.body.note_content,
+                note_title: req.body.note_title
             }
         });
         res.status(201).json({ message: 'Successfully change note' });

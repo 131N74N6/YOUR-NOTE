@@ -16,6 +16,6 @@ noteRoutes.get('/selected/:id', getSelectedNote);
 
 noteRoutes.post('/add', insertNewNote);
 
-noteRoutes.put('/change:id', updateSelectedNote);
+noteRoutes.put('/change/:id', updateSelectedNote);
 
 export default noteRoutes;

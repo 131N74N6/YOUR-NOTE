@@ -1,7 +1,6 @@
-import { memo } from "react";
 import type { BalanceFormProps } from "../services/custom-types";
 
-const BalanceForm = memo((props: BalanceFormProps) => {
+const BalanceForm = (props: BalanceFormProps) => {
     return (
         <form onSubmit={props.onSave} className="flex justify-center items-center z-20 fixed inset-0 bg-[rgba(0,0,0,0.66)]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-white w-[400px] h-[400px]">
@@ -44,6 +43,6 @@ const BalanceForm = memo((props: BalanceFormProps) => {
             </div>
         </form>
     );
-});
+}
 
 export default BalanceForm;

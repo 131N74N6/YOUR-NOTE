@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type BotAnswer = {
     answer: string;
@@ -7,11 +7,11 @@ type BotAnswer = {
     loading: boolean;
 }
 
-const AnswerField = memo((props: BotAnswer) => {
+const AnswerField = (props: BotAnswer) => {
     const [copyAnswer, setCopyAnswer] = useState<boolean>(false);
     const [copyTimeout, setCopyTimeout] = useState<NodeJS.Timeout | null>(null);
 
-    const copyToClipboard = useCallback(async (): Promise<void> => {
+    const copyToClipboard = async (): Promise<void> => {
         if (!props.answer) return;
         
         try {
@@ -25,7 +25,7 @@ const AnswerField = memo((props: BotAnswer) => {
         } catch (error) {
             console.error('Failed to copy text: ', error);
         }
-    }, [props.answer, copyTimeout]);
+    }
 
     useEffect(() => {
         return () => {
@@ -70,6 +70,6 @@ const AnswerField = memo((props: BotAnswer) => {
             </div>
         </div>
     );
-});
+}
 
 export default AnswerField;
