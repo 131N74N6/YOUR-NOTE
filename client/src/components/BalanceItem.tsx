@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
 const BalanceItem = (props: BalanceItemProps) => {
@@ -28,9 +28,9 @@ const BalanceItem = (props: BalanceItemProps) => {
         });
     }
 
-    const handleCancel = useCallback(() => {
+    const handleCancel = () => {
         props.onSelect(props.selected_data._id);
-    }, [props.onSelect, props.selected_data._id]);
+    }
 
     if (props.isSelected) {
         return (
@@ -79,17 +79,17 @@ const BalanceItem = (props: BalanceItemProps) => {
                 </div>
                 <div className="flex gap-[0.7rem]">
                     <button 
+                        type="submit" 
+                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
+                    >
+                        Save
+                    </button>
+                    <button 
                         type="button" 
                         className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
                         onClick={handleCancel}
                     >
                         Close
-                    </button>
-                    <button 
-                        type="submit" 
-                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
-                    >
-                        Save
                     </button>
                 </div>
             </form>
