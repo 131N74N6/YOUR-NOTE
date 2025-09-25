@@ -11,7 +11,7 @@ const BalanceList = (props: BalanceListProps) => {
     }
     
     return (
-        <div className="grid md:grid-cols-2 gap-[1rem] grid-cols-1 overflow-y-auto">
+        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-[1rem] grid-cols-1 overflow-y-auto">
             {props.data.map((balance) => (
                 <BalanceItem
                     key={`blnc_${balance._id}`}

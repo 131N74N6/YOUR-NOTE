@@ -124,7 +124,7 @@ export default function Balances() {
                     onClose={closeForm}
                 /> 
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <button 
                         onClick={() => setOpenForm(true)}

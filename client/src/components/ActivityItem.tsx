@@ -54,7 +54,7 @@ const ActivityItem = (props: ActivityItemProps) => {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditSchedule(event.target.value)}
                     className="border border-white p-[0.45rem] text-white text-[0.9rem] outline-0"
                 />
-                <div className="flex gap-[0.7rem]">
+                <div className="flex gap-[0.4rem]">
                     <button type="submit" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]">Save</button>
                     <button type="button" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" onClick={handleCancel}>Cancel</button>
                 </div>
@@ -65,11 +65,11 @@ const ActivityItem = (props: ActivityItemProps) => {
     return (
         <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
             <div className="flex flex-col gap-[0.3rem]">                                
-                <p className="text-white font-[500] text-[0.9rem]">Act: {props.selected_act.act_name}</p>
+                <p className="text-white font-[500] text-[0.9rem] line-clamp-2">Act: {props.selected_act.act_name}</p>
                 <p className="text-white font-[500] text-[0.9rem]">Schedule: {new Date(props.selected_act.schedule_at).toLocaleString()}</p>
                 <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_act.created_at).toLocaleString()}</p>
             </div>
-            <div className="flex gap-[0.7rem]">
+            <div className="flex gap-[0.4rem]">
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
                     onClick={() => props.onSelect(props.selected_act._id)}

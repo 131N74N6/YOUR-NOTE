@@ -77,7 +77,7 @@ const BalanceItem = (props: BalanceItemProps) => {
                         checked={editType === 'expense'}
                     />
                 </div>
-                <div className="flex gap-[0.7rem]">
+                <div className="flex gap-[0.4rem]">
                     <button 
                         type="submit" 
                         className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
@@ -100,11 +100,11 @@ const BalanceItem = (props: BalanceItemProps) => {
         <div className="border-white border rounded p-[0.45rem] flex flex-col gap-[0.5rem]">
             <div className="flex flex-col gap-[0.3rem]">                                
                 <p className="text-white font-[500] text-[0.9rem]">Amount: {props.selected_data.amount}</p>
-                <p className="text-white font-[500] text-[0.9rem]">Description: {props.selected_data.description}</p>
+                <p className="text-white font-[500] text-[0.9rem] line-clamp-2">Description: {props.selected_data.description}</p>
                 <p className="text-white font-[500] text-[0.9rem]">Type: {props.selected_data.balance_type}</p>
                 <p className="text-white font-[500] text-[0.9rem]">Added at: {new Date(props.selected_data.created_at).toLocaleString()}</p>
             </div>
-            <div className="flex gap-[0.7rem]">
+            <div className="flex gap-[0.4rem]">
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
                     onClick={() => props.onSelect(props.selected_data._id)}

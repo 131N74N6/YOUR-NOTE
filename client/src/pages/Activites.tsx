@@ -116,7 +116,7 @@ export default function Activites() {
                     onSave={saveActName}
                 />
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full h-[90%] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col min-h-[500px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <button 
                         onClick={() => setOpenForm(true)}

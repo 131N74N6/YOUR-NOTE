@@ -11,7 +11,7 @@ function ActivityList(props: ActivityListProps) {
     }
 
     return (
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem] overflow-y-auto">
+        <div className="grid lg:grid-cols-2 xl:grid-cols-3 grid-cols-1 gap-[0.7rem] overflow-y-auto">
             {props.act_data.map((act) => (
                 <ActivityItem
                     is_selected={props.selectedId === act._id}
