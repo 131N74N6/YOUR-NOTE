@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import useApiCalls from "../services/useModifyData";
+import useApiCalls from "../services/data-modifier";
 import type { IActivity } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 
 export default function Activites() {
     const [actName, setActName] = useState<string>('');
@@ -14,28 +14,19 @@ export default function Activites() {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { user } = useAuth();
-    const token = user?.token;
 
-    const { deleteData, insertData, updateData } = useApiCalls<IActivity>();
-    const { mutate } = useSWRConfig();
+    const { deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
 
-    const fetcher = async () => {
-        if (!user) return;
-        const request = await fetch(`http://localhost:1234/activities/get-all/${user.info.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const response = await request.json();
-        return response;
-    }
-
-    const { data: actData, isLoading } = useSWR<IActivity[]>(`activities-${user?.info.id}`, fetcher, {
-        refreshInterval: 1000
-    });
+    const { data: actData, isLoading, mutate } = useSWR<IActivity[]>(
+        user ? `http://localhost:1234/activities/get-all/${user.info.id}` : null, 
+        getData, 
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000, // Reduce unnecessary requests
+            errorRetryCount: 3,
+        }
+    );
 
     const saveActName = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -54,7 +45,8 @@ export default function Activites() {
                 user_id: user.info.id
             }
         });
-        mutate(`activities-${user.info.id}`);
+
+        mutate();
         closeForm();
     }
 
@@ -65,14 +57,14 @@ export default function Activites() {
     const deleteSelcetedAct = async (id: string): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
-        mutate(`activities-${user.info.id}`);
+        mutate();
         if (selectedId === id) setSelectedId(null);
     }
 
     const deleteAllAct = async (): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
-        mutate(`activities-${user.info.id}`);
+        mutate();
     }
 
     const updateSelectedAct = async (id: string, changeAct: {
@@ -90,7 +82,7 @@ export default function Activites() {
         } catch (error: any) {
             console.error(error.message);
         } finally {
-            mutate(`activities-${user.info.id}`);
+            mutate();
             setSelectedId(null);
         }
     }
@@ -124,7 +116,7 @@ export default function Activites() {
                     onSave={saveActName}
                 />
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full h-[90%] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <button 
                         onClick={() => setOpenForm(true)}

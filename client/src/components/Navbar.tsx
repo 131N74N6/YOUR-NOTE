@@ -3,7 +3,6 @@ import useAuth from "../services/useAuth";
 
 export function Navbar1() {
     const { quit, user } = useAuth();
-    
     const signOut = async() => await quit();
 
     return (

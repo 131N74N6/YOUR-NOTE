@@ -3,10 +3,10 @@ import BalanceList from "../components/BalanceList";
 import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/useModifyData";
+import useApiCalls from "../services/data-modifier";
 import type { IBalance } from "../services/custom-types";
 import Loading from "../components/Loading";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 
 export default function Balances() {
     const [amount, setAmount] = useState<string>('');
@@ -15,28 +15,19 @@ export default function Balances() {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>('');
     const { user } = useAuth();
-    const token = user?.token;
     
-    const { deleteData, insertData, updateData } = useApiCalls<IBalance>();
-    const { mutate } = useSWRConfig();
+    const { deleteData, getData, insertData, updateData } = useApiCalls<IBalance>();
 
-    const fetcher = async () => {
-        if (!user) return;
-        const request = await fetch(`http://localhost:1234/balances/get-all/${user.info.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const response = await request.json();
-        return response;
-    }
-
-    const { data: balanceData, isLoading } = useSWR<IBalance[]>(`balances-${user?.info.id}`, fetcher, {
-        refreshInterval: 1000
-    });
+    const { data: balanceData, isLoading, mutate } = useSWR<IBalance[]>(
+        user ? `http://localhost:1234/balances/get-all/${user.info.id}` : null, 
+        getData, 
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000, // Reduce unnecessary requests
+            errorRetryCount: 3,
+        }
+    );
 
     const saveBalances = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -56,7 +47,8 @@ export default function Balances() {
                 user_id: user.info.id
             }
         });
-        mutate(`balances-${user.info.id}`);
+
+        mutate();
         closeForm();
     }
 
@@ -67,13 +59,13 @@ export default function Balances() {
     const deleteAllBalance = async (): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
-        mutate(`balances-${user.info.id}`);
+        mutate();
     }
 
     const deleteSelectedBalance = async (id: string): Promise<void> => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
-        mutate(`balances-${user.info.id}`);
+        mutate();
         if (selectedId === id) setSelectedId(null);
     }
 
@@ -94,7 +86,7 @@ export default function Balances() {
         } catch (error: any) {
             console.error(error.message);
         } finally {
-            mutate(`balances-${user.info.id}`);
+            mutate();
             setSelectedId(null);
         }
     }
@@ -132,7 +124,7 @@ export default function Balances() {
                     onClose={closeForm}
                 /> 
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] h-[90%] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <button 
                         onClick={() => setOpenForm(true)}

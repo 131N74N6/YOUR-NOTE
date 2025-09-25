@@ -28,7 +28,7 @@ export default function useAuth() {
 
             if (request.status === 400) throw new Error(response.message);
             else if (request.status === 409) throw new Error(response.message);
-
+            navigate('/sign-in');
             return { response, error: null };
         } catch (err: any) {
             setError(err.message);

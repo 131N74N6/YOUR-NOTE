@@ -54,7 +54,7 @@ async function insertNewBalance(req: Request, res: Response) {
 async function updateSelectedBalance(req: Request, res: Response) {
     try {
         const getBalanceById = req.params.id;
-        await Balances.findByIdAndUpdate({ _id: getBalanceById }, { 
+        await Balances.updateOne({ _id: getBalanceById }, { 
             $set: { 
                 amount: req.body.amount,
                 balance_type: req.body.balance_type,

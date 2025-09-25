@@ -17,7 +17,7 @@ const ActivityItem = (props: ActivityItemProps) => {
     }
 
     useEffect((): void => {
-        if (props.is_selected) {            
+        if (props.is_selected) {
             setEditActName(props.selected_act.act_name);
             setEditSchedule(isoToLocalDateTime(props.selected_act.schedule_at));
         } else {

@@ -3,7 +3,7 @@ import useAuth from "./useAuth";
 
 export default function useApiCalls<HX>() {
     const { user } = useAuth();
-    const token = user?.token;
+    const token = user ? user.token : null;
 
     async function deleteData(props: IDeleteApi): Promise<void> {
         const request = await fetch(props.api_url, {
@@ -18,6 +18,19 @@ export default function useApiCalls<HX>() {
 
         if (request.ok) return response;
         else throw new Error(response.message);
+    }
+
+    async function getData(api_url: string) {
+        const request = await fetch(api_url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const response = await request.json();
+        return response;
     }
 
     async function insertData(props: IPostApi<HX>) {
@@ -52,5 +65,5 @@ export default function useApiCalls<HX>() {
         else throw new Error(response.message);
     }
 
-    return { deleteData, insertData, updateData }
+    return { deleteData, getData, insertData, updateData }
 }

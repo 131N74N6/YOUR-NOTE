@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import useApiCalls from "../services/useModifyData";
+import useApiCalls from "../services/data-modifier";
 import type { INote } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import { useSWRConfig } from "swr";

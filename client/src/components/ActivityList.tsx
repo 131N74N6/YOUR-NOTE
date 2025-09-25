@@ -1,4 +1,3 @@
-import { memo } from "react";
 import type { ActivityListProps } from "../services/custom-types";
 import ActivityItem from "./ActivityItem";
 
@@ -27,4 +26,4 @@ function ActivityList(props: ActivityListProps) {
     );
 }
 
-export default memo(ActivityList);
+export default ActivityList;
