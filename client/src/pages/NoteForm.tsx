@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import useAuth from "../services/useAuth";
 import useApiCalls from "../services/useModifyData";
 import type { INote } from "../services/custom-types";
@@ -12,7 +12,7 @@ export default function NoteForm() {
     
     const { insertData } = useApiCalls<INote>();
 
-    const addNote = useCallback(async (event: React.FormEvent) => {
+    const addNote = async (event: React.FormEvent) => {
         event.preventDefault();
         const trimmedContent = content.trim();
         const trimmedTitle = title.trim();
@@ -32,12 +32,12 @@ export default function NoteForm() {
         });
 
         resetForm();
-    }, [title, content, user]);
+    }
 
-    const resetForm = useCallback(() => {
+    const resetForm = () => {
         setTitle('');
         setContent('');
-    }, []);
+    }
 
     return (
         <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">

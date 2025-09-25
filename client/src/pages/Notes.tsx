@@ -4,7 +4,6 @@ import NoteList from "../components/NoteList";
 import useAuth from "../services/useAuth";
 import useApiCalls from "../services/useModifyData";
 import Loading from "../components/Loading";
-import { useCallback } from "react";
 import type { INote } from "../services/custom-types";
 import useSWR, { useSWRConfig } from "swr";
 
@@ -33,17 +32,17 @@ export default function Notes() {
         refreshInterval: 1000
     });
 
-    const deleteAllNotes = useCallback(async () => {
+    const deleteAllNotes = async () => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
         mutate(`notes-${user.info.id}`);
-    }, [noteData, user]);
+    }
 
-    const deleteSelectedNote = useCallback(async (id: string) => {
+    const deleteSelectedNote = async (id: string) => {
         if (!user) return;
         await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
         mutate(`notes-${user.info.id}`);
-    }, [mutate]);
+    }
     
     if (isLoading) return <Loading/>
 

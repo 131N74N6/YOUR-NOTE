@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useApiCalls from "../services/useModifyData";
@@ -28,7 +28,7 @@ export default function SelectedNote() {
         getSelectedNote();
     }, [_id, navigate]);
 
-    const saveEditedNote = useCallback(async (event: React.FormEvent) => {
+    const saveEditedNote = async (event: React.FormEvent) => {
         event.preventDefault();
         if (!user) return;
 
@@ -51,7 +51,7 @@ export default function SelectedNote() {
             navigate('/notes');
             mutate(`notes-${user.info.id}`);
         }
-    }, [editContent, editTitle, _id]);
+    }
 
     return (
         <main className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
