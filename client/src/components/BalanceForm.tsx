@@ -37,8 +37,20 @@ const BalanceForm = (props: BalanceFormProps) => {
                     />
                 </div>
                 <div className="flex gap-[0.7rem]">
-                    <button type="button" className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" onClick={props.onClose}>Close</button>
-                    <button type="submit" className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]">Save</button>
+                    <button 
+                        type="button" 
+                        className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
+                        onClick={props.onClose}
+                    >
+                        Close
+                    </button>
+                    <button 
+                        type="submit" 
+                        disabled={!props.balance_type || !props.amount || !props.description}
+                        className="bg-white disabled:cursor-not-allowed cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]"
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
         </form>

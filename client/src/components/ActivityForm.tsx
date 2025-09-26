@@ -18,8 +18,20 @@ const ActivityForm = (props: ActivityFormProps) => {
                     onChange={props.makeSchedule}
                 />
                 <div className="flex gap-[0.7rem]">
-                    <button type="button" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" onClick={props.onClose}>Close</button>
-                    <button type="submit" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]">Save</button>
+                    <button 
+                        type="button" 
+                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
+                        onClick={props.onClose}
+                    >
+                        Close
+                    </button>
+                    <button 
+                        type="submit" 
+                        disabled={!props.act_name || !props.schedule_at} 
+                        className="bg-white cursor-pointer disabled:cursor-not-allowed text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
         </form>

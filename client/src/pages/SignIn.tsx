@@ -7,7 +7,7 @@ export default function SignIn() {
     const [password, setPassword] = useState<string>('');
     const [message, setMessage] = useState<string | null>(null);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const { user, signIn } = useAuth();
+    const { loading, signIn, user } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,6 +17,7 @@ export default function SignIn() {
     useEffect(() => {
         if (showMessage) {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
+            setMessage(null);
             return () => clearTimeout(timeout);
         }
     }, [showMessage]);
@@ -77,9 +78,10 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer rounded hover:bg-white hover:text-black transition-colors"
+                    disabled={loading}
+                    className="disabled:cursor-not-allowed p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer rounded hover:bg-white hover:text-black transition-colors"
                 >
-                    Sign In
+                    {loading ? 'Please wait...' : 'Sign In'}
                 </button>
             </form>
         </div>

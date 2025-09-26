@@ -34,7 +34,6 @@ export default function Activites() {
         const getCurrentDate = new Date();
 
         if (!user) return;
-        if (!trimmedActName || !schedule) throw new Error('Missing required data');
 
         await insertData({
             api_url: 'http://localhost:1234/activities/add',

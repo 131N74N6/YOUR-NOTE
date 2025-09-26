@@ -1,6 +1,4 @@
-export type IDeleteApi = IGetApi;
-
-export type IGetApi = {
+export type IDeleteApi = {
     api_url: string;
 }
 

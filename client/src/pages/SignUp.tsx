@@ -9,7 +9,7 @@ export default function SignUp() {
     const [message, setMessage] = useState<string | null>(null);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const navigate = useNavigate();
-    const { signUp, user } = useAuth();
+    const { loading, signUp, user } = useAuth();
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
@@ -18,6 +18,7 @@ export default function SignUp() {
     useEffect(() => {
         if (showMessage) {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
+            setMessage(null);
             return () => clearTimeout(timeout);
         }
     }, [showMessage]);
@@ -81,15 +82,16 @@ export default function SignUp() {
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-200 hover:underline" to={'/sign-in'}>Sign In</Link></div>
                 {showMessage ? 
-                    <div className="text-red-400 text-sm font-medium text-center p-2 bg-red-100 rounded">
+                    <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
                         {message}
                     </div>
                 : null}
                 <button 
                     type="submit" 
+                    disabled={loading}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-white hover:text-black transition-colors"
                 >
-                    Sign Up
+                    {loading ? 'Please wait...' : 'Sign Up'}
                 </button>
             </form>
         </div>
