@@ -55,8 +55,20 @@ const ActivityItem = (props: ActivityItemProps) => {
                     className="border border-white p-[0.45rem] text-white text-[0.9rem] outline-0"
                 />
                 <div className="flex gap-[0.4rem]">
-                    <button type="submit" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]">Save</button>
-                    <button type="button" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" onClick={handleCancel}>Cancel</button>
+                    <button 
+                        type="submit" 
+                        disabled={!editActName}
+                        className="bg-white disabled:cursor-not-allowed cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
+                    >
+                        Save
+                    </button>
+                    <button 
+                        type="button" 
+                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
+                        onClick={handleCancel}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </form>
         );

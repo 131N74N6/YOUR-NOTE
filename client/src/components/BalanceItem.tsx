@@ -80,7 +80,8 @@ const BalanceItem = (props: BalanceItemProps) => {
                 <div className="flex gap-[0.4rem]">
                     <button 
                         type="submit" 
-                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
+                        disabled={!editAmount || !editType || !editDescription}
+                        className="bg-white disabled:cursor-not-allowed cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
                     >
                         Save
                     </button>
