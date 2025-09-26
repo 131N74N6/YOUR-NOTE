@@ -69,7 +69,13 @@ export default function SelectedNote() {
                 ></textarea>
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem]">
                     <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
-                    <button type="submit" className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]">Save</button>
+                    <button 
+                        type="submit" 
+                        disabled={!editContent || !editTitle}
+                        className="bg-white disabled:cursor-not-allowed cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]"
+                    >
+                        Save
+                    </button>
                 </div>
             </form>
         </main>
