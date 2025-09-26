@@ -4,7 +4,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import useApiCalls from "../services/data-modifier";
 import type { INote } from "../services/custom-types";
 import useAuth from "../services/useAuth";
-import { useSWRConfig } from "swr";
 
 export default function SelectedNote() {
     const { user } = useAuth();
@@ -12,7 +11,6 @@ export default function SelectedNote() {
     const navigate = useNavigate();
 
     const { updateData } = useApiCalls<INote>();
-    const { mutate } = useSWRConfig();
 
     const [editTitle, setEditTitle] = useState<string>('');
     const [editContent, setEditContent] = useState<string>('');
@@ -49,7 +47,6 @@ export default function SelectedNote() {
             console.error(error.message);
         } finally {
             navigate('/notes');
-            mutate(`notes-${user.info.id}`);
         }
     }
 

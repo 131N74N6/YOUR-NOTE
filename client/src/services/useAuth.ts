@@ -25,9 +25,7 @@ export default function useAuth() {
             });
 
             const response = await request.json();
-
-            if (request.status === 400) throw new Error(response.message);
-            else if (request.status === 409) throw new Error(response.message);
+            
             navigate('/sign-in');
             return { response, error: null };
         } catch (err: any) {
@@ -48,9 +46,6 @@ export default function useAuth() {
             
             const response: IUser = await request.json();
 
-            if (request.status === 400) throw new Error(response.message);
-            else if (request.status === 401) throw new Error(response.message);
-
             const signedInUser: IUser = { 
                 message: response.message,
                 token: response.token,
@@ -59,7 +54,7 @@ export default function useAuth() {
                     email: response.info.email,
                     username: response.info.username,
                 }
-            };
+            }
 
             setUser(signedInUser);
             localStorage.setItem('user', JSON.stringify(signedInUser));

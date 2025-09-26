@@ -5,8 +5,9 @@ import useAuth from "../services/useAuth";
 export default function SignIn() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [message, setMessage] = useState<string | null>(null);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const { user, signIn, error } = useAuth();
+    const { user, signIn } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,14 +23,17 @@ export default function SignIn() {
 
     const handleSignIn = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
-        const trimmedEmail = email.trim();
-
-        if (error) {
+        try {            
+            const trimmedEmail = email.trim();
+            if (!trimmedEmail) throw new Error('email is required here');
+            if (!trimmedEmail.includes('@')) throw new Error('invalid email address');
+            if (!password) throw new Error('password is required here');
+            if (password.length < 5) throw new Error('password too weak');
+            await signIn(trimmedEmail, password);
+        } catch (error: any) {
+            setMessage(error.message);
             setShowMessage(true);
-            return;
-        }
-
-        await signIn(trimmedEmail, password);
+        } 
     }, [email, password]);
 
     return (
@@ -67,7 +71,7 @@ export default function SignIn() {
                 
                 {showMessage && (
                     <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {error}
+                        {message}
                     </div>
                 )}
                 

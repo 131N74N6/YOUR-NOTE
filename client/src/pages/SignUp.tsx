@@ -6,34 +6,40 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
+    const [message, setMessage] = useState<string | null>(null);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const navigate = useNavigate();
-    const { signUp, user, error } = useAuth();
+    const { signUp, user } = useAuth();
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
     useEffect(() => {
-        if (error) {
-            setShowMessage(true);
+        if (showMessage) {
             const timeout = setTimeout(() => setShowMessage(false), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error]);
+    }, [showMessage]);
 
     const handleSignUp = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
-        const trimmedEmail = email.trim();
-        const trimmedUsername = username.trim();
-        const getCurrentDate = new Date();
+        try {            
+            const trimmedEmail = email.trim();
+            const trimmedUsername = username.trim();
+            const getCurrentDate = new Date();
 
-        if (!trimmedEmail || !password || !trimmedUsername) {
+            if (!trimmedUsername) throw new Error('username is required here');
+            if (!trimmedEmail) throw new Error('email is required here');
+            if (!trimmedEmail.includes('@')) throw new Error('invalid email address');
+            if (!password) throw new Error('password is required here');
+            if (password.length < 5) throw new Error('password too weak');
+
+            await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUsername, password);
+        } catch (error: any) {
+            setMessage(error.message);
             setShowMessage(true);
-            return;
         }
-
-        await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUsername, password);
     }, [email, password, username]);
 
     return (
@@ -76,7 +82,7 @@ export default function SignUp() {
                 <div className="text-center text-white">Already have account? <Link className="text-blue-200 hover:underline" to={'/sign-in'}>Sign In</Link></div>
                 {showMessage ? 
                     <div className="text-red-400 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {error}
+                        {message}
                     </div>
                 : null}
                 <button 
