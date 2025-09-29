@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { 
-    deleteAllActivities, deleteSelectedActivity, getAllActivities, 
+    countAllActivities, deleteAllActivities, deleteSelectedActivity, getAllActivities, 
     getSelectedActivity, insertNewActivity, updateSelectedActivity 
 } from "../controllers/activity.controller";
 
@@ -15,6 +15,8 @@ activityRoutes.delete('/erase/:id', deleteSelectedActivity);
 activityRoutes.get('/get-all/:id', getAllActivities);
 
 activityRoutes.get('/selected/:id', getSelectedActivity);
+
+activityRoutes.get('/summary/:id', countAllActivities);
 
 activityRoutes.post('/add', insertNewActivity);
 

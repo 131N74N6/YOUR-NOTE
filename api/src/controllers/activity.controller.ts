@@ -1,6 +1,16 @@
 import { Request, Response } from "express";
 import { Activity } from "../models/activity.model";
 
+async function countAllActivities(req: Request, res: Response): Promise<void> {
+    try {
+        const getUserId = req.params.id;
+        const activityList = await Activity.find({ user_id: getUserId }).countDocuments();
+        res.json(activityList);
+    } catch (error) {
+        res.status(500).send({ message: 'Something went wrong' });
+    }
+}
+
 async function deleteAllActivities(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
@@ -67,6 +77,7 @@ async function updateSelectedActivity(req: Request, res: Response): Promise<void
 }
 
 export { 
+    countAllActivities,
     deleteAllActivities,
     deleteSelectedActivity, 
     getAllActivities, 

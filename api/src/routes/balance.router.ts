@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { 
+    countUserBalance,
     deleteAllBalances, deleteSelectedBalance, getAllBalances, 
     getSelectedBalance, insertNewBalance, updateSelectedBalance 
 } from '../controllers/balance.controller';
@@ -13,6 +14,8 @@ balanceRoutes.delete('/erase/:id', deleteSelectedBalance);
 balanceRoutes.get('/get-all/:id', getAllBalances);
 
 balanceRoutes.get('/selected/:id', getSelectedBalance);
+
+balanceRoutes.get('/summary/:id', countUserBalance);
 
 balanceRoutes.post('/add', insertNewBalance);
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { 
-    deleteAllNotes, deleteSelectedNote, getAllNotes, 
+    countAllNotes, deleteAllNotes, deleteSelectedNote, getAllNotes, 
     getSelectedNote, insertNewNote, updateSelectedNote 
 } from "../controllers/note.controller";
 
@@ -13,6 +13,8 @@ noteRoutes.delete('/erase/:id', deleteSelectedNote);
 noteRoutes.get('/get-all/:id', getAllNotes);
 
 noteRoutes.get('/selected/:id', getSelectedNote);
+
+noteRoutes.get('/summary/:id', countAllNotes);
 
 noteRoutes.post('/add', insertNewNote);
 

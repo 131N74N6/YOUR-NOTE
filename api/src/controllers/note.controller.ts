@@ -1,7 +1,17 @@
 import { Request, Response } from "express";
 import { Notes } from "../models/note.model";
 
-async function deleteAllNotes(req: Request, res: Response) {
+async function countAllNotes(req: Request, res: Response): Promise<void> {
+    try {
+        const getUserId = req.params.id;
+        const noteList = await Notes.find({ user_id: getUserId }).countDocuments();
+        res.json(noteList);
+    } catch (error) {
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+}
+
+async function deleteAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         await Notes.deleteMany({ user_id: getUserId });
@@ -11,7 +21,7 @@ async function deleteAllNotes(req: Request, res: Response) {
     }
 }
 
-async function deleteSelectedNote(req: Request, res: Response) {
+async function deleteSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         await Notes.deleteOne({ _id: getNoteById });
@@ -21,7 +31,7 @@ async function deleteSelectedNote(req: Request, res: Response) {
     }
 }
 
-async function getAllNotes(req: Request, res: Response) {
+async function getAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const noteList = await Notes.find({ user_id: getUserId });
@@ -31,7 +41,7 @@ async function getAllNotes(req: Request, res: Response) {
     }
 }
 
-async function getSelectedNote(req: Request, res: Response) {
+async function getSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         const getNote = await Notes.find({ _id: getNoteById });
@@ -41,7 +51,7 @@ async function getSelectedNote(req: Request, res: Response) {
     }
 }
 
-async function insertNewNote(req: Request, res: Response) {
+async function insertNewNote(req: Request, res: Response): Promise<void> {
     try {
         const newNote = new Notes(req.body);
         await newNote.save();
@@ -51,7 +61,7 @@ async function insertNewNote(req: Request, res: Response) {
     }
 }
 
-async function updateSelectedNote(req: Request, res: Response) {
+async function updateSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         await Notes.updateOne({ _id: getNoteById }, {  
@@ -67,6 +77,7 @@ async function updateSelectedNote(req: Request, res: Response) {
 }
 
 export {
+    countAllNotes,
     deleteAllNotes,
     deleteSelectedNote,
     getAllNotes,
