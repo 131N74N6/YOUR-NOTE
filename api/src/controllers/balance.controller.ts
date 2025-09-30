@@ -5,20 +5,24 @@ import { Types } from 'mongoose';
 async function countUserBalance(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const incomeTotal = await Balances.aggregate([
+        const incomeResult = await Balances.aggregate([
             { $match: { $and: [{ user_id: new Types.ObjectId(getUserId) }, { balance_type: 'income' }] } },
             { $group: { _id: "income", total: { $sum: "$amount" } } }
         ]);
         
-        const expenseTotal = await Balances.aggregate([
+        const expenseResult = await Balances.aggregate([
             { $match: { $and: [{ user_id: new Types.ObjectId(getUserId) }, { balance_type: 'expense' }] } },
             { $group: { _id: 'expense', total: { $sum: '$amount' } } }
         ]);
 
+        const incomeTotal = incomeResult.length > 0 ? incomeResult[0].total : 0;
+        const expenseTotal = expenseResult.length > 0 ? expenseResult[0].total : 0;
+        const currentBalance = incomeTotal - expenseTotal;
+
         res.json({
             expense: expenseTotal,
             income: incomeTotal,
-            balance: incomeTotal[0].total - expenseTotal[0].total
+            balance: currentBalance
         });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
