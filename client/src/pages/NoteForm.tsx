@@ -10,7 +10,7 @@ export default function NoteForm() {
     const [content, setContent] = useState<string>('');
     const { user } = useAuth();
     
-    const { insertData } = useApiCalls<INote>();
+    const { insertData } = useApiCalls();
 
     const addNote = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -21,7 +21,7 @@ export default function NoteForm() {
         if (!user) return;
         if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
 
-        await insertData({
+        await insertData<INote>({
             api_url: 'http://localhost:1234/notes/add',
             api_data: {
                 created_at: getCurrentDate.toISOString(),

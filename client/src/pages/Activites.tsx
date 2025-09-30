@@ -15,7 +15,7 @@ export default function Activites() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { user } = useAuth();
 
-    const { deleteData, getData, insertData, updateData } = useApiCalls<IActivity>();
+    const { deleteData, getData, insertData, updateData } = useApiCalls();
 
     const { data: actData, isLoading, mutate } = useSWR<IActivity[]>(
         user ? `http://localhost:1234/activities/get-all/${user.info.id}` : null, 
@@ -35,7 +35,7 @@ export default function Activites() {
 
         if (!user) return;
 
-        await insertData({
+        await insertData<IActivity>({
             api_url: 'http://localhost:1234/activities/add',
             api_data: {
                 act_name: trimmedActName,
@@ -74,7 +74,7 @@ export default function Activites() {
         try {
             if (!changeAct.act_name.trim()) throw new Error('Missing required data');
             
-            await updateData({
+            await updateData<IActivity>({
                 api_url: `http://localhost:1234/activities/change/${id}`,
                 api_data: changeAct
             });

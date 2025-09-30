@@ -10,7 +10,7 @@ export default function SelectedNote() {
     const { _id } = useParams();
     const navigate = useNavigate();
 
-    const { updateData } = useApiCalls<INote>();
+    const { updateData } = useApiCalls();
 
     const [editTitle, setEditTitle] = useState<string>('');
     const [editContent, setEditContent] = useState<string>('');
@@ -36,7 +36,7 @@ export default function SelectedNote() {
             const trimmedTitle = editTitle.trim();
             const trimmedContent = editContent.trim();
             
-            await updateData({ 
+            await updateData<INote>({ 
                 api_url: `http://localhost:1234/notes/change/${_id}`,
                 api_data: {
                     note_content: trimmedContent,

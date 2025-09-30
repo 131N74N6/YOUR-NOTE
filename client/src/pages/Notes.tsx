@@ -9,7 +9,7 @@ import useSWR from "swr";
 
 export default function Notes() {
     const { user } = useAuth();
-    const { deleteData, getData } = useApiCalls<INote>();
+    const { deleteData, getData } = useApiCalls();
 
     const { data: noteData, isLoading, mutate } = useSWR<INote[]>(
         user ? `http://localhost:1234/notes/get-all/${user.info.id}` : null, 

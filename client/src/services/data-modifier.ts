@@ -1,11 +1,11 @@
 import type { IDeleteApi, IPostApi, IPutApi } from "./custom-types";
 import useAuth from "./useAuth";
 
-export default function useApiCalls<HX>() {
+export default function useApiCalls() {
     const { user } = useAuth();
-    const token = user ? user.token : null;
+    const token = user && user.token;
 
-    async function deleteData(props: IDeleteApi): Promise<void> {
+    const deleteData = async(props: IDeleteApi) => {
         const request = await fetch(props.api_url, {
             method: 'DELETE',
             headers: {
@@ -15,12 +15,10 @@ export default function useApiCalls<HX>() {
         });
 
         const response = await request.json();
-
-        if (request.ok) return response;
-        else throw new Error(response.message);
+        return response;
     }
 
-    async function getData(api_url: string) {
+    const getData = async (api_url: string) => {
         const request = await fetch(api_url, {
             method: 'GET',
             headers: {
@@ -33,7 +31,7 @@ export default function useApiCalls<HX>() {
         return response;
     }
 
-    async function insertData(props: IPostApi<HX>) {
+    const insertData = async <HX>(props: IPostApi<HX>) => {
         const request = await fetch(props.api_url, { 
             method: 'POST', 
             body: JSON.stringify(props.api_data),
@@ -44,12 +42,10 @@ export default function useApiCalls<HX>() {
         });
 
         const response = await request.json();
-
-        if (request.ok) return response;
-        else throw new Error(response.message);
+        return response;
     }
 
-    async function updateData(props: IPutApi<HX>) {
+    const updateData = async <HX>(props: IPutApi<HX>) => {
         const request = await fetch(props.api_url, { 
             method: 'PUT', 
             body: JSON.stringify(props.api_data),
@@ -60,9 +56,7 @@ export default function useApiCalls<HX>() {
         });
 
         const response = await request.json();
-            
-        if (request.ok) return response;
-        else throw new Error(response.message);
+        return response;
     }
 
     return { deleteData, getData, insertData, updateData }

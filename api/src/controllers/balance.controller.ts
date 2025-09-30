@@ -1,31 +1,24 @@
 import { Request, Response } from 'express';
 import { Balances } from '../models/balance.model';
+import { Types } from 'mongoose';
 
 async function countUserBalance(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const summary = await Balances.aggregate([
-            { $match: { user_id: getUserId } },
-            { $group: { _id: "$balance_type", income_total: { $sum: "$amount" } } }
+        const incomeTotal = await Balances.aggregate([
+            { $match: { $and: [{ user_id: new Types.ObjectId(getUserId) }, { balance_type: 'income' }] } },
+            { $group: { _id: "income", total: { $sum: "$amount" } } }
         ]);
         
-        let incomeTotal = 0;
-        let expenseTotal = 0;
-
-        summary.forEach(item => {
-            if (item._id === 'income') {
-                incomeTotal = item.total;
-            } else if (item._id === 'expense') {
-                expenseTotal = item.total;
-            }
-        });
-
-        const balance = incomeTotal - expenseTotal;
+        const expenseTotal = await Balances.aggregate([
+            { $match: { $and: [{ user_id: new Types.ObjectId(getUserId) }, { balance_type: 'expense' }] } },
+            { $group: { _id: 'expense', total: { $sum: '$amount' } } }
+        ]);
 
         res.json({
-            balance: balance,
-            income_total: incomeTotal,
-            expense_total: expenseTotal,
+            expense: expenseTotal,
+            income: incomeTotal,
+            balance: incomeTotal[0].total - expenseTotal[0].total
         });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

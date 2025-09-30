@@ -16,7 +16,7 @@ export default function Balances() {
     const [selectedId, setSelectedId] = useState<string | null>('');
     const { user } = useAuth();
     
-    const { deleteData, getData, insertData, updateData } = useApiCalls<IBalance>();
+    const { deleteData, getData, insertData, updateData } = useApiCalls();
 
     const { data: balanceData, isLoading, mutate } = useSWR<IBalance[]>(
         user ? `http://localhost:1234/balances/get-all/${user.info.id}` : null, 
@@ -37,7 +37,7 @@ export default function Balances() {
 
         if (!user) return;
 
-        await insertData({
+        await insertData<IBalance>({
             api_url: 'http://localhost:1234/balances/add',
             api_data: {
                 amount: trimmedAmount,
@@ -79,7 +79,7 @@ export default function Balances() {
             if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
             if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');
 
-            await updateData({ 
+            await updateData<IBalance>({ 
                 api_url: `http://localhost:1234/balances/change/${id}`,
                 api_data: data
             });
