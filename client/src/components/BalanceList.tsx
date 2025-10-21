@@ -15,6 +15,7 @@ const BalanceList = (props: BalanceListProps) => {
             {props.data.map((balance) => (
                 <BalanceItem
                     key={`blnc_${balance._id}`}
+                    isDataChanging={props.isDataChanging}
                     isSelected={props.selectedId === balance._id}
                     selected_data={balance}
                     onDelete={props.onDelete}

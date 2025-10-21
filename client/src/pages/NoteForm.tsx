@@ -1,37 +1,54 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useState } from "react";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/data-modifier";
 import type { INote } from "../services/custom-types";
+import DataModifier from "../services/data-modifier";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function NoteForm() {
-    const [title, setTitle] = useState<string>('');
-    const [content, setContent] = useState<string>('');
+    const { insertData } = DataModifier();
     const { user } = useAuth();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
     
-    const { insertData } = useApiCalls();
+    const [content, setContent] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const addNote = async (event: React.FormEvent) => {
+    const insertNoteMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async () => {
+            const trimmedContent = content.trim();
+            const trimmedTitle = title.trim();
+            const getCurrentDate = new Date();
+
+            if (!user) return;
+            if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
+
+            await insertData<INote>({
+                api_url: 'http://localhost:1234/notes/add',
+                api_data: {
+                    created_at: getCurrentDate.toISOString(),
+                    note_content: trimmedContent,
+                    note_title: trimmedTitle,
+                    user_id: user.info.id
+                }
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
+            navigate('/notes');
+        },
+        onSettled: () => {
+            resetForm();
+            setIsDataChanging(false);
+        }
+    });
+
+    const addNote = (event: React.FormEvent): void => {
         event.preventDefault();
-        const trimmedContent = content.trim();
-        const trimmedTitle = title.trim();
-        const getCurrentDate = new Date();
-
-        if (!user) return;
-        if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
-
-        await insertData<INote>({
-            api_url: 'http://localhost:1234/notes/add',
-            api_data: {
-                created_at: getCurrentDate.toISOString(),
-                note_content: trimmedContent,
-                note_title: trimmedTitle,
-                user_id: user.info.id
-            }
-        });
-
-        resetForm();
+        insertNoteMutation.mutate();
     }
 
     const resetForm = () => {
@@ -60,8 +77,8 @@ export default function NoteForm() {
                     <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                     <button 
                         type="submit" 
-                        disabled={!title || !content}
-                        className="bg-white cursor-pointer disabled:cursor-not-allowed text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]"
+                        disabled={!title || !content || isDataChanging}
+                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Save
                     </button>

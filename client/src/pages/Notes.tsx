@@ -2,36 +2,50 @@ import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/data-modifier";
 import Loading from "../components/Loading";
 import type { INote } from "../services/custom-types";
-import useSWR from "swr";
+import DataModifier from "../services/data-modifier";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Notes() {
     const { user } = useAuth();
-    const { deleteData, getData } = useApiCalls();
+    const { deleteData, getData } = DataModifier();
+    const queryClient = useQueryClient();
 
-    const { data: noteData, isLoading, mutate } = useSWR<INote[]>(
-        user ? `http://localhost:1234/notes/get-all/${user.info.id}` : null, 
-        getData, 
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000, // Reduce unnecessary requests
-            errorRetryCount: 3,
-        }
-    );
+    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const deleteAllNotes = async () => {
-        if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
-        mutate();
+    const { data: noteData, isLoading } = getData<INote[]>({
+        api_url: `http://localhost:1234/notes/get-all/${user?.info.id}`,
+        query_key: [`notes-${user?.info.id}`],
+        stale_time: 1000
+    });
+
+    const deleteOneNoteMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async (id: string) => {
+            await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` })
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] }),
+        onSettled: () => setIsDataChanging(false)
+    });
+
+    const deleteManyNotesMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async () => {
+            if (!user) return;
+            await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] }),
+        onSettled: () => setIsDataChanging(false)
+    });
+
+    const deleteAllNotes = () => {
+        deleteManyNotesMutation.mutate();
     }
 
     const deleteSelectedNote = async (id: string) => {
-        if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` });
-        mutate();
+        deleteOneNoteMutation.mutate(id);
     }
     
     if (isLoading) return <Loading/>
@@ -45,8 +59,9 @@ export default function Notes() {
                     <Link to={'/add-note'} className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]">Add Note</Link>
                     <button 
                         type="button" 
+                        disabled={isDataChanging}
                         onClick={deleteAllNotes}
-                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                        className="bg-white cursor-pointer font-[500] disabled:cursor-not-allowed text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                     >
                         Delete All Notes
                     </button>

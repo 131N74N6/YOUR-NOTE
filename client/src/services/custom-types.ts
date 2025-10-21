@@ -25,6 +25,13 @@ export type UpdateActivityDataProps = {
     schedule_at: string;
 }
 
+export type UpdateBalanceProps = {
+    _id: string;
+    amount: number; 
+    balance_type: 'income' | 'expense'; 
+    description: string;
+}
+
 export type GetDataProps = {
     api_url: string; 
     query_key: string[]; 
@@ -91,6 +98,7 @@ export type BalanceFormProps = {
     changeToExpense: () => void;
     description: string;
     changeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    isDataChanging: boolean;
 }
 
 export type IBalance = {
@@ -106,28 +114,18 @@ export type BalanceListProps = {
     data: IBalance[];
     selectedId: string | null;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, 
-        data: { 
-            amount: number; 
-            balance_type: 'income' | 'expense'; 
-            description: string 
-        }
-    ) => Promise<void>;
+    onUpdate: (selected: UpdateBalanceProps) => void;
     onDelete: (id: string) => void;
+    isDataChanging: boolean;
 }
 
 export type BalanceItemProps = {
     selected_data: IBalance;
     isSelected: boolean;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, 
-        data: { 
-            amount: number; 
-            balance_type: 'income' | 'expense'; 
-            description: string 
-        }
-    ) => Promise<void>;
+    onUpdate: (selected: UpdateBalanceProps) => void;
     onDelete: (id: string) => void;
+    isDataChanging: boolean;
 }
 
 export type INote = {

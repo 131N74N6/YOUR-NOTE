@@ -18,10 +18,11 @@ const BalanceItem = (props: BalanceItemProps) => {
         }
     }, [props.selected_data, props.isSelected]);
 
-    const handleSave = async (event: React.FormEvent): Promise<void> => {
+    const handleSave = (event: React.FormEvent): void => {
         event.preventDefault();
 
-        await props.onUpdate(props.selected_data._id, {
+        props.onUpdate({
+            _id: props.selected_data._id,
             amount: Number(editAmount.trim()),
             balance_type: editType,
             description: editDescription.trim()

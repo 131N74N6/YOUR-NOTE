@@ -3,53 +3,100 @@ import BalanceList from "../components/BalanceList";
 import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/useAuth";
-import useApiCalls from "../services/data-modifier";
-import type { IBalance } from "../services/custom-types";
+import type { IBalance, UpdateBalanceProps } from "../services/custom-types";
 import Loading from "../components/Loading";
-import useSWR from "swr";
+import DataModifier from "../services/data-modifier";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Balances() {
+    const { user } = useAuth();
+    const { deleteData, getData, insertData, updateData } = DataModifier();
+    const queryClient = useQueryClient();
+
     const [amount, setAmount] = useState<string>('');
     const [amountType, setAmountType] = useState<'income' | 'expense'>('income');
     const [description, setDescription] = useState<string>('');
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>('');
-    const { user } = useAuth();
-    
-    const { deleteData, getData, insertData, updateData } = useApiCalls();
+    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const { data: balanceData, isLoading, mutate } = useSWR<IBalance[]>(
-        user ? `http://localhost:1234/balances/get-all/${user.info.id}` : null, 
-        getData, 
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000, // Reduce unnecessary requests
-            errorRetryCount: 3,
+    const { data: balanceData, isLoading } = getData<IBalance[]>({
+        api_url: `http://localhost:1234/balances/get-all/${user?.info.id}`,
+        query_key: [`balances-${user?.info.id}`],
+        stale_time: 1000,
+    });
+
+    const changeBalanceMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async (selected: UpdateBalanceProps) => {
+            if (isNaN(selected.amount) || selected.amount <= 0) throw new Error('Enter proper amount');
+            if (!selected.balance_type || !selected.description.trim()) throw new Error('Fill these too');
+
+            await updateData<IBalance>({ 
+                api_url: `http://localhost:1234/balances/change/${selected._id}`,
+                api_data: { 
+                    amount: selected.amount, 
+                    description: selected.description, 
+                    balance_type: selected.balance_type 
+                }
+            });
+        },
+        onSettled: () => {
+            setIsDataChanging(false);
+            setSelectedId(null);
         }
-    );
+    });
+
+    const deleteAllBalanceMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async () => {
+            if (!user) return;
+            await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSettled: () => setIsDataChanging(false)
+    });
+
+    const deleteOneBalanceMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async (id: string) => {
+            await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
+            if (selectedId === id) setSelectedId(null);
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSettled: () => setIsDataChanging(false)
+    });
+
+    const insertBalanceMutation = useMutation({
+        onMutate: () => setIsDataChanging(true),
+        mutationFn: async () => {
+            const trimmedAmount = Number(amount.trim());
+            const trimmedDescription = description.trim();
+            const getCurrentDate = new Date();
+
+            if (!user) return;
+
+            await insertData<IBalance>({
+                api_url: 'http://localhost:1234/balances/add',
+                api_data: {
+                    amount: trimmedAmount,
+                    balance_type: amountType,
+                    created_at: getCurrentDate.toISOString(),
+                    description: trimmedDescription,
+                    user_id: user.info.id
+                }
+            });
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSettled: () => {
+            closeForm();
+            setIsDataChanging(false);
+        }
+    });
 
     const saveBalances = async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-        const trimmedAmount = Number(amount.trim());
-        const trimmedDescription = description.trim();
-        const getCurrentDate = new Date();
-
-        if (!user) return;
-
-        await insertData<IBalance>({
-            api_url: 'http://localhost:1234/balances/add',
-            api_data: {
-                amount: trimmedAmount,
-                balance_type: amountType,
-                created_at: getCurrentDate.toISOString(),
-                description: trimmedDescription,
-                user_id: user.info.id
-            }
-        });
-
-        mutate();
-        closeForm();
+        insertBalanceMutation.mutate();
     }
 
     const handleSelectItem = (id: string): void => {
@@ -57,38 +104,15 @@ export default function Balances() {
     }
 
     const deleteAllBalance = async (): Promise<void> => {
-        if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
-        mutate();
+        deleteAllBalanceMutation.mutate();
     }
 
-    const deleteSelectedBalance = async (id: string): Promise<void> => {
-        if (!user) return;
-        await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
-        mutate();
-        if (selectedId === id) setSelectedId(null);
+    const deleteSelectedBalance = (id: string): void => {
+        deleteOneBalanceMutation.mutate(id);
     }
 
-    const updateSelectedBalance = async (id: string, data: { 
-        amount: number; 
-        balance_type: 'income' | 'expense'; 
-        description: string;
-    }): Promise<void> => {
-        if (!user) return;
-        try {
-            if (isNaN(data.amount) || data.amount <= 0) throw new Error('Enter proper amount');
-            if (!data.balance_type || !data.description.trim()) throw new Error('Fill these too');
-
-            await updateData<IBalance>({ 
-                api_url: `http://localhost:1234/balances/change/${id}`,
-                api_data: data
-            });
-        } catch (error: any) {
-            console.error(error.message);
-        } finally {
-            mutate();
-            setSelectedId(null);
-        }
+    const updateSelectedBalance = (selected: UpdateBalanceProps): void => {
+        changeBalanceMutation.mutate(selected);
     }
 
     const closeForm = (): void => {
@@ -122,6 +146,7 @@ export default function Balances() {
                     changeDescription={(event: React.ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
                     onSave={saveBalances}
                     onClose={closeForm}
+                    isDataChanging={isDataChanging}
                 /> 
             : null}
             <div className="flex flex-col gap-[1rem] md:w-3/4 w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
@@ -143,6 +168,7 @@ export default function Balances() {
                 </div>
                 <BalanceList
                     data={balanceData ? balanceData : []}
+                    isDataChanging={isDataChanging}
                     onDelete={deleteSelectedBalance}
                     onSelect={handleSelectItem}
                     onUpdate={updateSelectedBalance}
