@@ -12,6 +12,19 @@ export type IPutApi<I> = {
     api_data: Partial<Omit<I, '_id'>>;
 }
 
+export type InfiniteScrollProps = {
+    api_url: string; 
+    query_key: string[]; 
+    stale_time: number;
+    limit: number;
+}
+
+export type GetDataProps = {
+    api_url: string; 
+    query_key: string[]; 
+    stale_time: number;
+}
+
 export interface IUser {
     message: string;
     token: string;
