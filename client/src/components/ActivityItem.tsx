@@ -29,7 +29,8 @@ const ActivityItem = (props: ActivityItemProps) => {
     const handleSave = (event: React.FormEvent): void => {
         event.preventDefault();
         
-        props.onUpdate(props.selected_act._id, {
+        props.onUpdate({
+            _id: props.selected_act._id,
             act_name: editActName.trim(),
             schedule_at: new Date(editSchedule).toISOString(),
         });

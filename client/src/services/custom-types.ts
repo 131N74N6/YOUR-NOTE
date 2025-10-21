@@ -19,6 +19,12 @@ export type InfiniteScrollProps = {
     limit: number;
 }
 
+export type UpdateActivityDataProps = {
+    _id: string;
+    act_name: string;
+    schedule_at: string;
+}
+
 export type GetDataProps = {
     api_url: string; 
     query_key: string[]; 
@@ -62,10 +68,7 @@ export type ActivityItemProps = {
     is_selected: boolean;
     onDelete: (id: string) => void;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, changeAct: { 
-        act_name: string; 
-        schedule_at: string; 
-    }) => void;
+    onUpdate: (selected: UpdateActivityDataProps) => void;
     isDataChanging: boolean;
 }
 
@@ -74,10 +77,7 @@ export type ActivityListProps = {
     act_data: IActivity[];
     onDelete: (id: string) => void;
     onSelect: (id: string) => void;
-    onUpdate: (id: string, changeAct: { 
-        act_name: string; 
-        schedule_at: string; 
-    }) => void;
+    onUpdate: (selected: UpdateActivityDataProps) => void;
     isDataChanging: boolean;
 }
 

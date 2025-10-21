@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import type { IActivity } from "../services/custom-types";
+import type { IActivity, UpdateActivityDataProps } from "../services/custom-types";
 import useAuth from "../services/useAuth";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export default function Activites() {
     const { user } = useAuth();
     const { deleteData, getData, insertData, updateData } = DataModifier();
-    const queryQlient = useQueryClient();
+    const queryClient = useQueryClient();
 
     const [actName, setActName] = useState<string>('');
     const [schedule, setSchedule] = useState<string>('');
@@ -27,15 +27,16 @@ export default function Activites() {
 
     const changeActMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
-        mutationFn: async (id: string, changeAct: { act_name: string; schedule_at: string; }) => {
+        mutationFn: async (selected: UpdateActivityDataProps) => {
             if (!user) return;
-            if (!changeAct.act_name.trim()) throw new Error('Missing required data');
+            if (!selected.act_name.trim()) throw new Error('Missing required data');
             
             await updateData<IActivity>({
-                api_url: `http://localhost:1234/activities/change/${id}`,
-                api_data: changeAct
+                api_url: `http://localhost:1234/activities/change/${selected._id}`,
+                api_data: { act_name: selected.act_name, schedule_at: selected.schedule_at }
             });
         },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
         onSettled: () => {
             setIsDataChanging(false);
             setSelectedId(null);
@@ -60,7 +61,7 @@ export default function Activites() {
                 }
             });
         },
-        onSuccess: () => queryQlient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
         onSettled: () => {
             setIsDataChanging(false);
             closeForm();
@@ -73,9 +74,7 @@ export default function Activites() {
             await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
-        onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -85,9 +84,7 @@ export default function Activites() {
             if (!user) return;
             await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
         },
-        onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -108,8 +105,8 @@ export default function Activites() {
         deleteAllActMutation.mutate()
     }
 
-    const updateSelectedAct = (id: string) => {
-        changeActMutation.mutate(id);
+    const updateSelectedAct = (selected: UpdateActivityDataProps) => {
+        changeActMutation.mutate(selected);
     }
 
     const closeForm = (): void => {
