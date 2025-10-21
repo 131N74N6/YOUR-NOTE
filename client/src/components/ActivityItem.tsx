@@ -26,10 +26,10 @@ const ActivityItem = (props: ActivityItemProps) => {
         }
     }, [props.is_selected, props.selected_act]);
 
-    const handleSave = async (event: React.FormEvent): Promise<void> => {
+    const handleSave = (event: React.FormEvent): void => {
         event.preventDefault();
         
-        await props.onUpdate(props.selected_act._id, {
+        props.onUpdate(props.selected_act._id, {
             act_name: editActName.trim(),
             schedule_at: new Date(editSchedule).toISOString(),
         });
@@ -57,14 +57,15 @@ const ActivityItem = (props: ActivityItemProps) => {
                 <div className="flex gap-[0.4rem]">
                     <button 
                         type="submit" 
-                        disabled={!editActName}
+                        disabled={!editActName || props.isDataChanging}
                         className="bg-white disabled:cursor-not-allowed cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
                     >
                         Save
                     </button>
                     <button 
                         type="button" 
-                        className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
+                        disabled={props.isDataChanging}
+                        className="bg-white cursor-pointer disabled:cursor-not-allowed text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
                         onClick={handleCancel}
                     >
                         Cancel

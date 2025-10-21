@@ -46,6 +46,7 @@ export type ActivityFormProps = {
     makeSchedule: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onClose: () => void;
     onSave: (event: React.FormEvent) => void;
+    isDataChanging: boolean;
 }
 
 export type IActivity = {
@@ -64,7 +65,8 @@ export type ActivityItemProps = {
     onUpdate: (id: string, changeAct: { 
         act_name: string; 
         schedule_at: string; 
-    }) => Promise<void>;
+    }) => void;
+    isDataChanging: boolean;
 }
 
 export type ActivityListProps = {
@@ -75,7 +77,8 @@ export type ActivityListProps = {
     onUpdate: (id: string, changeAct: { 
         act_name: string; 
         schedule_at: string; 
-    }) => Promise<void>;
+    }) => void;
+    isDataChanging: boolean;
 }
 
 export type BalanceFormProps = {
