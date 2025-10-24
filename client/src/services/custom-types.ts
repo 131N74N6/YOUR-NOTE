@@ -89,6 +89,7 @@ export type ActivityListProps = {
     onUpdate: (selected: UpdateActivityDataProps) => void;
     isDataChanging: boolean;
     isReachedEnd: boolean;
+    isLoadMore: boolean;
     getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
@@ -122,6 +123,7 @@ export type BalanceListProps = {
     onDelete: (id: string) => void;
     isDataChanging: boolean;
     isReachedEnd: boolean;
+    isLoadMore: boolean;
     getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
@@ -151,5 +153,6 @@ export type NoteListProps = {
     notes: INote[];
     onDelete: (id: string) => void;
     isReachedEnd: boolean;
+    isLoadMore: boolean;
     getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }

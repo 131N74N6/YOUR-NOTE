@@ -10,15 +10,22 @@ import { useState } from "react";
 
 export default function Notes() {
     const { user } = useAuth();
-    const { deleteData, getData } = DataModifier();
+    const { deleteData, infiniteScroll } = DataModifier();
     const queryClient = useQueryClient();
 
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const { data: noteData, isLoading } = getData<INote[]>({
+    const { 
+        paginatedData: noteData, 
+        fetchNextPage,
+        isFetchingNextPage,
+        isReachedEnd,
+        isLoading 
+    } = infiniteScroll<INote>({
         api_url: `http://localhost:1234/notes/get-all/${user?.info.id}`,
         query_key: [`notes-${user?.info.id}`],
-        stale_time: 1000
+        stale_time: 1000,
+        limit: 12
     });
 
     const deleteOneNoteMutation = useMutation({
@@ -72,7 +79,13 @@ export default function Notes() {
                         Delete All Notes
                     </button>
                 </div>
-                <NoteList notes={noteData ? noteData : []} onDelete={deleteSelectedNote}/>
+                <NoteList 
+                    notes={noteData ? noteData : []} 
+                    getMore={fetchNextPage}
+                    isLoadMore={isFetchingNextPage}
+                    isReachedEnd={isReachedEnd}
+                    onDelete={deleteSelectedNote}
+                />
             </div>
         </main>
     );

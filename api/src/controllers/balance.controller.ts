@@ -52,7 +52,12 @@ async function deleteSelectedBalance(req: Request, res: Response) {
 async function getAllBalances(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const balanceList = await Balances.find({ user_id: getUserId });
+        
+        const limit = parseInt(req.query.limit as string) || 12;
+        const page = parseInt(req.query.page as string) || 1;
+        const skip = (page - 1) * limit;
+
+        const balanceList = await Balances.find({ user_id: getUserId }).limit(limit).skip(skip);
         res.json(balanceList);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

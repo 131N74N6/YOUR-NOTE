@@ -1,5 +1,6 @@
 import type { ActivityListProps } from "../services/custom-types";
 import ActivityItem from "./ActivityItem";
+import Loading from "./Loading";
 
 function ActivityList(props: ActivityListProps) {
     if (props.act_data.length === 0) {
@@ -26,6 +27,7 @@ function ActivityList(props: ActivityListProps) {
                 ))}
             </div>
             <div className="flex justify-center">
+                {props.isLoadMore ? <Loading/> : null}
                 {props.isReachedEnd && props.act_data.length > 0 ? (
                     <p className="text-purple-400 font-[500] text-center text-[1rem]">No More Data to Show</p>
                 ) : (

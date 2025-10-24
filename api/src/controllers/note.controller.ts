@@ -34,7 +34,10 @@ async function deleteSelectedNote(req: Request, res: Response): Promise<void> {
 async function getAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
-        const noteList = await Notes.find({ user_id: getUserId });
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 12;
+        const skip = (page - 1) * limit;
+        const noteList = await Notes.find({ user_id: getUserId }).limit(limit).skip(skip);
         res.json(noteList);
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });

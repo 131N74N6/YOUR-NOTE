@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Balances() {
     const { user } = useAuth();
-    const { deleteData, getData, insertData, updateData } = DataModifier();
+    const { deleteData, infiniteScroll, insertData, updateData } = DataModifier();
     const queryClient = useQueryClient();
 
     const [amount, setAmount] = useState<string>('');
@@ -20,10 +20,17 @@ export default function Balances() {
     const [selectedId, setSelectedId] = useState<string | null>('');
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const { data: balanceData, isLoading } = getData<IBalance[]>({
+    const { 
+        paginatedData: balanceData, 
+        fetchNextPage,
+        isFetchingNextPage,
+        isReachedEnd,
+        isLoading 
+    } = infiniteScroll<IBalance>({
         api_url: `http://localhost:1234/balances/get-all/${user?.info.id}`,
         query_key: [`balances-${user?.info.id}`],
         stale_time: 1000,
+        limit: 12
     });
 
     const changeBalanceMutation = useMutation({
@@ -181,7 +188,10 @@ export default function Balances() {
                 </div>
                 <BalanceList
                     data={balanceData ? balanceData : []}
+                    getMore={fetchNextPage}
                     isDataChanging={isDataChanging}
+                    isLoadMore={isFetchingNextPage}
+                    isReachedEnd={isReachedEnd}
                     onDelete={deleteSelectedBalance}
                     onSelect={handleSelectItem}
                     onUpdate={updateSelectedBalance}

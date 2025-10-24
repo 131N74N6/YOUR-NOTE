@@ -21,14 +21,15 @@ export default function Activites() {
 
     const { 
         paginatedData: actData, 
-        isLoading, 
         fetchNextPage,
+        isFetchingNextPage,
+        isLoading, 
         isReachedEnd 
     } = infiniteScroll<IActivity>({
         api_url: `http://localhost:1234/activities/get-all/${user?.info.id}`,
         query_key: [`activities-${user?.info.id}`],
         stale_time: 1000,
-        limit: 10
+        limit: 12
     });
 
     const changeActMutation = useMutation({
@@ -179,6 +180,7 @@ export default function Activites() {
                     act_data={actData ? actData : []}
                     getMore={fetchNextPage}
                     isDataChanging={isDataChanging}
+                    isLoadMore={isFetchingNextPage}
                     isReachedEnd={isReachedEnd}
                     onDelete={deleteSelcetedAct}
                     onSelect={handleSelectAct}
