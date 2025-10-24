@@ -52,7 +52,6 @@ async function deleteSelectedBalance(req: Request, res: Response) {
 async function getAllBalances(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        
         const limit = parseInt(req.query.limit as string) || 12;
         const page = parseInt(req.query.page as string) || 1;
         const skip = (page - 1) * limit;

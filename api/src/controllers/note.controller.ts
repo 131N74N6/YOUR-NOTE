@@ -37,6 +37,7 @@ async function getAllNotes(req: Request, res: Response): Promise<void> {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 12;
         const skip = (page - 1) * limit;
+        
         const noteList = await Notes.find({ user_id: getUserId }).limit(limit).skip(skip);
         res.json(noteList);
     } catch (error) {
