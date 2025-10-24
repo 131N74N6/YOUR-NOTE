@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Activites() {
     const { user } = useAuth();
-    const { deleteData, getData, insertData, updateData } = DataModifier();
+    const { deleteData, infiniteScroll, insertData, updateData } = DataModifier();
     const queryClient = useQueryClient();
 
     const [actName, setActName] = useState<string>('');
@@ -19,10 +19,16 @@ export default function Activites() {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
-    const { data: actData, isLoading } = getData<IActivity[]>({
+    const { 
+        paginatedData: actData, 
+        isLoading, 
+        fetchNextPage,
+        isReachedEnd 
+    } = infiniteScroll<IActivity>({
         api_url: `http://localhost:1234/activities/get-all/${user?.info.id}`,
         query_key: [`activities-${user?.info.id}`],
-        stale_time: 1000
+        stale_time: 1000,
+        limit: 10
     });
 
     const changeActMutation = useMutation({
@@ -171,11 +177,13 @@ export default function Activites() {
                 </div>
                 <ActivityList
                     act_data={actData ? actData : []}
+                    getMore={fetchNextPage}
+                    isDataChanging={isDataChanging}
+                    isReachedEnd={isReachedEnd}
                     onDelete={deleteSelcetedAct}
                     onSelect={handleSelectAct}
                     onUpdate={updateSelectedAct}
                     selectedId={selectedId}
-                    isDataChanging={isDataChanging}
                 />
             </div>
         </main>

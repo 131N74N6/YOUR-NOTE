@@ -1,3 +1,5 @@
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
+
 export type IDeleteApi = {
     api_url: string;
 }
@@ -86,6 +88,8 @@ export type ActivityListProps = {
     onSelect: (id: string) => void;
     onUpdate: (selected: UpdateActivityDataProps) => void;
     isDataChanging: boolean;
+    isReachedEnd: boolean;
+    getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
 export type BalanceFormProps = {
@@ -117,6 +121,8 @@ export type BalanceListProps = {
     onUpdate: (selected: UpdateBalanceProps) => void;
     onDelete: (id: string) => void;
     isDataChanging: boolean;
+    isReachedEnd: boolean;
+    getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
 export type BalanceItemProps = {
@@ -144,4 +150,6 @@ export type NoteItemProps = {
 export type NoteListProps = {
     notes: INote[];
     onDelete: (id: string) => void;
+    isReachedEnd: boolean;
+    getMore: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }

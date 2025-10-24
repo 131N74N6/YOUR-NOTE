@@ -43,7 +43,7 @@ export default function DataModifier() {
         return { data, error, isLoading }
     }
 
-    const infiniteScroll = (props: InfiniteScrollProps) => {
+    const infiniteScroll = <LV>(props: InfiniteScrollProps) => {
         const fetchData = async ({ pageParam = 1 }: { pageParam?: number }) => {
             const request = await fetch(`${props.api_url}?page=${pageParam}&limit=${props.limit}`, {
                 headers: {
@@ -72,7 +72,7 @@ export default function DataModifier() {
             refetchOnWindowFocus: false,
         });
 
-        const paginatedData = data ? data.pages.flat() : [];
+        const paginatedData: LV[] = data ? data.pages.flat() : [];
         const isReachedEnd = !hasNextPage;
 
         return { paginatedData, error, fetchNextPage, isFetchingNextPage, isLoading, isReachedEnd }
