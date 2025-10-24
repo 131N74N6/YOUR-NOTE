@@ -26,7 +26,10 @@ export default function Notes() {
         mutationFn: async (id: string) => {
             await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` })
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -36,7 +39,10 @@ export default function Notes() {
             if (!user) return;
             await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 

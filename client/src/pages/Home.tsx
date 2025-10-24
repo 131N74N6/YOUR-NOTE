@@ -1,6 +1,5 @@
-import useSWR from "swr";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import useApiCalls from "../services/data-modifier";
+import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
 
 type IBalanceSummary = {
@@ -11,24 +10,25 @@ type IBalanceSummary = {
 
 export default function Home() {
     const { user } = useAuth();
-    const { getData: getBalanceSummary } = useApiCalls();
-    const { getData: getActivityTotal } = useApiCalls();
-    const { getData: getNoteTotal } = useApiCalls();
+    const { getData } = DataModifier();
 
-    const { data: balanceSummary } = useSWR<IBalanceSummary>(
-        user && `http://localhost:1234/balances/summary/${user.info.id}`,
-        getBalanceSummary
-    );
+    const { data: balanceSummary } = getData<IBalanceSummary>({
+        api_url: `http://localhost:1234/balances/summary/${user?.info.id}`,
+        stale_time: 1000,
+        query_key: [`balance-total-${user?.info.id}`]
+    });
 
-    const { data: activityTotal } = useSWR<number>(
-        user && `http://localhost:1234/activities/summary/${user.info.id}`,
-        getActivityTotal
-    );
+    const { data: activityTotal } = getData<number>({
+        api_url: `http://localhost:1234/activities/summary/${user?.info.id}`,
+        stale_time: 1000,
+        query_key: [`act-total-${user?.info.id}`]
+    });
 
-    const { data: noteTotal } = useSWR<number>(
-        user && `http://localhost:1234/notes/summary/${user.info.id}`,
-        getNoteTotal
-    );
+    const { data: noteTotal } = getData<number>({
+        api_url: `http://localhost:1234/notes/summary/${user?.info.id}`,
+        stale_time: 1000,
+        query_key: [`note-total-${user?.info.id}`]
+    });
 
     return (
         <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">

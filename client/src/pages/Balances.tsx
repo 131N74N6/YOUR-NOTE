@@ -41,6 +41,10 @@ export default function Balances() {
                 }
             });
         },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+        },
         onSettled: () => {
             setIsDataChanging(false);
             setSelectedId(null);
@@ -53,7 +57,10 @@ export default function Balances() {
             if (!user) return;
             await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -63,7 +70,10 @@ export default function Balances() {
             await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -87,7 +97,10 @@ export default function Balances() {
                 }
             });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+        },
         onSettled: () => {
             closeForm();
             setIsDataChanging(false);

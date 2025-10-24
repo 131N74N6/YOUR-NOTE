@@ -38,6 +38,7 @@ export default function NoteForm() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
             navigate('/notes');
         },
         onSettled: () => {

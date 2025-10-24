@@ -36,7 +36,10 @@ export default function Activites() {
                 api_data: { act_name: selected.act_name, schedule_at: selected.schedule_at }
             });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+        },
         onSettled: () => {
             setIsDataChanging(false);
             setSelectedId(null);
@@ -61,7 +64,10 @@ export default function Activites() {
                 }
             });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+        },
         onSettled: () => {
             setIsDataChanging(false);
             closeForm();
@@ -74,7 +80,10 @@ export default function Activites() {
             await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 
@@ -84,7 +93,10 @@ export default function Activites() {
             if (!user) return;
             await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+        },
         onSettled: () => setIsDataChanging(false)
     });
 
