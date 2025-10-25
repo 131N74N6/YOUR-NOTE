@@ -186,7 +186,7 @@ export default function Balances() {
                     </button>
                 </div>
                 <BalanceList
-                    data={balanceData ? balanceData : []}
+                    balances={balanceData ? balanceData : []}
                     getMore={fetchNextPage}
                     isDataChanging={isDataChanging}
                     isLoadMore={isFetchingNextPage}

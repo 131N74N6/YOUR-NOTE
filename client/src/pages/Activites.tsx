@@ -176,7 +176,7 @@ export default function Activites() {
                     </button>
                 </div>
                 <ActivityList
-                    act_data={actData ? actData : []}
+                    act_datas={actData ? actData : []}
                     getMore={fetchNextPage}
                     isDataChanging={isDataChanging}
                     isLoadMore={isFetchingNextPage}

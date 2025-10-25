@@ -83,7 +83,7 @@ export type ActivityItemProps = {
 
 export type ActivityListProps = {
     selectedId: string | null;
-    act_data: IActivity[];
+    act_datas: IActivity[];
     onDelete: (id: string) => void;
     onSelect: (id: string) => void;
     onUpdate: (selected: UpdateActivityDataProps) => void;
@@ -116,7 +116,7 @@ export type IBalance = {
 }
 
 export type BalanceListProps = {
-    data: IBalance[];
+    balances: IBalance[];
     selectedId: string | null;
     onSelect: (id: string) => void;
     onUpdate: (selected: UpdateBalanceProps) => void;
