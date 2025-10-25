@@ -6,7 +6,7 @@ export default function DataModifier() {
     const { user } = useAuth();
     const token = user && user.token;
 
-    const deleteData = async(props: IDeleteApi) => {
+    const deleteData = async(props: IDeleteApi): Promise<void> => {
         const request = await fetch(props.api_url, {
             method: 'DELETE',
             headers: {
@@ -33,7 +33,7 @@ export default function DataModifier() {
                 return response;
             },
             queryKey: props.query_key,
-            gcTime: 300000,
+            gcTime: 540000,
             staleTime: props.stale_time,
             refetchOnMount: true,
             refetchOnReconnect: true,
@@ -66,7 +66,7 @@ export default function DataModifier() {
             },
             initialPageParam: 1,
             staleTime: props.stale_time,
-            gcTime: 300000,
+            gcTime: 540000,
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
@@ -78,7 +78,7 @@ export default function DataModifier() {
         return { paginatedData, error, fetchNextPage, isFetchingNextPage, isLoading, isReachedEnd }
     }
 
-    const insertData = async <HX>(props: IPostApi<HX>) => {
+    const insertData = async <HX>(props: IPostApi<HX>): Promise<void> => {
         const request = await fetch(props.api_url, { 
             method: 'POST', 
             body: JSON.stringify(props.api_data),
@@ -91,7 +91,7 @@ export default function DataModifier() {
         await request.json();
     }
 
-    const updateData = async <HX>(props: IPutApi<HX>) => {
+    const updateData = async <HX>(props: IPutApi<HX>): Promise<void> => {
         const request = await fetch(props.api_url, { 
             method: 'PUT', 
             body: JSON.stringify(props.api_data),

@@ -22,7 +22,7 @@ export default function Notes() {
         isReachedEnd,
         isLoading 
     } = infiniteScroll<INote>({
-        api_url: `http://localhost:1234/notes/get-all/${user?.info.id}`,
+        api_url: user ? `http://localhost:1234/notes/get-all/${user.info.id}` : '',
         query_key: [`notes-${user?.info.id}`],
         stale_time: 1000,
         limit: 12
