@@ -27,7 +27,7 @@ export default function Balances() {
         isReachedEnd,
         isLoading 
     } = infiniteScroll<IBalance>({
-        api_url: `http://localhost:1234/balances/get-all/${user?.info.id}`,
+        api_url: user ? `http://localhost:1234/balances/get-all/${user.info.id}` : '',
         query_key: [`balances-${user?.info.id}`],
         stale_time: 1000,
         limit: 12

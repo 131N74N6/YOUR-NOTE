@@ -13,19 +13,19 @@ export default function Home() {
     const { getData } = DataModifier();
 
     const { data: balanceSummary } = getData<IBalanceSummary>({
-        api_url: `http://localhost:1234/balances/summary/${user?.info.id}`,
+        api_url: user ? `http://localhost:1234/balances/summary/${user.info.id}` : '',
         stale_time: 1000,
         query_key: [`balance-total-${user?.info.id}`]
     });
 
     const { data: activityTotal } = getData<number>({
-        api_url: `http://localhost:1234/activities/summary/${user?.info.id}`,
+        api_url: user ? `http://localhost:1234/activities/summary/${user.info.id}` : '',
         stale_time: 1000,
         query_key: [`act-total-${user?.info.id}`]
     });
 
     const { data: noteTotal } = getData<number>({
-        api_url: `http://localhost:1234/notes/summary/${user?.info.id}`,
+        api_url: user ? `http://localhost:1234/notes/summary/${user.info.id}` : '',
         stale_time: 1000,
         query_key: [`note-total-${user?.info.id}`]
     });
@@ -45,7 +45,7 @@ export default function Home() {
                         <p>{balanceSummary ? balanceSummary.expense : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
-                        <h3>Expense Total</h3>
+                        <h3>Balances</h3>
                         <p>{balanceSummary ? balanceSummary.balance : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
