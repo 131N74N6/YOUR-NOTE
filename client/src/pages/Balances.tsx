@@ -50,7 +50,6 @@ export default function Balances() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
         },
         onSettled: () => {
             setIsDataChanging(false);

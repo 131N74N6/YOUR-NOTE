@@ -45,7 +45,6 @@ export default function Activites() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
         },
         onSettled: () => {
             setIsDataChanging(false);
