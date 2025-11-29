@@ -3,7 +3,7 @@ import type { GetDataProps, IDeleteApi, InfiniteScrollProps, IPostApi, IPutApi }
 import useAuth from "./useAuth";
 
 export default function DataModifier() {
-    const { user } = useAuth();
+    const { loading, user } = useAuth();
     const token = user && user.token;
 
     const deleteData = async(props: IDeleteApi): Promise<void> => {
@@ -20,6 +20,8 @@ export default function DataModifier() {
 
     const getData = <HX>(props: GetDataProps) => {
         const { data, error, isLoading } = useQuery<HX, Error>({
+            enabled: !loading && !!token,
+            gcTime: 540000,
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
                     method: 'GET',
@@ -33,11 +35,10 @@ export default function DataModifier() {
                 return response;
             },
             queryKey: props.query_key,
-            gcTime: 540000,
-            staleTime: props.stale_time,
             refetchOnMount: true,
             refetchOnReconnect: true,
-            refetchOnWindowFocus: false
+            refetchOnWindowFocus: false,
+            staleTime: props.stale_time
         });
 
         return { data, error, isLoading }
@@ -58,6 +59,7 @@ export default function DataModifier() {
         }
 
         const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
+            enabled: !loading && !!token,
             queryKey: props.query_key,
             queryFn: fetchData,
             getNextPageParam: (lastPage, allPages) => {

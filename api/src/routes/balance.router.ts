@@ -4,21 +4,22 @@ import {
     deleteAllBalances, deleteSelectedBalance, getAllBalances, 
     getSelectedBalance, insertNewBalance, updateSelectedBalance 
 } from '../controllers/balance.controller';
+import { checkOwnership, verifyToken } from '../middleware/auth.middleware';
 
 const balanceRoutes = Router();
 
-balanceRoutes.delete('/erase-all/:id', deleteAllBalances);
+balanceRoutes.delete('/erase-all/:id', verifyToken, checkOwnership, deleteAllBalances);
 
-balanceRoutes.delete('/erase/:id', deleteSelectedBalance);
+balanceRoutes.delete('/erase/:id', verifyToken, deleteSelectedBalance);
 
-balanceRoutes.get('/get-all/:id', getAllBalances);
+balanceRoutes.get('/get-all/:id', verifyToken, checkOwnership, getAllBalances);
 
-balanceRoutes.get('/selected/:id', getSelectedBalance);
+balanceRoutes.get('/selected/:id', verifyToken, getSelectedBalance);
 
-balanceRoutes.get('/summary/:id', countUserBalance);
+balanceRoutes.get('/summary/:id', verifyToken, checkOwnership, countUserBalance);
 
-balanceRoutes.post('/add', insertNewBalance);
+balanceRoutes.post('/add', verifyToken, insertNewBalance);
 
-balanceRoutes.put('/change/:id', updateSelectedBalance);
+balanceRoutes.put('/change/:id', verifyToken, updateSelectedBalance);
 
 export default balanceRoutes;

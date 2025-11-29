@@ -6,7 +6,7 @@ const BalanceList = (props: BalanceListProps) => {
     if (props.balances.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
-                <span className="text-white font-[600] text-[1rem]">No balance added currently...</span>
+                <span className="text-white font-[600] text-[1rem]">No balance found...</span>
             </section>
         );
     }
@@ -28,7 +28,9 @@ const BalanceList = (props: BalanceListProps) => {
             </div>
             <div className="flex justify-center">
                 {props.isLoadMore ? <Loading/> : null}
-                {props.isReachedEnd && props.balances.length > 0 ? (
+                {props.balances.length < 12 ? (
+                    <></>
+                ) : props.isReachedEnd && props.balances.length > 0 ? (
                     <p className="text-white font-[500] text-center text-[1rem]">No More Data to Show</p>
                 ) : (
                     <button 

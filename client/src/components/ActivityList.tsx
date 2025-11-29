@@ -6,7 +6,7 @@ function ActivityList(props: ActivityListProps) {
     if (props.act_datas.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
-                <span className="text-white font-[600] text-[1rem]">No activity added currently...</span>
+                <span className="text-white font-[600] text-[1rem]">No activity found...</span>
             </section>
         );
     }
@@ -28,7 +28,9 @@ function ActivityList(props: ActivityListProps) {
             </div>
             <div className="flex justify-center">
                 {props.isLoadMore ? <Loading/> : null}
-                {props.isReachedEnd && props.act_datas.length > 0 ? (
+                {props.act_datas.length < 12 ? (
+                    <></>
+                ) : props.isReachedEnd ? (
                     <p className="text-white font-[500] text-center text-[1rem]">No More Data to Show</p>
                 ) : (
                     <button 

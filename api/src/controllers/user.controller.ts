@@ -11,13 +11,22 @@ async function signIn(req: Request, res: Response) {
         const { email, password } = req.body;
         const findUserByEmail = await User.findOne({ email });
 
-        if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+        if (!email || !password) {
+            res.status(400).json({ message: 'Email and password are required' });
+            return;
+        }
 
-        if (!findUserByEmail) return res.status(401).json({ message: 'Incorrect email or password' });
+        if (!findUserByEmail) {
+            res.status(401).json({ message: 'Incorrect email or password' });
+            return;
+        }
 
         const isPasswordMatch = await bcrypt.compare(password, findUserByEmail.password);
 
-        if (!isPasswordMatch) return res.status(401).json({ message: 'Incorrect email or password' });
+        if (!isPasswordMatch) {
+            res.status(401).json({ message: 'Incorrect email or password' });
+            return;
+        }
 
         const token = jwt.sign(
             { 
@@ -48,9 +57,15 @@ async function signUp(req: Request, res: Response) {
         const { created_at, email, password, username } = req.body;
         const alreadyExits = await User.findOne({ email });
 
-        if (!email || !password ||!username) return res.status(400).json({ message: 'Email, username, and password are required' });
+        if (!email || !password ||!username) {
+            res.status(400).json({ message: 'Email, username, and password are required' });
+            return;
+        }
 
-        if (alreadyExits) return res.status(409).json({ message: 'User already exist' });
+        if (alreadyExits) {
+            res.status(409).json({ message: 'User already exist' });
+            return;
+        }
         
         const hashedPassword = await bcrypt.hash(password, 10);
 

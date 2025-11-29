@@ -6,7 +6,7 @@ const NoteList = (props: NoteListProps) => {
     if (props.notes.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
-                <span className="text-white font-[600] text-[1rem]">No notes added currently...</span>
+                <span className="text-white font-[600] text-[1rem]">No notes found...</span>
             </section>
         );
     }
@@ -20,7 +20,9 @@ const NoteList = (props: NoteListProps) => {
             </div>
             <div className="flex justify-center">
                 {props.isLoadMore ? <Loading/> : null}
-                {props.isReachedEnd && props.notes.length > 0 ? (
+                {props.notes.length < 12 ? (
+                    <></>
+                ) : props.isReachedEnd && props.notes.length > 0 ? (
                     <p className="text-white font-[500] text-center text-[1rem]">No More Data to Show</p>
                 ) : (
                     <button 
