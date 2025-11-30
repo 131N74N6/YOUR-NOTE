@@ -28,7 +28,7 @@ export default function Activites() {
     } = infiniteScroll<IActivity>({
         api_url: user ? `http://localhost:1234/activities/get-all/${user.info.id}` : '',
         query_key: [`activities-${user?.info.id}`],
-        stale_time: 1000,
+        stale_time: 600000,
         limit: 12
     });
 

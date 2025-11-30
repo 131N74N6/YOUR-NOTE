@@ -6,6 +6,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAuth from "../services/useAuth";
 import DataModifier from "../services/data-modifier";
 import Loading from "../components/Loading";
+import ReactQuill from 'react-quill-new';
+import 'quill/dist/quill.snow.css';
+import Quill from 'quill';
+import List from 'quill/formats/list'; 
+import Blockquote from 'quill/formats/blockquote';
+import CodeBlock from 'quill/formats/code';
+
+Quill.register('formats/list', List);
+Quill.register('formats/blockquote', Blockquote);
+Quill.register('formats/code-block', CodeBlock);
 
 export default function SelectedNote() {
     const { user } = useAuth();
@@ -24,6 +34,36 @@ export default function SelectedNote() {
         query_key: [`selected-notes-${_id}`],
         stale_time: 1000
     });
+
+    const modules = {
+        toolbar: [
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [{ 'indent': '-1' }, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['link', 'image', 'video'],
+            ['clean']
+        ],
+    };
+
+    const formats = [
+        'header',
+        'bold', 'italic', 'underline', 'strike',
+        'blockquote', 'code-block',
+        'list', 
+        'indent',
+        'script', 'direction',
+        'size', 'color', 'background',
+        'font', 'align',
+        'link', 'image', 'video'
+    ];
 
     const changeNoteMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
@@ -73,11 +113,27 @@ export default function SelectedNote() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditTitle(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] border border-white outline-0 text-white font-[500] rounded-[0.5rem]"
                     />
-                    <textarea 
-                        value={editContent}
-                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setEditContent(event.target.value)}
-                        className="resize-0 border h-full outline-0 border-white p-[0.7rem] text-white font-[500] rounded-[0.5rem]"
-                    ></textarea>
+                    <div className="h-full border border-white rounded-[0.5rem] overflow-hidden">
+                        <ReactQuill
+                            theme="snow"
+                            value={editContent}
+                            onChange={setEditContent}
+                            modules={modules}
+                            formats={formats}
+                            className="h-full min-h-[200px] bg-transparent text-white"
+                            placeholder="Write your note here..."
+                            style={{
+                                height: '89%',
+                                fontSize: '1rem',
+                                fontFamily: 'inherit',
+                                color: 'white',
+                                background: 'transparent',
+                                border: 'none',
+                                padding: '0.7rem',
+                                borderRadius: '0.5rem'
+                            }}
+                        />
+                    </div>
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem]">
                         <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                         <button 

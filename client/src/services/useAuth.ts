@@ -8,10 +8,22 @@ export default function useAuth() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    useEffect((): void => {
-        const userToken = localStorage.getItem('user');
-        if (userToken) setUser(JSON.parse(userToken));
-        setLoading(false);
+    useEffect(() => {
+        const initAuth = () => {
+            try {
+                const userExist = localStorage.getItem('user');
+                if (userExist) {
+                    const parsedUser = JSON.parse(userExist);
+                    setUser(parsedUser);
+                }
+            } catch (err) {
+                localStorage.removeItem('user'); 
+            } finally {
+                setLoading(false); 
+            }
+        }
+
+        initAuth();
     }, []);
 
     async function signIn(email: string, password: string) {

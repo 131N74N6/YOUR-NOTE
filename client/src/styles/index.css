@@ -20,3 +20,11 @@
 input::placeholder {
     color: rgba(255, 255, 255, 0.7);
 }
+
+
+/* Jika menggunakan theme "snow", pastikan background toolbar tetap gelap */
+.ql-toolbar.ql-snow {
+    background-color: white;
+    border: 1px solid #333;
+    color: white;
+}

@@ -13,8 +13,10 @@
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/react-query": "^5.90.5",
     "cors": "^2.8.5",
+    "quill": "^2.0.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-quill-new": "^3.6.0",
     "react-router-dom": "^7.9.1",
     "tailwindcss": "^4.1.13"
   },

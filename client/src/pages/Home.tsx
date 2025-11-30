@@ -14,19 +14,19 @@ export default function Home() {
 
     const { data: balanceSummary } = getData<IBalanceSummary>({
         api_url: user ? `http://localhost:1234/balances/summary/${user.info.id}` : '',
-        stale_time: 1000,
+        stale_time: 600000,
         query_key: [`balance-total-${user?.info.id}`]
     });
 
     const { data: activityTotal } = getData<number>({
         api_url: user ? `http://localhost:1234/activities/summary/${user.info.id}` : '',
-        stale_time: 1000,
+        stale_time: 600000,
         query_key: [`act-total-${user?.info.id}`]
     });
 
     const { data: noteTotal } = getData<number>({
         api_url: user ? `http://localhost:1234/notes/summary/${user.info.id}` : '',
-        stale_time: 1000,
+        stale_time: 600000,
         query_key: [`note-total-${user?.info.id}`]
     });
 
