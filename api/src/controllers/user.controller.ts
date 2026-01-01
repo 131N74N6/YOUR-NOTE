@@ -35,7 +35,6 @@ async function signIn(req: Request, res: Response) {
                 username: findUserByEmail.username 
             },
             process.env.JWT_SECRET || 'your jwt key',
-            { expiresIn: '1h' }
         );
 
         res.status(200).json({ 
