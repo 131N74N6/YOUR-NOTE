@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Activity } from "../models/activity.model";
 
-async function countAllActivities(req: Request, res: Response): Promise<void> {
+export async function countAllActivities(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const activityList = await Activity.find({ user_id: getUserId }).countDocuments();
@@ -11,7 +11,7 @@ async function countAllActivities(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function deleteAllActivities(req: Request, res: Response): Promise<void> {
+export async function deleteAllActivities(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         await Activity.deleteMany({ user_id: getUserId });
@@ -21,7 +21,7 @@ async function deleteAllActivities(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function deleteSelectedActivity(req: Request, res: Response): Promise<void> {
+export async function deleteSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         await Activity.deleteOne({ _id: getActId });
@@ -31,7 +31,7 @@ async function deleteSelectedActivity(req: Request, res: Response): Promise<void
     }
 }
 
-async function getAllActivities(req: Request, res: Response): Promise<void> {
+export async function getAllActivities(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const page = parseInt(req.query.page as string) || 1;
@@ -45,7 +45,7 @@ async function getAllActivities(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function getSelectedActivity(req: Request, res: Response): Promise<void> {
+export async function getSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         const getActivity = await Activity.find({ _id: getActId });
@@ -55,7 +55,7 @@ async function getSelectedActivity(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function insertNewActivity(req: Request, res: Response): Promise<void> {
+export async function insertNewActivity(req: Request, res: Response): Promise<void> {
     try {
         const newActivity = new Activity(req.body)
         await newActivity.save();
@@ -65,7 +65,7 @@ async function insertNewActivity(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function updateSelectedActivity(req: Request, res: Response): Promise<void> {
+export async function updateSelectedActivity(req: Request, res: Response): Promise<void> {
     try {
         const getActId = req.params.id;
         await Activity.updateOne({ _id: getActId }, { 
@@ -78,14 +78,4 @@ async function updateSelectedActivity(req: Request, res: Response): Promise<void
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
     }
-}
-
-export { 
-    countAllActivities,
-    deleteAllActivities,
-    deleteSelectedActivity, 
-    getAllActivities, 
-    getSelectedActivity,
-    insertNewActivity, 
-    updateSelectedActivity 
 }

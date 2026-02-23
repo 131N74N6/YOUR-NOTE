@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-async function signIn(req: Request, res: Response) {
+export async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
         const findUserByEmail = await User.findOne({ email });
@@ -51,7 +51,7 @@ async function signIn(req: Request, res: Response) {
     }
 }
 
-async function signUp(req: Request, res: Response) {
+export async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
         const alreadyExits = await User.findOne({ email });
@@ -81,5 +81,3 @@ async function signUp(req: Request, res: Response) {
         res.status(500).json({ message: 'Something went wrong' });
     }
 }
-
-export { signIn, signUp }

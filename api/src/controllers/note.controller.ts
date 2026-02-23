@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Notes } from "../models/note.model";
 
-async function countAllNotes(req: Request, res: Response): Promise<void> {
+export async function countAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const noteList = await Notes.find({ user_id: getUserId }).countDocuments();
@@ -11,7 +11,7 @@ async function countAllNotes(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function deleteAllNotes(req: Request, res: Response): Promise<void> {
+export async function deleteAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         await Notes.deleteMany({ user_id: getUserId });
@@ -21,7 +21,7 @@ async function deleteAllNotes(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function deleteSelectedNote(req: Request, res: Response): Promise<void> {
+export async function deleteSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         await Notes.deleteOne({ _id: getNoteById });
@@ -31,7 +31,7 @@ async function deleteSelectedNote(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function getAllNotes(req: Request, res: Response): Promise<void> {
+export async function getAllNotes(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const page = parseInt(req.query.page as string) || 1;
@@ -45,7 +45,7 @@ async function getAllNotes(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function getSelectedNote(req: Request, res: Response): Promise<void> {
+export async function getSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         const getNote = await Notes.find({ _id: getNoteById });
@@ -55,7 +55,7 @@ async function getSelectedNote(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function insertNewNote(req: Request, res: Response): Promise<void> {
+export async function insertNewNote(req: Request, res: Response): Promise<void> {
     try {
         const newNote = new Notes(req.body);
         await newNote.save();
@@ -65,7 +65,7 @@ async function insertNewNote(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function updateSelectedNote(req: Request, res: Response): Promise<void> {
+export async function updateSelectedNote(req: Request, res: Response): Promise<void> {
     try {
         const getNoteById = req.params.id;
         await Notes.updateOne({ _id: getNoteById }, {  
@@ -78,14 +78,4 @@ async function updateSelectedNote(req: Request, res: Response): Promise<void> {
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
     }
-}
-
-export {
-    countAllNotes,
-    deleteAllNotes,
-    deleteSelectedNote,
-    getAllNotes,
-    getSelectedNote,
-    insertNewNote,
-    updateSelectedNote
 }

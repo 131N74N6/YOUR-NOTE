@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Balances } from '../models/balance.model';
 import { Types } from 'mongoose';
 
-async function countUserBalance(req: Request, res: Response) {
+export async function countUserBalance(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
         const incomeResult = await Balances.aggregate([
@@ -29,7 +29,7 @@ async function countUserBalance(req: Request, res: Response) {
     }
 }
 
-async function deleteAllBalances(req: Request, res: Response) {
+export async function deleteAllBalances(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
         await Balances.deleteMany({ user_id: getUserId });
@@ -39,7 +39,7 @@ async function deleteAllBalances(req: Request, res: Response) {
     }
 }
 
-async function deleteSelectedBalance(req: Request, res: Response) {
+export async function deleteSelectedBalance(req: Request, res: Response) {
     try {
         const getBalanceById = req.params.id;
         await Balances.deleteOne({ _id: getBalanceById });
@@ -49,7 +49,7 @@ async function deleteSelectedBalance(req: Request, res: Response) {
     }
 }
 
-async function getAllBalances(req: Request, res: Response) {
+export async function getAllBalances(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
         const limit = parseInt(req.query.limit as string) || 12;
@@ -63,7 +63,7 @@ async function getAllBalances(req: Request, res: Response) {
     }
 }
 
-async function getSelectedBalance(req: Request, res: Response) {
+export async function getSelectedBalance(req: Request, res: Response) {
     try {
         const getBalanceById = req.params.id;
         const getBalance = await Balances.find({ _id: getBalanceById });
@@ -73,7 +73,7 @@ async function getSelectedBalance(req: Request, res: Response) {
     }
 }
 
-async function insertNewBalance(req: Request, res: Response) {
+export async function insertNewBalance(req: Request, res: Response) {
     try {
         const newBalance = new Balances(req.body);
         await newBalance.save();
@@ -83,7 +83,7 @@ async function insertNewBalance(req: Request, res: Response) {
     }
 }
 
-async function updateSelectedBalance(req: Request, res: Response) {
+export async function updateSelectedBalance(req: Request, res: Response) {
     try {
         const getBalanceById = req.params.id;
         await Balances.updateOne({ _id: getBalanceById }, { 
@@ -97,14 +97,4 @@ async function updateSelectedBalance(req: Request, res: Response) {
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
-}
-
-export {
-    countUserBalance,
-    deleteAllBalances,
-    deleteSelectedBalance,
-    getAllBalances,
-    getSelectedBalance,
-    insertNewBalance,
-    updateSelectedBalance
 }
