@@ -26,7 +26,7 @@ export default function Activites() {
         isLoading, 
         isReachedEnd 
     } = infiniteScroll<IActivity>({
-        api_url: user ? `http://localhost:1234/activities/get-all/${user.info.id}` : '',
+        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/activities/get-all/${user.info.id}` : '',
         query_key: [`activities-${user?.info.id}`],
         stale_time: 600000,
         limit: 12
@@ -39,7 +39,7 @@ export default function Activites() {
             if (!selected.act_name.trim()) throw new Error('Missing required data');
             
             await updateData<IActivity>({
-                api_url: `http://localhost:1234/activities/change/${selected._id}`,
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/change/${selected._id}`,
                 api_data: { act_name: selected.act_name, schedule_at: selected.schedule_at }
             });
         },
@@ -61,7 +61,7 @@ export default function Activites() {
             if (!user) return;
 
             await insertData<IActivity>({
-                api_url: 'http://localhost:1234/activities/add',
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/add`,
                 api_data: {
                     act_name: trimmedActName,
                     created_at: getCurrentDate.toISOString(),
@@ -83,7 +83,7 @@ export default function Activites() {
     const deleteOneActMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async (id: string) => {
-            await deleteData({ api_url: `http://localhost:1234/activities/erase/${id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
         onSuccess: () => {
@@ -97,7 +97,7 @@ export default function Activites() {
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
             if (!user) return;
-            await deleteData({ api_url: `http://localhost:1234/activities/erase-all/${user.info.id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/erase-all/${user.info.id}` });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });

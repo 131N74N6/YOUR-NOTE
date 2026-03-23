@@ -67,7 +67,7 @@ export default function NoteForm() {
             if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
 
             await insertData<INote>({
-                api_url: 'http://localhost:1234/notes/add',
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/add`,
                 api_data: {
                     created_at: getCurrentDate.toISOString(),
                     note_content: trimmedContent,

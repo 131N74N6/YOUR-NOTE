@@ -2,9 +2,6 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export async function signIn(req: Request, res: Response) {
     try {

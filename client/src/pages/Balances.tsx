@@ -27,7 +27,7 @@ export default function Balances() {
         isReachedEnd,
         isLoading 
     } = infiniteScroll<IBalance>({
-        api_url: user ? `http://localhost:1234/balances/get-all/${user.info.id}` : '',
+        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/balances/get-all/${user.info.id}` : '',
         query_key: [`balances-${user?.info.id}`],
         stale_time: 600000,
         limit: 12
@@ -40,7 +40,7 @@ export default function Balances() {
             if (!selected.balance_type || !selected.description.trim()) throw new Error('Fill these too');
 
             await updateData<IBalance>({ 
-                api_url: `http://localhost:1234/balances/change/${selected._id}`,
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/change/${selected._id}`,
                 api_data: { 
                     amount: selected.amount, 
                     description: selected.description, 
@@ -61,7 +61,7 @@ export default function Balances() {
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
             if (!user) return;
-            await deleteData({ api_url: `http://localhost:1234/balances/erase-all/${user.info.id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase-all/${user.info.id}` });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
@@ -73,7 +73,7 @@ export default function Balances() {
     const deleteOneBalanceMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async (id: string) => {
-            await deleteData({ api_url: `http://localhost:1234/balances/erase/${id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
         onSuccess: () => {
@@ -93,7 +93,7 @@ export default function Balances() {
             if (!user) return;
 
             await insertData<IBalance>({
-                api_url: 'http://localhost:1234/balances/add',
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/add`,
                 api_data: {
                     amount: trimmedAmount,
                     balance_type: amountType,

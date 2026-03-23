@@ -29,7 +29,7 @@ export default function useAuth() {
     async function signIn(email: string, password: string) {
         setLoading(true);
         try {
-            const request = await fetch('http://localhost:1234/users/sign-in', {
+            const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/sign-in`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -61,7 +61,7 @@ export default function useAuth() {
         setLoading(true);
         setError(null);
         try {
-            const request = await fetch('http://localhost:1234/users/sign-up', {
+            const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/sign-up`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({ created_at, email, password, username }),

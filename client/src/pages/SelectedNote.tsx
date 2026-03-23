@@ -30,7 +30,7 @@ export default function SelectedNote() {
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
     const { data: selectedNote, isLoading } = getData<INote[]>({
-        api_url: `http://localhost:1234/notes/selected/${_id}`,
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/selected/${_id}`,
         query_key: [`selected-notes-${_id}`],
         stale_time: 1000
     });
@@ -74,7 +74,7 @@ export default function SelectedNote() {
             const trimmedContent = editContent.trim();
             
             await updateData<INote>({ 
-                api_url: `http://localhost:1234/notes/change/${_id}`,
+                api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/change/${_id}`,
                 api_data: {
                     note_content: trimmedContent,
                     note_title: trimmedTitle,

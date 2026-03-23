@@ -22,7 +22,7 @@ export default function Notes() {
         isReachedEnd,
         isLoading 
     } = infiniteScroll<INote>({
-        api_url: user ? `http://localhost:1234/notes/get-all/${user.info.id}` : '',
+        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${user.info.id}` : '',
         query_key: [`notes-${user?.info.id}`],
         stale_time: 600000,
         limit: 12
@@ -31,7 +31,7 @@ export default function Notes() {
     const deleteOneNoteMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async (id: string) => {
-            await deleteData({ api_url: `http://localhost:1234/notes/erase/${id}` })
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase/${id}` })
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
@@ -44,7 +44,7 @@ export default function Notes() {
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
             if (!user) return;
-            await deleteData({ api_url: `http://localhost:1234/notes/erase-all/${user.info.id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase-all/${user.info.id}` });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
