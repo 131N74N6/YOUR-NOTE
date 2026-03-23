@@ -11,10 +11,10 @@ if (process.env.NODE_ENV !== 'production') {
 import { db } from "./database/mongodb";
 import express from "express";
 import cors from 'cors';
-import balanceRoutes from "./routes/balance.router";
-import noteRoutes from "./routes/note.route";
-import activityRoutes from "./routes/activity.router";
-import userRoutes from "./routes/user.router";
+import balanceRoutes from "./routers/balance.router";
+import noteRoutes from "./routers/note.route";
+import activityRoutes from "./routers/activity.router";
+import userRoutes from "./routers/user.router";
 
 const app = express();
 
