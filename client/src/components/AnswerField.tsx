@@ -9,7 +9,7 @@ type BotAnswer = {
 
 const AnswerField = (props: BotAnswer) => {
     const [copyAnswer, setCopyAnswer] = useState<boolean>(false);
-    const [copyTimeout, setCopyTimeout] = useState<NodeJS.Timeout | null>(null);
+    const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
     const copyToClipboard = async (): Promise<void> => {
         if (!props.answer) return;
