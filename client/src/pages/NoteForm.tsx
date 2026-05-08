@@ -121,8 +121,6 @@ export default function NoteForm() {
                         borderRadius: '0.5rem'
                     }}
                 />
-                {/* <div className="h-full border border-white rounded-[0.5rem] overflow-hidden">
-                </div> */}
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem]">
                     <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                     <button 
