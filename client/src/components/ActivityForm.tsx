@@ -1,6 +1,17 @@
+import { useEffect } from "react";
 import type { ActivityFormProps } from "../services/custom-types";
+import DataModifier from "../services/data-services";
 
 const ActivityForm = (props: ActivityFormProps) => {
+    const { message, setMessage } = DataModifier();
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+
     return (
         <form onSubmit={props.onSave} className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)]">
             <div className="bg-[#1a1a1a] flex flex-col gap-[1rem] p-[1rem] w-[300px] h-[300px] border border-white">
@@ -34,6 +45,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                         Save
                     </button>
                 </div>
+                <div>{message ? <p className="text-gray-500">{message}</p> : null}</div>
             </div>
         </form>
     );

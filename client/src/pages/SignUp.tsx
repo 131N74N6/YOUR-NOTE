@@ -1,47 +1,29 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth-services";
 
 export default function SignUp() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
-    const [message, setMessage] = useState<string | null>(null);
-    const [showMessage, setShowMessage] = useState<boolean>(false);
     const navigate = useNavigate();
-    const { loading, signUp, user } = useAuth();
+    const { currentUserId, error, loading, setError, signUp  } = useAuth();
 
     useEffect(() => {
-        if (user) navigate('/home', { replace: true });
-    }, [user, navigate]);
+        if (currentUserId && !loading) navigate('/home', { replace: true });
+    }, [currentUserId, loading, navigate]);
 
     useEffect(() => {
-        if (showMessage) {
-            const timeout = setTimeout(() => setShowMessage(false), 3000);
-            setMessage(null);
+        if (error) {
+            const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [showMessage]);
+    }, [error, setError]);
 
-    const handleSignUp = useCallback(async (event: React.FormEvent) => {
+    async function handleSignUp (event: React.FormEvent) {
         event.preventDefault();
-        try {            
-            const trimmedEmail = email.trim();
-            const trimmedUsername = username.trim();
-            const getCurrentDate = new Date();
-
-            if (!trimmedUsername) throw new Error('username is required here');
-            if (!trimmedEmail) throw new Error('email is required here');
-            if (!trimmedEmail.includes('@')) throw new Error('invalid email address');
-            if (!password) throw new Error('password is required here');
-            if (password.length < 5) throw new Error('password too weak');
-
-            await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUsername, password);
-        } catch (error: any) {
-            setMessage(error.message);
-            setShowMessage(true);
-        }
-    }, [email, password, username]);
+        await signUp(new Date().toISOString(), email.trim(), username.trim(), password);
+    }
 
     return (
         <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
@@ -81,9 +63,9 @@ export default function SignUp() {
                     />
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-200 hover:underline" to={'/sign-in'}>Sign In</Link></div>
-                {showMessage ? 
+                {error ? 
                     <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {message}
+                        {error}
                     </div>
                 : null}
                 <button 

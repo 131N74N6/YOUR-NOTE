@@ -3,8 +3,8 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { INote } from "../services/custom-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAuth from "../services/useAuth";
-import DataModifier from "../services/data-modifier";
+import useAuth from "../services/auth-services";
+import DataModifier from "../services/data-services";
 import Loading from "../components/Loading";
 import ReactQuill from 'react-quill-new';
 import 'quill/dist/quill.snow.css';
@@ -18,7 +18,7 @@ Quill.register('formats/blockquote', Blockquote);
 Quill.register('formats/code-block', CodeBlock);
 
 export default function SelectedNote() {
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { _id } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -70,20 +70,17 @@ export default function SelectedNote() {
         mutationFn: async () => {
             if (!_id) throw new Error('Note not found');
 
-            const trimmedTitle = editTitle.trim();
-            const trimmedContent = editContent.trim();
-            
             await updateData<INote>({ 
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/change/${_id}`,
                 api_data: {
-                    note_content: trimmedContent,
-                    note_title: trimmedTitle,
+                    note_content: editContent.trim(),
+                    note_title: editTitle.trim(),
                 }
             });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`selected-notes-${_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
             navigate('/notes');
         },
         onSettled: () => setIsDataChanging(false)

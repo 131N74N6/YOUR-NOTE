@@ -7,17 +7,12 @@ import { checkOwnership, verifyToken } from "../middleware/auth.middleware";
 
 const activityRoutes = Router();
 
-// delete all by user id
-activityRoutes.delete('/erase-all/:id', verifyToken, checkOwnership, deleteAllActivities);
-
+activityRoutes.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllActivities);
 activityRoutes.delete('/erase/:id', verifyToken, deleteSelectedActivity);
 
-// get all by user id
-activityRoutes.get('/get-all/:id', verifyToken, checkOwnership, getAllActivities);
-
+activityRoutes.get('/get-all/:user_id', verifyToken, checkOwnership, getAllActivities);
 activityRoutes.get('/selected/:id', verifyToken, getSelectedActivity);
-
-activityRoutes.get('/summary/:id', verifyToken, checkOwnership, countAllActivities);
+activityRoutes.get('/summary/:user_id', verifyToken, checkOwnership, countAllActivities);
 
 activityRoutes.post('/add', verifyToken, insertNewActivity);
 

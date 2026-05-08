@@ -2,14 +2,14 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import BalanceList from "../components/BalanceList";
 import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth-services";
 import type { IBalance, UpdateBalanceProps } from "../services/custom-types";
 import Loading from "../components/Loading";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Balances() {
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { deleteData, infiniteScroll, insertData, updateData } = DataModifier();
     const queryClient = useQueryClient();
 
@@ -22,13 +22,14 @@ export default function Balances() {
 
     const { 
         paginatedData: balanceData, 
+        error,
         fetchNextPage,
         isFetchingNextPage,
         isReachedEnd,
         isLoading 
     } = infiniteScroll<IBalance>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/balances/get-all/${user.info.id}` : '',
-        query_key: [`balances-${user?.info.id}`],
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/get-all/${currentUserId}`,
+        query_key: [`balances-${currentUserId}`],
         stale_time: 600000,
         limit: 12
     });
@@ -48,8 +49,9 @@ export default function Balances() {
                 }
             });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
         },
         onSettled: () => {
             setIsDataChanging(false);
@@ -60,12 +62,12 @@ export default function Balances() {
     const deleteAllBalanceMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            if (!user) return;
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase-all/${user.info.id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase-all/${currentUserId}` });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
@@ -76,9 +78,10 @@ export default function Balances() {
             await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
@@ -86,26 +89,21 @@ export default function Balances() {
     const insertBalanceMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            const trimmedAmount = Number(amount.trim());
-            const trimmedDescription = description.trim();
-            const getCurrentDate = new Date();
-
-            if (!user) return;
-
             await insertData<IBalance>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/add`,
                 api_data: {
-                    amount: trimmedAmount,
+                    amount: Number(amount.trim()),
                     balance_type: amountType,
-                    created_at: getCurrentDate.toISOString(),
-                    description: trimmedDescription,
-                    user_id: user.info.id
+                    created_at: new Date().toISOString(),
+                    description: description.trim(),
+                    user_id: currentUserId
                 }
             });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`balances-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`balance-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
         },
         onSettled: () => {
             closeForm();
@@ -122,18 +120,6 @@ export default function Balances() {
         setSelectedId(prev => prev === id ? null : id);
     }
 
-    const deleteAllBalance = async (): Promise<void> => {
-        deleteAllBalanceMutation.mutate();
-    }
-
-    const deleteSelectedBalance = (id: string): void => {
-        deleteOneBalanceMutation.mutate(id);
-    }
-
-    const updateSelectedBalance = (selected: UpdateBalanceProps): void => {
-        changeBalanceMutation.mutate(selected);
-    }
-
     const closeForm = (): void => {
         setAmount('');
         setAmountType('income');
@@ -142,13 +128,11 @@ export default function Balances() {
     }
 
     useEffect((): void => {
-        if (!user) {
+        if (!currentUserId) {
             closeForm();
             setSelectedId(null);
         }
-    }, [user, closeForm]);
-
-    if (isLoading) return <Loading/>
+    }, [currentUserId, closeForm]);
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
@@ -168,34 +152,46 @@ export default function Balances() {
                     isDataChanging={isDataChanging}
                 /> 
             : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
-                <div className="flex gap-[0.7rem]">
-                    <button 
-                        onClick={() => setOpenForm(true)}
-                        type="button" 
-                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                    >
-                        Add Balances
-                    </button>
-                    <button 
-                        onClick={deleteAllBalance}
-                        type="button" 
-                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                    >
-                        Delete All Balances
-                    </button>
-                </div>
-                <BalanceList
-                    balances={balanceData ? balanceData : []}
-                    getMore={fetchNextPage}
-                    isDataChanging={isDataChanging}
-                    isLoadMore={isFetchingNextPage}
-                    isReachedEnd={isReachedEnd}
-                    onDelete={deleteSelectedBalance}
-                    onSelect={handleSelectItem}
-                    onUpdate={updateSelectedBalance}
-                    selectedId={selectedId}
-                />
+            <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div>
+                ) : error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your balance. Try again later.'}</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex gap-[0.7rem]">
+                            <button 
+                                onClick={() => setOpenForm(true)}
+                                type="button" 
+                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            >
+                                Add Balances
+                            </button>
+                            <button 
+                                onClick={() => deleteAllBalanceMutation.mutate()}
+                                type="button" 
+                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            >
+                                Delete All Balances
+                            </button>
+                        </div>
+                        <BalanceList
+                            balances={balanceData ? balanceData : []}
+                            getMore={fetchNextPage}
+                            isDataChanging={isDataChanging}
+                            isLoadMore={isFetchingNextPage}
+                            isReachedEnd={isReachedEnd}
+                            onDelete={(id) => deleteOneBalanceMutation.mutate(id)}
+                            onSelect={handleSelectItem}
+                            onUpdate={(balance) => changeBalanceMutation.mutate(balance)}
+                            selectedId={selectedId}
+                        />
+                    </>
+                )}
             </div>
         </main>
     );

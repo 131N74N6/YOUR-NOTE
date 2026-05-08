@@ -1,6 +1,17 @@
+import { useEffect } from "react";
 import type { BalanceFormProps } from "../services/custom-types";
+import DataModifier from "../services/data-services";
 
 const BalanceForm = (props: BalanceFormProps) => {
+    const { message, setMessage } = DataModifier();
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+
     return (
         <form onSubmit={props.onSave} className="flex justify-center items-center z-20 fixed inset-0 bg-[rgba(0,0,0,0.66)]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-white w-[400px] h-[400px]">
@@ -52,6 +63,7 @@ const BalanceForm = (props: BalanceFormProps) => {
                         Save
                     </button>
                 </div>
+                <div>{message ? <p className="text-gray-500">{message}</p> : null}</div>
             </div>
         </form>
     );

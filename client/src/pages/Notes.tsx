@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth-services";
 import Loading from "../components/Loading";
 import type { INote } from "../services/custom-types";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 export default function Notes() {
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { deleteData, infiniteScroll } = DataModifier();
     const queryClient = useQueryClient();
 
@@ -17,13 +17,14 @@ export default function Notes() {
 
     const { 
         paginatedData: noteData, 
+        error,
         fetchNextPage,
         isFetchingNextPage,
         isReachedEnd,
         isLoading 
     } = infiniteScroll<INote>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${user.info.id}` : '',
-        query_key: [`notes-${user?.info.id}`],
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${currentUserId}`,
+        query_key: [`notes-${currentUserId}`],
         stale_time: 600000,
         limit: 12
     });
@@ -33,9 +34,10 @@ export default function Notes() {
         mutationFn: async (id: string) => {
             await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase/${id}` })
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
@@ -43,49 +45,50 @@ export default function Notes() {
     const deleteManyNotesMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            if (!user) return;
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase-all/${user.info.id}` });
+            if (!currentUserId) return;
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase-all/${currentUserId}` });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
-
-    const deleteAllNotes = () => {
-        deleteManyNotesMutation.mutate();
-    }
-
-    const deleteSelectedNote = async (id: string) => {
-        deleteOneNoteMutation.mutate(id);
-    }
-    
-    if (isLoading) return <Loading/>
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col gap-[1rem] md:w-3/4 w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col gap-[1rem] md:w-3/4 h-full w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <Link to={'/add-note'} className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]">Add Note</Link>
                     <button 
                         type="button" 
                         disabled={isDataChanging}
-                        onClick={deleteAllNotes}
+                        onClick={() => deleteManyNotesMutation.mutate()}
                         className="bg-white cursor-pointer font-[500] disabled:cursor-not-allowed text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                     >
                         Delete All Notes
                     </button>
                 </div>
-                <NoteList 
-                    notes={noteData ? noteData : []} 
-                    getMore={fetchNextPage}
-                    isLoadMore={isFetchingNextPage}
-                    isReachedEnd={isReachedEnd}
-                    onDelete={deleteSelectedNote}
-                />
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div>
+                ) : error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your notes. Try again later.'}</p>
+                    </div>
+                ) : (
+                    <NoteList 
+                        notes={noteData ? noteData : []} 
+                        getMore={fetchNextPage}
+                        isLoadMore={isFetchingNextPage}
+                        isReachedEnd={isReachedEnd}
+                        onDelete={(id) => deleteOneNoteMutation.mutate(id)}
+                    />
+                )}
             </div>
         </main>
     );

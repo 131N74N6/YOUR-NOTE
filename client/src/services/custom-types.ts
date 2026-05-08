@@ -43,11 +43,7 @@ export type GetDataProps = {
 export interface IUser {
     message: string;
     token: string;
-    info: {
-        id: string;
-        email: string;
-        username: string;
-    }
+    user_id: string;
 }
 
 export type ErrorPage = {

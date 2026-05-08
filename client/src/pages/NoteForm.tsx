@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useState } from "react";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth-services";
 import type { INote } from "../services/custom-types";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ReactQuill from 'react-quill-new';
 import 'quill/dist/quill.snow.css';
@@ -18,7 +18,7 @@ Quill.register('formats/code-block', CodeBlock);
 
 export default function NoteForm() {
     const { insertData } = DataModifier();
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     
@@ -59,26 +59,20 @@ export default function NoteForm() {
     const insertNoteMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            const trimmedContent = content.trim();
-            const trimmedTitle = title.trim();
-            const getCurrentDate = new Date();
-
-            if (!user) return;
-            if (!trimmedContent || !trimmedTitle) throw new Error('Missing required data');
-
             await insertData<INote>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/add`,
                 api_data: {
-                    created_at: getCurrentDate.toISOString(),
-                    note_content: trimmedContent,
-                    note_title: trimmedTitle,
-                    user_id: user.info.id
+                    created_at: new Date().toISOString(),
+                    note_content: content.trim(),
+                    note_title: title.trim(),
+                    user_id: currentUserId
                 }
             });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
             navigate('/notes');
         },
         onSettled: () => {
@@ -109,27 +103,26 @@ export default function NoteForm() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                     className="p-[0.45rem] text-[0.9rem] border border-white outline-0 text-white font-[500] rounded-[0.5rem]"
                 />
-                <div className="h-full border border-white rounded-[0.5rem] overflow-hidden">
-                    <ReactQuill
-                        theme="snow"
-                        value={content}
-                        onChange={setContent}
-                        modules={modules}
-                        formats={formats}
-                        className="h-full min-h-[200px] bg-transparent text-white"
-                        placeholder="Write your note here..."
-                        style={{
-                            height: '89%',
-                            fontSize: '1rem',
-                            fontFamily: 'inherit',
-                            color: 'white',
-                            background: 'transparent',
-                            border: 'none',
-                            padding: '0.7rem',
-                            borderRadius: '0.5rem'
-                        }}
-                    />
-                </div>
+                <ReactQuill
+                    theme="snow"
+                    value={content}
+                    onChange={setContent}
+                    modules={modules}
+                    formats={formats}
+                    className="overflow-y-auto bg-transparent text-white"
+                    placeholder="Write your note here..."
+                    style={{
+                        height: '100%',
+                        fontSize: '1rem',
+                        fontFamily: 'inherit',
+                        color: 'white',
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: '0.5rem'
+                    }}
+                />
+                {/* <div className="h-full border border-white rounded-[0.5rem] overflow-hidden">
+                </div> */}
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-[0.7rem]">
                     <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                     <button 

@@ -3,39 +3,34 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface AuthRequest extends Request {
     user?: {
-        id: string;
-        email: string;
-        username: string;
+        message: string;
+        token: string;
+        user_id: string;
     } 
 }
 
 interface CustomJwtPayload extends JwtPayload {
-    id: string;
-    email: string;
-    username: string;
+    message: string;
+    token: string;
+    user_id: string;
 }
 
 function verifyToken(req: AuthRequest, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) {
-        res.status(401).json({ message: 'Access token is missing' });
-        return;
-    }
+    if (!token) return res.status(401).json({ message: 'Access token is missing' });
 
-    jwt.verify(token, process.env.JWT_SECRET || 'your jwt key', (err, decoded) => {
-        if (err) {
-            res.status(403).json({ message: 'Invalid access token' });
-            return;
-        }
+    jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_key', (err, decoded) => {
+
+        if (err) return res.status(403).json({ message: 'Invalid access token' });
 
         const payload = decoded as CustomJwtPayload;
 
         req.user = {
-            id: payload.id,
-            email: payload.email,
-            username: payload.username
+            message: payload.message,
+            token: payload.token,
+            user_id: payload.user_id
         }
         
         next();
@@ -43,22 +38,12 @@ function verifyToken(req: AuthRequest, res: Response, next: NextFunction) {
 }
 
 function checkOwnership(req: AuthRequest, res: Response, next: NextFunction) {
-    if (!req.user) {
-        res.status(401).json({ message: 'Authentication required before checking ownership' });
-        return;
-    }
+    if (!req.user) return res.status(401).json({ message: 'Authentication required before checking ownership' });
 
-    const requestedId = req.params.id;
+    const requestedId = req.params.user_id;
 
-    if (!requestedId) {
-        res.status(400).json({ message: 'Resource id parameter required' });
-        return;
-    }
-
-    if (req.user.id !== requestedId) {
-        res.status(403).json({ message: 'You do not have permission to access this resource' });
-        return;
-    }
+    if (!requestedId) return res.status(400).json({ message: 'Resource id parameter required' });
+    if (req.user.user_id !== requestedId) return res.status(403).json({ message: 'You do not have permission to access this resource' });
 
     next();
 }

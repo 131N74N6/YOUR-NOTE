@@ -16,18 +16,20 @@ const BalanceList = (props: BalanceListProps) => {
             <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-[1rem] grid-cols-1">
                 {props.balances.map((balance) => (
                     <BalanceItem
-                        key={`blnc_${balance._id}`}
                         isDataChanging={props.isDataChanging}
                         isSelected={props.selectedId === balance._id}
-                        selected_data={balance}
+                        key={`blnc_${balance._id}`}
                         onDelete={props.onDelete}
                         onSelect={props.onSelect}
                         onUpdate={props.onUpdate}
+                        selected_data={balance}
                     />
                 ))}
             </div>
             <div className="flex justify-center">
-                {props.isLoadMore ? <Loading/> : null}
+                {props.isLoadMore ? (
+                    <div className="text-center"><Loading/></div>
+                ) : null}
                 {props.balances.length < 12 ? (
                     <></>
                 ) : props.isReachedEnd && props.balances.length > 0 ? (

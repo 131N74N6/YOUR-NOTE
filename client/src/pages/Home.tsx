@@ -1,6 +1,6 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data-modifier";
-import useAuth from "../services/useAuth";
+import DataModifier from "../services/data-services";
+import useAuth from "../services/auth-services";
 
 type IBalanceSummary = {
     income: number;
@@ -9,25 +9,25 @@ type IBalanceSummary = {
 }
 
 export default function Home() {
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { getData } = DataModifier();
 
-    const { data: balanceSummary } = getData<IBalanceSummary>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/balances/summary/${user.info.id}` : '',
+    const { data: balanceSummary, isLoading: isBalanceLoading } = getData<IBalanceSummary>({
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/summary/${currentUserId}`,
         stale_time: 600000,
-        query_key: [`balance-total-${user?.info.id}`]
+        query_key: [`balance-total-${currentUserId}`]
     });
 
-    const { data: activityTotal } = getData<number>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/activities/summary/${user.info.id}` : '',
+    const { data: activityTotal, isLoading: isActivityLoading } = getData<number>({
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/summary/${currentUserId}`,
         stale_time: 600000,
-        query_key: [`act-total-${user?.info.id}`]
+        query_key: [`act-total-${currentUserId}`]
     });
 
-    const { data: noteTotal } = getData<number>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/notes/summary/${user.info.id}` : '',
+    const { data: noteTotal, isLoading: isNoteLoading } = getData<number>({
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/summary/${currentUserId}`,
         stale_time: 600000,
-        query_key: [`note-total-${user?.info.id}`]
+        query_key: [`note-total-${currentUserId}`]
     });
 
     return (
@@ -37,24 +37,29 @@ export default function Home() {
             <div className="p-[1rem] border border-white overflow-y-auto h-full md:w-3/4 w-full rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-[1rem]">
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
+                        <div>{isBalanceLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>
                         <h3>Income Total</h3>
                         <p>{balanceSummary ? balanceSummary.income : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
+                        <div>{isBalanceLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>
                         <h3>Expense Total</h3>
                         <p>{balanceSummary ? balanceSummary.expense : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
+                        <div>{isBalanceLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>
                         <h3>Balances</h3>
                         <p>{balanceSummary ? balanceSummary.balance : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
+                        <div>{isActivityLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>
                         <h3>Activity to do</h3>
-                        <p>{activityTotal}</p>
+                        <p>{activityTotal ? activityTotal : 0}</p>
                     </div>
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
+                        <div>{isNoteLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>
                         <h3>Notes</h3>
-                        <p>{noteTotal}</p>
+                        <p>{noteTotal ? noteTotal : 0}</p>
                     </div>
                 </div>
             </div>

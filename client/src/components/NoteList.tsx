@@ -15,11 +15,17 @@ const NoteList = (props: NoteListProps) => {
         <div className="flex flex-col gap-[1rem] overflow-y-auto">            
             <div className="grid lg:grid-cols-3 gap-[0.7rem] md:grid-cols-2 grid-cols-1">
                 {props.notes.map((note) => (
-                    <NoteItem key={`note_${note._id}`} note={note} onDelete={props.onDelete}/>
+                    <NoteItem 
+                        key={`note_${note._id}`} 
+                        note={note} 
+                        onDelete={props.onDelete}
+                    />
                 ))}
             </div>
             <div className="flex justify-center">
-                {props.isLoadMore ? <Loading/> : null}
+                {props.isLoadMore ? (
+                    <div className="text-center"><Loading/></div>
+                ) : null}
                 {props.notes.length < 12 ? (
                     <></>
                 ) : props.isReachedEnd && props.notes.length > 0 ? (

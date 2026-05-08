@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { IActivity, UpdateActivityDataProps } from "../services/custom-types";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth-services";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Activites() {
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { deleteData, infiniteScroll, insertData, updateData } = DataModifier();
     const queryClient = useQueryClient();
 
@@ -21,13 +21,14 @@ export default function Activites() {
 
     const { 
         paginatedData: actData, 
+        error,
         fetchNextPage,
         isFetchingNextPage,
         isLoading, 
         isReachedEnd 
     } = infiniteScroll<IActivity>({
-        api_url: user ? `${import.meta.env.VITE_BASE_API_URL}/activities/get-all/${user.info.id}` : '',
-        query_key: [`activities-${user?.info.id}`],
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/get-all/${currentUserId}`,
+        query_key: [`activities-${currentUserId}`],
         stale_time: 600000,
         limit: 12
     });
@@ -35,16 +36,14 @@ export default function Activites() {
     const changeActMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async (selected: UpdateActivityDataProps) => {
-            if (!user) return;
-            if (!selected.act_name.trim()) throw new Error('Missing required data');
-            
             await updateData<IActivity>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/change/${selected._id}`,
                 api_data: { act_name: selected.act_name, schedule_at: selected.schedule_at }
             });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`activities-${currentUserId}`] });
         },
         onSettled: () => {
             setIsDataChanging(false);
@@ -55,24 +54,20 @@ export default function Activites() {
     const insertActMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            const trimmedActName = actName.trim();
-            const getCurrentDate = new Date();
-
-            if (!user) return;
-
             await insertData<IActivity>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/add`,
                 api_data: {
-                    act_name: trimmedActName,
-                    created_at: getCurrentDate.toISOString(),
+                    act_name: actName.trim(),
+                    created_at: new Date().toISOString(),
                     schedule_at: new Date(schedule).toISOString(),
-                    user_id: user.info.id
+                    user_id: currentUserId
                 }
             });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`activities-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${currentUserId}`] });
         },
         onSettled: () => {
             setIsDataChanging(false);
@@ -86,9 +81,10 @@ export default function Activites() {
             await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`activities-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
@@ -96,12 +92,12 @@ export default function Activites() {
     const deleteAllActMutation = useMutation({
         onMutate: () => setIsDataChanging(true),
         mutationFn: async () => {
-            if (!user) return;
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/erase-all/${user.info.id}` });
+            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/erase-all/${currentUserId}` });
         },
+        onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`activities-${user?.info.id}`] });
-            queryClient.invalidateQueries({ queryKey: [`act-total-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`activities-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`act-total-${currentUserId}`] });
         },
         onSettled: () => setIsDataChanging(false)
     });
@@ -115,18 +111,6 @@ export default function Activites() {
         setSelectedId(prev => prev === id ? null : id);
     }
 
-    const deleteSelcetedAct = (id: string): void => {
-        deleteOneActMutation.mutate(id);
-    }
-
-    const deleteAllAct = (): void => {
-        deleteAllActMutation.mutate()
-    }
-
-    const updateSelectedAct = (selected: UpdateActivityDataProps) => {
-        changeActMutation.mutate(selected);
-    }
-
     const closeForm = (): void => {
         setActName('');
         setSchedule('');
@@ -134,13 +118,11 @@ export default function Activites() {
     }
     
     useEffect((): void => {
-        if (!user) {
+        if (!currentUserId) {
             closeForm();
             setSelectedId(null);
         }
-    }, [user, closeForm]);
-
-    if (isLoading) return <Loading/>
+    }, [currentUserId, closeForm]);
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
@@ -148,44 +130,56 @@ export default function Activites() {
             <Navbar2/>
             {openForm ? 
                 <ActivityForm
-                    act_name={actName}
-                    changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
-                    schedule_at={schedule}
-                    makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
-                    onClose={closeForm}
-                    onSave={saveActName}
-                    isDataChanging={isDataChanging}
+                act_name={actName}
+                changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
+                schedule_at={schedule}
+                makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
+                onClose={closeForm}
+                onSave={saveActName}
+                isDataChanging={isDataChanging}
                 />
             : null}
-            <div className="flex flex-col min-h-[500px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
-                <div className="flex gap-[0.7rem]">
-                    <button 
-                        onClick={() => setOpenForm(true)}
-                        type="button" 
-                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                    >
-                        Add Activity
-                    </button>
-                    <button 
-                        onClick={deleteAllAct}
-                        type="button" 
-                        disabled={isDataChanging}
-                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                    >
-                        Delete All Activities
-                    </button>
-                </div>
-                <ActivityList
-                    act_datas={actData ? actData : []}
-                    getMore={fetchNextPage}
-                    isDataChanging={isDataChanging}
-                    isLoadMore={isFetchingNextPage}
-                    isReachedEnd={isReachedEnd}
-                    onDelete={deleteSelcetedAct}
-                    onSelect={handleSelectAct}
-                    onUpdate={updateSelectedAct}
-                    selectedId={selectedId}
-                />
+            <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div>
+                ) : error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your activities. Try again later.'}</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex gap-[0.7rem] overflow-y-auto">
+                            <button 
+                                onClick={() => setOpenForm(true)}
+                                type="button" 
+                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            >
+                                Add Activity
+                            </button>
+                            <button 
+                                onClick={() => deleteAllActMutation.mutate()}
+                                type="button" 
+                                disabled={isDataChanging}
+                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                            >
+                                Delete All Activities
+                            </button>
+                        </div>
+                        <ActivityList
+                            act_datas={actData ? actData : []}
+                            getMore={fetchNextPage}
+                            isDataChanging={isDataChanging}
+                            isLoadMore={isFetchingNextPage}
+                            isReachedEnd={isReachedEnd}
+                            onDelete={(id) => deleteOneActMutation.mutate(id)}
+                            onSelect={handleSelectAct}
+                            onUpdate={(activity) => changeActMutation.mutate(activity)}
+                            selectedId={selectedId}
+                        />
+                    </>
+                )}
             </div>
         </main>
     );

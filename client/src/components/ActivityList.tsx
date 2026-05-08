@@ -16,9 +16,9 @@ function ActivityList(props: ActivityListProps) {
             <div className="grid lg:grid-cols-2 xl:grid-cols-3 grid-cols-1 gap-[0.7rem]">
                 {props.act_datas.map((act) => (
                     <ActivityItem
-                        key={`act_${act._id}`}
                         is_selected={props.selectedId === act._id}
                         isDataChanging={props.isDataChanging}
+                        key={`act_${act._id}`}
                         onDelete={props.onDelete}
                         onSelect={props.onSelect}
                         onUpdate={props.onUpdate}
@@ -27,7 +27,9 @@ function ActivityList(props: ActivityListProps) {
                 ))}
             </div>
             <div className="flex justify-center">
-                {props.isLoadMore ? <Loading/> : null}
+                {props.isLoadMore ? (
+                    <div className="text-center"><Loading/></div>
+                ) : null}
                 {props.act_datas.length < 12 ? (
                     <></>
                 ) : props.isReachedEnd ? (

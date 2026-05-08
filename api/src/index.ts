@@ -14,7 +14,7 @@ import cors from 'cors';
 import balanceRoutes from "./routers/balance.router";
 import noteRoutes from "./routers/note.route";
 import activityRoutes from "./routers/activity.router";
-import userRoutes from "./routers/user.router";
+import authRoutes from "./routers/auth.router";
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.use(cors());
 app.use('/api/activities', activityRoutes);
 app.use('/api/balances', balanceRoutes);
 app.use('/api/notes', noteRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/auths', authRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
     db.then(() => {
