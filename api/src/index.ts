@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:1234', 'http://localhost:5173', 'https://my-note-be.vercel.app/api']
+    origin: ['http://localhost:1234', 'http://localhost:5173', 'https://my-note-be.vercel.app/api', 'https://my-note-delta.vercel.app/']
 }));
 app.use('/api/activities', activityRoutes);
 app.use('/api/balances', balanceRoutes);
