@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { BalanceItemProps } from '../services/custom-types';
 
-const BalanceItem = (props: BalanceItemProps) => {
+export default function BalanceItem(props: BalanceItemProps) {
     const [editAmount, setEditAmount] = useState<string>('');
     const [editType, setEditType] = useState<'income' | 'expense'>('income');
     const [editDescription, setEditDescription] = useState<string>('');
@@ -123,5 +123,3 @@ const BalanceItem = (props: BalanceItemProps) => {
         </div>
     );
 }
-
-export default BalanceItem;

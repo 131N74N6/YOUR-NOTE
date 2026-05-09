@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import type { BalanceFormProps } from "../services/custom-types";
 import DataModifier from "../services/data-services";
 
-const BalanceForm = (props: BalanceFormProps) => {
+export default function BalanceForm(props: BalanceFormProps) {
     const { message, setMessage } = DataModifier();
 
     useEffect(() => {
@@ -60,7 +60,7 @@ const BalanceForm = (props: BalanceFormProps) => {
                         disabled={!props.balance_type || !props.amount || !props.description}
                         className="bg-white disabled:cursor-not-allowed cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]"
                     >
-                        Save
+                        {props.isDataChanging ? 'Saving...' : 'Save'}
                     </button>
                 </div>
                 <div>{message ? <p className="text-gray-500">{message}</p> : null}</div>
@@ -68,5 +68,3 @@ const BalanceForm = (props: BalanceFormProps) => {
         </form>
     );
 }
-
-export default BalanceForm;

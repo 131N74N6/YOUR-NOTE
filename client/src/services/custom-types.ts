@@ -46,10 +46,6 @@ export interface IUser {
     user_id: string;
 }
 
-export type ErrorPage = {
-    message: string;
-}
-
 export type ActivityFormProps = {
     act_name: string;
     schedule_at: string;

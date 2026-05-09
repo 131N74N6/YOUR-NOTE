@@ -7,10 +7,11 @@ import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Notification from "../components/Notification";
 
 export default function Activites() {
     const { currentUserId } = useAuth();
-    const { deleteData, infiniteScroll, insertData, updateData } = DataModifier();
+    const { deleteData, infiniteScroll, insertData, message, setMessage, updateData } = DataModifier();
     const queryClient = useQueryClient();
 
     const [actName, setActName] = useState<string>('');
@@ -29,7 +30,7 @@ export default function Activites() {
     } = infiniteScroll<IActivity>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/get-all/${currentUserId}`,
         query_key: [`activities-${currentUserId}`],
-        stale_time: 600000,
+        stale_time: 1800000,
         limit: 12
     });
 
@@ -116,11 +117,19 @@ export default function Activites() {
         setSchedule('');
         setOpenForm(false);
     }
-    
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+
     useEffect((): void => {
         if (!currentUserId) {
             closeForm();
             setSelectedId(null);
+            setMessage(null);
         }
     }, [currentUserId, closeForm]);
 
@@ -128,17 +137,18 @@ export default function Activites() {
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
-            {openForm ? 
+            {openForm ? (
                 <ActivityForm
-                act_name={actName}
-                changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
-                schedule_at={schedule}
-                makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
-                onClose={closeForm}
-                onSave={saveActName}
-                isDataChanging={isDataChanging}
+                    act_name={actName}
+                    changeActName={(event: React.ChangeEvent<HTMLInputElement>) => setActName(event.target.value)}
+                    schedule_at={schedule}
+                    makeSchedule={(event: React.ChangeEvent<HTMLInputElement>) => setSchedule(event.target.value)}
+                    onClose={closeForm}
+                    onSave={saveActName}
+                    isDataChanging={isDataChanging}
                 />
-            : null}
+            ) : null}
+            {message ? Notification(message) : null}
             <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full">

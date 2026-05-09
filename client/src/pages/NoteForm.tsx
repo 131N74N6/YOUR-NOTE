@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../services/auth-services";
+import Notification from "../components/Notification";
 import type { INote } from "../services/custom-types";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,7 +18,7 @@ Quill.register('formats/blockquote', Blockquote);
 Quill.register('formats/code-block', CodeBlock);
 
 export default function NoteForm() {
-    const { insertData } = DataModifier();
+    const { insertData, message, setMessage } = DataModifier();
     const { currentUserId } = useAuth();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -73,7 +74,6 @@ export default function NoteForm() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
-            navigate('/notes');
         },
         onSettled: () => {
             resetForm();
@@ -91,10 +91,29 @@ export default function NoteForm() {
         setContent('');
     }
 
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null);
+                navigate('/notes');
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+
+    useEffect((): void => {
+        if (!currentUserId) {
+            resetForm();
+            setMessage(null);
+        }
+    }, [currentUserId, resetForm]);
+
     return (
         <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1/>
             <Navbar2/>
+            {message ? Notification(message) : null}
             <form onSubmit={addNote} className="flex flex-col h-full gap-[1rem] p-[1rem] md:w-3/4 w-full border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">                
                 <input 
                     type="text" 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ActivityItemProps } from "../services/custom-types";
 
-const ActivityItem = (props: ActivityItemProps) => {
+export default function ActivityItem(props: ActivityItemProps) {
     const [editActName, setEditActName] = useState<string>('');
     const [editSchedule, setEditSchedule] = useState<string>('');
 
@@ -100,5 +100,3 @@ const ActivityItem = (props: ActivityItemProps) => {
         </div>
     );
 }
-
-export default ActivityItem;

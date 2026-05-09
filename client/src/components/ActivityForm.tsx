@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import type { ActivityFormProps } from "../services/custom-types";
 import DataModifier from "../services/data-services";
 
-const ActivityForm = (props: ActivityFormProps) => {
+export default function ActivityForm(props: ActivityFormProps) {
     const { message, setMessage } = DataModifier();
 
     useEffect(() => {
@@ -42,7 +42,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                         disabled={!props.act_name || !props.schedule_at || props.isDataChanging} 
                         className="bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]"
                     >
-                        Save
+                        {props.isDataChanging ? 'Saving...' : 'Save'}
                     </button>
                 </div>
                 <div>{message ? <p className="text-gray-500">{message}</p> : null}</div>
@@ -50,5 +50,3 @@ const ActivityForm = (props: ActivityFormProps) => {
         </form>
     );
 }
-
-export default ActivityForm;

@@ -25,7 +25,7 @@ export default function DataModifier() {
                 setMessage(errorMessage);
                 throw new Error(errorMessage);
             } else {
-                setMessage(null);
+                setMessage(response.message);
                 return response;
             }
         } catch (error: any) {
@@ -112,7 +112,7 @@ export default function DataModifier() {
                 setMessage(errorMessage);
                 throw new Error(errorMessage);
             } else {
-                setMessage(null);
+                setMessage(response.message);
                 return response;
             }
         } catch (error: any) {
@@ -139,7 +139,7 @@ export default function DataModifier() {
                 setMessage(errorMessage);
                 throw new Error(errorMessage);
             } else {
-                setMessage(null);
+                setMessage(response.message);
                 return response;
             }
         } catch (error: any) {

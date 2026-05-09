@@ -2,7 +2,7 @@ import type { BalanceListProps } from "../services/custom-types";
 import BalanceItem from "./BalanceItem";
 import Loading from "./Loading";
 
-const BalanceList = (props: BalanceListProps) => {
+export default function BalanceList(props: BalanceListProps) {
     if (props.balances.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
@@ -47,5 +47,3 @@ const BalanceList = (props: BalanceListProps) => {
         </div>
     );
 }
-
-export default BalanceList;

@@ -2,7 +2,7 @@ import type { ActivityListProps } from "../services/custom-types";
 import ActivityItem from "./ActivityItem";
 import Loading from "./Loading";
 
-function ActivityList(props: ActivityListProps) {
+export default function ActivityList(props: ActivityListProps) {
     if (props.act_datas.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
@@ -47,5 +47,3 @@ function ActivityList(props: ActivityListProps) {
         </div>
     );
 }
-
-export default ActivityList;

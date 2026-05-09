@@ -2,7 +2,7 @@ import type { NoteListProps } from "../services/custom-types";
 import Loading from "./Loading";
 import NoteItem from "./NoteItem";
 
-const NoteList = (props: NoteListProps) => {
+export default function NoteList(props: NoteListProps) {
     if (props.notes.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
@@ -43,5 +43,3 @@ const NoteList = (props: NoteListProps) => {
         </div>
     );
 }
-
-export default NoteList;

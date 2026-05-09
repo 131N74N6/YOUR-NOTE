@@ -6,6 +6,8 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
+
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
     const { currentUserId, error, loading, setError, signUp  } = useAuth();
 
@@ -26,8 +28,8 @@ export default function SignUp() {
     }
 
     return (
-        <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
-            <form onSubmit={handleSignUp} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-[320px]">
+        <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] p-3">
+            <form onSubmit={handleSignUp} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-90">
                 <div className="font-[650] text-[1.5rem] text-white text-center">Welcome</div>
                 <div className="flex flex-col gap-[0.5rem]">
                     <label htmlFor="username" className="text-white">Username</label>
@@ -36,7 +38,7 @@ export default function SignUp() {
                         id="username" 
                         value={username}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
+                        className="w-full p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
                         placeholder="ex: john"
                     />
                 </div>
@@ -47,20 +49,29 @@ export default function SignUp() {
                         id="email" 
                         value={email}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
+                        className="w-full p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
                         placeholder="your@gmail.com"
                     />
                 </div>
                 <div className="flex flex-col gap-[0.5rem]">
                     <label htmlFor="password" className="text-white">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        value={password}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
-                        placeholder="your_password"
-                    />
+                    <div className="relative">
+                        <input 
+                            type={showPassword ? 'text' : 'password'} 
+                            id="password" 
+                            value={password}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                            className="w-full p-[0.45rem] text-[0.9rem] outline-0 border border-white text-white font-[600]" 
+                            placeholder="your_password"
+                        />
+                        <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 px-3 flex cursor-pointer items-center text-white"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <i className="fa-solid fa-eye"></i> : <i className="fa-regular fa-eye"></i>}
+                        </button>
+                    </div>
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-200 hover:underline" to={'/sign-in'}>Sign In</Link></div>
                 {error ? 

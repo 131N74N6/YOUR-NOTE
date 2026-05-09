@@ -6,13 +6,13 @@ import Loading from "../components/Loading";
 import type { INote } from "../services/custom-types";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Notification from "../components/Notification";
 
 export default function Notes() {
     const { currentUserId } = useAuth();
-    const { deleteData, infiniteScroll } = DataModifier();
+    const { deleteData, infiniteScroll, message, setMessage } = DataModifier();
     const queryClient = useQueryClient();
-
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
     const { 
@@ -25,7 +25,7 @@ export default function Notes() {
     } = infiniteScroll<INote>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${currentUserId}`,
         query_key: [`notes-${currentUserId}`],
-        stale_time: 600000,
+        stale_time: 1800000,
         limit: 12
     });
 
@@ -55,11 +55,19 @@ export default function Notes() {
         },
         onSettled: () => setIsDataChanging(false)
     });
+    
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
             <Navbar1/>
             <Navbar2/>
+            {message ? Notification(message) : null}
             <div className="flex flex-col gap-[1rem] md:w-3/4 h-full w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
                     <Link to={'/add-note'} className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]">Add Note</Link>
