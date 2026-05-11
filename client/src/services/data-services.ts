@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import type { GetDataProps, IDeleteApi, InfiniteScrollProps, IPostApi, IPutApi } from "./custom-types";
+import type { GetDataProps, IDeleteApi, InfiniteScrollProps, IPostApi, IPutApi } from "../models/data-model";
 import useAuth from "./auth-services";
 import { useState } from "react";
 

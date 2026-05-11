@@ -11,6 +11,8 @@ import './styles/index.css';
 import NoteForm from "./pages/NoteForm";
 import SelectedNote from "./pages/SelectedNote";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ChatBotDetail from "./pages/ChatBotDetail";
+import ChatBotHistories from "./pages/ChatBotHistories";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,8 @@ export default function App() {
                     <Route path="/note-detail/:_id" element={<ProtectedRoute><SelectedNote/></ProtectedRoute>}/>
                     <Route path="/activities" element={<ProtectedRoute><Activites/></ProtectedRoute>}/>
                     <Route path="/chat-bot" element={<ProtectedRoute><ChatBot/></ProtectedRoute>}/>
+                    <Route path="/chat-bot-history" element={<ProtectedRoute><ChatBotHistories/></ProtectedRoute>}/>
+                    <Route path="/detailed-chat/:_id" element={<ProtectedRoute><ChatBotDetail/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to={'/home'} replace/>}/>
                     <Route path="*" element={<Navigate to={'/sign-in'} replace/>}/>
                 </Routes>

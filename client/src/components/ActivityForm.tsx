@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { ActivityFormProps } from "../services/custom-types";
+import type { ActivityFormProps } from "../models/activity-model";
 import DataModifier from "../services/data-services";
 
 export default function ActivityForm(props: ActivityFormProps) {

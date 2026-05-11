@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
 import useAuth from "../services/auth-services";
 import Loading from "../components/Loading";
-import type { INote } from "../services/custom-types";
+import type { INote } from "../models/note-model";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -13,6 +13,8 @@ export default function Notes() {
     const { currentUserId } = useAuth();
     const { deleteData, infiniteScroll, message, setMessage } = DataModifier();
     const queryClient = useQueryClient();
+
+    const navigate = useNavigate();
     const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
 
     const { 
@@ -68,9 +70,16 @@ export default function Notes() {
             <Navbar1/>
             <Navbar2/>
             {message ? Notification(message) : null}
-            <div className="flex flex-col gap-[1rem] md:w-3/4 h-full w-full min-h-[500px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col gap-[1rem] md:w-3/4 h-full w-full min-h-[200px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">
-                    <Link to={'/add-note'} className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]">Add Note</Link>
+                    <button 
+                        type="button" 
+                        disabled={isDataChanging}
+                        onClick={() => navigate('/add-note')}
+                        className="bg-white cursor-pointer font-[500] disabled:cursor-not-allowed text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Add Note
+                    </button>
                     <button 
                         type="button" 
                         disabled={isDataChanging}
@@ -94,7 +103,7 @@ export default function Notes() {
                         getMore={fetchNextPage}
                         isLoadMore={isFetchingNextPage}
                         isReachedEnd={isReachedEnd}
-                        onDelete={(id) => deleteOneNoteMutation.mutate(id)}
+                        onDelete={deleteOneNoteMutation}
                     />
                 )}
             </div>

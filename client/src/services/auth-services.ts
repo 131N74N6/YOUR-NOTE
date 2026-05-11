@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { IUser } from "./custom-types";
+import type { IUser } from "../models/user-model";
 import { useEffect, useState } from "react";
 
 export default function useAuth() {

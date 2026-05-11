@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { BalanceItemProps } from '../services/custom-types';
+import type { BalanceItemProps } from '../models/balance-model';
 
 export default function BalanceItem(props: BalanceItemProps) {
     const [editAmount, setEditAmount] = useState<string>('');
@@ -21,7 +21,7 @@ export default function BalanceItem(props: BalanceItemProps) {
     const handleSave = (event: React.FormEvent): void => {
         event.preventDefault();
 
-        props.onUpdate({
+        props.onUpdate.mutate({
             _id: props.selected_data._id,
             amount: Number(editAmount.trim()),
             balance_type: editType,
@@ -115,7 +115,7 @@ export default function BalanceItem(props: BalanceItemProps) {
                 </button>
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onDelete(props.selected_data._id)}
+                    onClick={() => props.onDelete.mutate(props.selected_data._id)}
                 >
                     Delete
                 </button>

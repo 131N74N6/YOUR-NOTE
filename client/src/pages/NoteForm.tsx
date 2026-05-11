@@ -3,7 +3,7 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useEffect, useState } from "react";
 import useAuth from "../services/auth-services";
 import Notification from "../components/Notification";
-import type { INote } from "../services/custom-types";
+import type { INote } from "../models/note-model";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ReactQuill from 'react-quill-new';

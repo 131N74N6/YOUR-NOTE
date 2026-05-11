@@ -1,4 +1,4 @@
-import type { NoteListProps } from "../services/custom-types";
+import type { NoteListProps } from "../models/note-model";
 import Loading from "./Loading";
 import NoteItem from "./NoteItem";
 

@@ -1,4 +1,4 @@
-import type { NoteItemProps } from "../services/custom-types";
+import type { NoteItemProps } from "../models/note-model";
 import { Link } from "react-router-dom";
 
 export default function NoteItem(props: NoteItemProps) {
@@ -19,7 +19,7 @@ export default function NoteItem(props: NoteItemProps) {
                 <button 
                     className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] w-[85px]" 
                     type="button" 
-                    onClick={() => props.onDelete(props.note._id)}
+                    onClick={() => props.onDelete.mutate(props.note._id)}
                 >
                     Delete
                 </button>

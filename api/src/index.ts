@@ -11,10 +11,11 @@ if (process.env.NODE_ENV !== 'production') {
 import { db } from "./database/mongodb";
 import express from "express";
 import cors from 'cors';
-import balanceRoutes from "./routers/balance.router";
-import noteRoutes from "./routers/note.route";
-import activityRoutes from "./routers/activity.router";
-import authRoutes from "./routers/auth.router";
+import balanceRouters from "./routers/balance.router";
+import noteRouters from "./routers/note.route";
+import activityRouters from "./routers/activity.router";
+import authRouters from "./routers/auth.router";
+import chatBotRouters from './routers/chatbot.router';
 
 const app = express();
 
@@ -23,10 +24,11 @@ app.use(cors({
     credentials: true,
     origin: ['http://localhost:1234', 'http://localhost:5173', 'https://my-note-be.vercel.app/api', 'https://my-note-delta.vercel.app/']
 }));
-app.use('/api/activities', activityRoutes);
-app.use('/api/balances', balanceRoutes);
-app.use('/api/notes', noteRoutes);
-app.use('/api/auths', authRoutes);
+app.use('/api/activities', activityRouters);
+app.use('/api/balances', balanceRouters);
+app.use('/api/chatbot', chatBotRouters)
+app.use('/api/notes', noteRouters);
+app.use('/api/auths', authRouters);
 
 if (process.env.NODE_ENV !== 'production') {
     db.then(() => {

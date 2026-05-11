@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import type { INote } from "../services/custom-types";
+import type { INote } from "../models/note-model";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAuth from "../services/auth-services";
 import DataModifier from "../services/data-services";

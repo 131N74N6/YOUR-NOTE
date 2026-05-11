@@ -6,17 +6,17 @@ import {
 } from '../controllers/balance.controller';
 import { checkOwnership, verifyToken } from '../middleware/auth.middleware';
 
-const balanceRoutes = Router();
+const balanceRouters = Router();
 
-balanceRoutes.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllBalances);
-balanceRoutes.delete('/erase/:id', verifyToken, deleteSelectedBalance);
+balanceRouters.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllBalances);
+balanceRouters.delete('/erase/:id', verifyToken, deleteSelectedBalance);
 
-balanceRoutes.get('/get-all/:user_id', verifyToken, checkOwnership, getAllBalances);
-balanceRoutes.get('/selected/:id', verifyToken, getSelectedBalance)
-balanceRoutes.get('/summary/:user_id', verifyToken, checkOwnership, countUserBalance);
+balanceRouters.get('/get-all/:user_id', verifyToken, checkOwnership, getAllBalances);
+balanceRouters.get('/selected/:id', verifyToken, getSelectedBalance)
+balanceRouters.get('/summary/:user_id', verifyToken, checkOwnership, countUserBalance);
 
-balanceRoutes.post('/add', verifyToken, insertNewBalance);
+balanceRouters.post('/add', verifyToken, insertNewBalance);
 
-balanceRoutes.put('/change/:id', verifyToken, updateSelectedBalance);
+balanceRouters.put('/change/:id', verifyToken, updateSelectedBalance);
 
-export default balanceRoutes;
+export default balanceRouters;

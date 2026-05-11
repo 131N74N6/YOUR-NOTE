@@ -5,17 +5,17 @@ import {
 } from "../controllers/note.controller";
 import { checkOwnership, verifyToken } from "../middleware/auth.middleware";
 
-const noteRoutes = Router();
+const noteRouters = Router();
 
-noteRoutes.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllNotes);
-noteRoutes.delete('/erase/:id', verifyToken, deleteSelectedNote);
+noteRouters.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllNotes);
+noteRouters.delete('/erase/:id', verifyToken, deleteSelectedNote);
 
-noteRoutes.get('/get-all/:user_id', verifyToken, checkOwnership, getAllNotes);
-noteRoutes.get('/selected/:id', verifyToken, getSelectedNote);
-noteRoutes.get('/summary/:user_id', verifyToken, checkOwnership, countAllNotes);
+noteRouters.get('/get-all/:user_id', verifyToken, checkOwnership, getAllNotes);
+noteRouters.get('/selected/:id', verifyToken, getSelectedNote);
+noteRouters.get('/summary/:user_id', verifyToken, checkOwnership, countAllNotes);
 
-noteRoutes.post('/add', verifyToken, insertNewNote);
+noteRouters.post('/add', verifyToken, insertNewNote);
 
-noteRoutes.put('/change/:id', verifyToken, updateSelectedNote);
+noteRouters.put('/change/:id', verifyToken, updateSelectedNote);
 
-export default noteRoutes;
+export default noteRouters;

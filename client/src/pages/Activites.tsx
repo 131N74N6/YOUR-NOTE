@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import type { IActivity, UpdateActivityDataProps } from "../services/custom-types";
+import type { IActivity, UpdateActivityDataProps } from "../models/activity-model";
 import useAuth from "../services/auth-services";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
@@ -149,7 +149,24 @@ export default function Activites() {
                 />
             ) : null}
             {message ? Notification(message) : null}
-            <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col h-full min-h-[200px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        onClick={() => setOpenForm(true)}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Add Activity
+                    </button>
+                    <button 
+                        onClick={() => deleteAllActMutation.mutate()}
+                        type="button" 
+                        disabled={isDataChanging}
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Delete All Activities
+                    </button>
+                </div>
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
@@ -159,36 +176,17 @@ export default function Activites() {
                         <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your activities. Try again later.'}</p>
                     </div>
                 ) : (
-                    <>
-                        <div className="flex gap-[0.7rem] overflow-y-auto">
-                            <button 
-                                onClick={() => setOpenForm(true)}
-                                type="button" 
-                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                            >
-                                Add Activity
-                            </button>
-                            <button 
-                                onClick={() => deleteAllActMutation.mutate()}
-                                type="button" 
-                                disabled={isDataChanging}
-                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                            >
-                                Delete All Activities
-                            </button>
-                        </div>
-                        <ActivityList
-                            act_datas={actData ? actData : []}
-                            getMore={fetchNextPage}
-                            isDataChanging={isDataChanging}
-                            isLoadMore={isFetchingNextPage}
-                            isReachedEnd={isReachedEnd}
-                            onDelete={(id) => deleteOneActMutation.mutate(id)}
-                            onSelect={handleSelectAct}
-                            onUpdate={(activity) => changeActMutation.mutate(activity)}
-                            selectedId={selectedId}
-                        />
-                    </>
+                    <ActivityList
+                        act_datas={actData ? actData : []}
+                        getMore={fetchNextPage}
+                        isDataChanging={isDataChanging}
+                        isLoadMore={isFetchingNextPage}
+                        isReachedEnd={isReachedEnd}
+                        onDelete={deleteOneActMutation}
+                        onSelect={handleSelectAct}
+                        onUpdate={changeActMutation}
+                        selectedId={selectedId}
+                    />
                 )}
             </div>
         </main>

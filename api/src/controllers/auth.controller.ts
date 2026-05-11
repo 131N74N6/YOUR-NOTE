@@ -40,8 +40,11 @@ export async function signUp(req: Request, res: Response) {
         if (!password) return res.status(400).json({ message: 'Password is required' });
         if (!username) return res.status(400).json({ message: 'Username is required' });
 
-        const alreadyExits = await User.findOne({ email });
-        if (alreadyExits) return res.status(409).json({ message: 'User already exist' });
+        const isEmailExists = await User.findOne({ email });
+        const isUsernameExists = await User.findOne({ username });
+        
+        if (isUsernameExists) return res.status(409).json({ message: 'This username already exist' });
+        if (isEmailExists) return res.status(409).json({ message: 'This email already exist' });
         
         const hashedPassword = await bcrypt.hash(password, 10);
 

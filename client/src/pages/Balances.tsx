@@ -3,7 +3,7 @@ import BalanceList from "../components/BalanceList";
 import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
 import useAuth from "../services/auth-services";
-import type { IBalance, UpdateBalanceProps } from "../services/custom-types";
+import type { IBalance, UpdateBalanceProps } from "../models/balance-model";
 import Loading from "../components/Loading";
 import DataModifier from "../services/data-services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -162,7 +162,23 @@ export default function Balances() {
                 /> 
             ) : null}
             {message ? Notification(message) : null}
-            <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col h-full min-h-[200px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                <div className="flex gap-[0.7rem]">
+                    <button 
+                        onClick={() => setOpenForm(true)}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Add Balances
+                    </button>
+                    <button 
+                        onClick={() => deleteAllBalanceMutation.mutate()}
+                        type="button" 
+                        className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
+                    >
+                        Delete All Balances
+                    </button>
+                </div>
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
@@ -172,35 +188,17 @@ export default function Balances() {
                         <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your balance. Try again later.'}</p>
                     </div>
                 ) : (
-                    <>
-                        <div className="flex gap-[0.7rem]">
-                            <button 
-                                onClick={() => setOpenForm(true)}
-                                type="button" 
-                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                            >
-                                Add Balances
-                            </button>
-                            <button 
-                                onClick={() => deleteAllBalanceMutation.mutate()}
-                                type="button" 
-                                className="bg-white cursor-pointer font-[500] text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
-                            >
-                                Delete All Balances
-                            </button>
-                        </div>
-                        <BalanceList
-                            balances={balanceData ? balanceData : []}
-                            getMore={fetchNextPage}
-                            isDataChanging={isDataChanging}
-                            isLoadMore={isFetchingNextPage}
-                            isReachedEnd={isReachedEnd}
-                            onDelete={(id) => deleteOneBalanceMutation.mutate(id)}
-                            onSelect={handleSelectItem}
-                            onUpdate={(balance) => changeBalanceMutation.mutate(balance)}
-                            selectedId={selectedId}
-                        />
-                    </>
+                    <BalanceList
+                        balances={balanceData ? balanceData : []}
+                        getMore={fetchNextPage}
+                        isDataChanging={isDataChanging}
+                        isLoadMore={isFetchingNextPage}
+                        isReachedEnd={isReachedEnd}
+                        onDelete={deleteOneBalanceMutation}
+                        onSelect={handleSelectItem}
+                        onUpdate={changeBalanceMutation}
+                        selectedId={selectedId}
+                    />
                 )}
             </div>
         </main>

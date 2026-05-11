@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ActivityItemProps } from "../services/custom-types";
+import type { ActivityItemProps } from "../models/activity-model";
 
 export default function ActivityItem(props: ActivityItemProps) {
     const [editActName, setEditActName] = useState<string>('');
@@ -29,7 +29,7 @@ export default function ActivityItem(props: ActivityItemProps) {
     const handleSave = (event: React.FormEvent): void => {
         event.preventDefault();
         
-        props.onUpdate({
+        props.onUpdate.mutate({
             _id: props.selected_act._id,
             act_name: editActName.trim(),
             schedule_at: new Date(editSchedule).toISOString(),
@@ -92,7 +92,7 @@ export default function ActivityItem(props: ActivityItemProps) {
                 </button>
                 <button 
                     className="bg-white cursor-pointer w-[85px] text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" 
-                    onClick={() => props.onDelete(props.selected_act._id)}
+                    onClick={() => props.onDelete.mutate(props.selected_act._id)}
                 >
                     Delete
                 </button>

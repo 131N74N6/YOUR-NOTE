@@ -1,12 +1,7 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-services";
 import useAuth from "../services/auth-services";
-
-type IBalanceSummary = {
-    income: number;
-    expense: number;
-    balance: number;
-}
+import type { IBalanceSummary } from "../models/balance-model";
 
 export default function Home() {
     const { currentUserId } = useAuth();

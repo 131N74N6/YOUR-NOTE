@@ -5,17 +5,17 @@ import {
 } from "../controllers/activity.controller";
 import { checkOwnership, verifyToken } from "../middleware/auth.middleware";
 
-const activityRoutes = Router();
+const activityRouters = Router();
 
-activityRoutes.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllActivities);
-activityRoutes.delete('/erase/:id', verifyToken, deleteSelectedActivity);
+activityRouters.delete('/erase-all/:user_id', verifyToken, checkOwnership, deleteAllActivities);
+activityRouters.delete('/erase/:id', verifyToken, deleteSelectedActivity);
 
-activityRoutes.get('/get-all/:user_id', verifyToken, checkOwnership, getAllActivities);
-activityRoutes.get('/selected/:id', verifyToken, getSelectedActivity);
-activityRoutes.get('/summary/:user_id', verifyToken, checkOwnership, countAllActivities);
+activityRouters.get('/get-all/:user_id', verifyToken, checkOwnership, getAllActivities);
+activityRouters.get('/selected/:id', verifyToken, getSelectedActivity);
+activityRouters.get('/summary/:user_id', verifyToken, checkOwnership, countAllActivities);
 
-activityRoutes.post('/add', verifyToken, insertNewActivity);
+activityRouters.post('/add', verifyToken, insertNewActivity);
 
-activityRoutes.put('/change/:id', verifyToken, updateSelectedActivity);
+activityRouters.put('/change/:id', verifyToken, updateSelectedActivity);
 
-export default activityRoutes;
+export default activityRouters;
