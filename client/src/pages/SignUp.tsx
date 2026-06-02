@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 
 export default function SignUp() {
     const [email, setEmail] = useState<string>('');
@@ -9,11 +9,11 @@ export default function SignUp() {
 
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
-    const { currentUserId, error, loading, setError, signUp  } = useAuth();
+    const { currentUserId, error, isSigningIn, setError, signUp  } = useAuth();
 
     useEffect(() => {
-        if (currentUserId && !loading) navigate('/home', { replace: true });
-    }, [currentUserId, loading, navigate]);
+        if (currentUserId && !isSigningIn) navigate('/home', { replace: true });
+    }, [currentUserId, isSigningIn, navigate]);
 
     useEffect(() => {
         if (error) {
@@ -81,10 +81,10 @@ export default function SignUp() {
                 : null}
                 <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={isSigningIn}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-white hover:text-black transition-colors"
                 >
-                    {loading ? 'Please wait...' : 'Sign Up'}
+                    {isSigningIn ? 'Please wait...' : 'Sign Up'}
                 </button>
             </form>
         </div>

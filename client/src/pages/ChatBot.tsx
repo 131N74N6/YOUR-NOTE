@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data-services";
+import DataModifier from "../services/data.services";
 import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot-model";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Notification from "../components/Notification";
 import ReactMarkdown from "react-markdown";
@@ -40,7 +40,7 @@ export default function ChatBot() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    "model": "baidu/cobuddy:free",
+                    "model": "google/gemma-4-31b-it:free",
                     "messages": [{ 
                         "role": "user", 
                         "content": question.trim() 

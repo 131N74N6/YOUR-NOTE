@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 
 export default function SignIn() {
-    const { currentUserId, error, loading, setError, signIn } = useAuth();
+    const { currentUserId, error, isSigningIn, setError, signInMt } = useAuth();
     const navigate = useNavigate();
     
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -11,8 +11,8 @@ export default function SignIn() {
     const [password, setPassword] = useState<string>('');
 
     useEffect(() => {
-        if (currentUserId && !loading) navigate('/home', { replace: true });
-    }, [currentUserId, loading, navigate]);
+        if (currentUserId && !isSigningIn) navigate('/home', { replace: true });
+    }, [currentUserId, isSigningIn, navigate]);
 
     useEffect(() => {
         if (error) {
@@ -23,7 +23,7 @@ export default function SignIn() {
 
     async function handleSignIn(event: React.FormEvent) {
         event.preventDefault();
-        await signIn(email.trim(), password);
+        await signInMt.mutateAsync({ email: email.trim(), username: password });
     }
 
     return (
@@ -76,10 +76,10 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={isSigningIn}
                     className="disabled:cursor-not-allowed p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-black text-white font-[550] cursor-pointer rounded hover:bg-white hover:text-black transition-colors"
                 >
-                    {loading ? 'Please wait...' : 'Sign In'}
+                    {isSigningIn ? 'Please wait...' : 'Sign In'}
                 </button>
             </form>
         </div>

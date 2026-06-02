@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 import Loading from "./Loading";
 import { Navigate } from "react-router-dom";
 

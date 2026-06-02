@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Navbar2, Navbar1 } from "../components/Navbar";
-import DataModifier from "../services/data-services";
+import DataModifier from "../services/data.services";
 import type { ChatBotIntrf } from "../models/chatbot-model";
 import Loading from "../components/Loading";
 import ReactMarkdown from "react-markdown";

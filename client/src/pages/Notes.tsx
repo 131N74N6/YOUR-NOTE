@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 import Loading from "../components/Loading";
 import type { INote } from "../models/note-model";
-import DataModifier from "../services/data-services";
+import DataModifier from "../services/data.services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";

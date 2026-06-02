@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { IActivity, UpdateActivityDataProps } from "../models/activity-model";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 import ActivityList from "../components/ActivityList";
 import ActivityForm from "../components/ActivityForm";
 import Loading from "../components/Loading";
-import DataModifier from "../services/data-services";
+import DataModifier from "../services/data.services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Notification from "../components/Notification";
 

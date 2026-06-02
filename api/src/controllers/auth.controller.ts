@@ -18,14 +18,21 @@ export async function signIn(req: Request, res: Response) {
         if (!isPasswordMatch) return res.status(400).json({ message: 'Incorrect email or password' });
 
         const token = jwt.sign(
-            { user_id: findUserByEmail._id },
+            { user_id: findUserByEmail._id, username: findUserByEmail.username },
             process.env.JWT_SECRET || 'your_jwt_key',
+            { expiresIn: '1d' }
         );
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+            secure: process.env.NODE_ENV === 'production'
+        });
+
         res.status(200).json({ 
-            message: 'Sign in success', 
-            token,
             user_id: findUserByEmail._id,
+            username: findUserByEmail.username
         });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
@@ -57,6 +64,19 @@ export async function signUp(req: Request, res: Response) {
 
         await newUser.save();
         res.status(200).json({ message: 'Sign up success' });
+    } catch (error) {
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+}
+
+export async function signOut(req: Request, res: Response) {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+            secure: process.env.NODE_ENV === 'production'
+        });
+        res.status(200).json({ message: 'Sign out success' });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
     }

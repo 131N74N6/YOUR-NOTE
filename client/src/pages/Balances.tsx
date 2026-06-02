@@ -2,10 +2,10 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import BalanceList from "../components/BalanceList";
 import { useEffect, useState } from "react";
 import BalanceForm from "../components/BalanceForm";
-import useAuth from "../services/auth-services";
+import useAuth from "../services/auth.services";
 import type { IBalance, UpdateBalanceProps } from "../models/balance-model";
 import Loading from "../components/Loading";
-import DataModifier from "../services/data-services";
+import DataModifier from "../services/data.services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Notification from "../components/Notification";
 
