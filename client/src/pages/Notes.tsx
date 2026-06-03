@@ -1,63 +1,13 @@
-import { useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import NoteList from "../components/NoteList";
-import useAuth from "../services/auth.services";
 import Loading from "../components/Loading";
-import type { INote } from "../models/note-model";
-import DataModifier from "../services/data.services";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Notification from "../components/Notification";
+import NoteServices from "../services/note.service";
 
 export default function Notes() {
-    const { currentUserId } = useAuth();
-    const { deleteData, infiniteScroll, message, setMessage } = DataModifier();
-    const queryClient = useQueryClient();
+    const { deleteOneNoteMutation, deleteManyNotesMutation, isProcessing, message, navigate, notes, setMessage } = NoteServices();
 
-    const navigate = useNavigate();
-    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
-
-    const { 
-        paginatedData: noteData, 
-        error,
-        fetchNextPage,
-        isFetchingNextPage,
-        isReachedEnd,
-        isLoading 
-    } = infiniteScroll<INote>({
-        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${currentUserId}`,
-        query_key: [`notes-${currentUserId}`],
-        stale_time: 1800000,
-        limit: 12
-    });
-
-    const deleteOneNoteMutation = useMutation({
-        onMutate: () => setIsDataChanging(true),
-        mutationFn: async (id: string) => {
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase/${id}` })
-        },
-        onError: () => {},
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
-        },
-        onSettled: () => setIsDataChanging(false)
-    });
-
-    const deleteManyNotesMutation = useMutation({
-        onMutate: () => setIsDataChanging(true),
-        mutationFn: async () => {
-            if (!currentUserId) return;
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/erase-all/${currentUserId}` });
-        },
-        onError: () => {},
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
-        },
-        onSettled: () => setIsDataChanging(false)
-    });
-    
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 3000);
@@ -74,7 +24,7 @@ export default function Notes() {
                 <div className="flex gap-[0.7rem]">
                     <button 
                         type="button" 
-                        disabled={isDataChanging}
+                        disabled={isProcessing || notes.isLoading}
                         onClick={() => navigate('/add-note')}
                         className="bg-white cursor-pointer font-[500] disabled:cursor-not-allowed text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                     >
@@ -82,27 +32,27 @@ export default function Notes() {
                     </button>
                     <button 
                         type="button" 
-                        disabled={isDataChanging}
+                        disabled={isProcessing || notes.isLoading}
                         onClick={() => deleteManyNotesMutation.mutate()}
                         className="bg-white cursor-pointer font-[500] disabled:cursor-not-allowed text-gray-950 p-[0.45rem] rounded-[0.45rem] text-[0.9rem]"
                     >
                         Delete All Notes
                     </button>
                 </div>
-                {isLoading ? (
+                {notes.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : error ? (
+                ) : notes.error ? (
                     <div className="flex justify-center items-center h-full">
-                        <p className="text-white font-[600] text-[1rem]">{error.message || 'Failed to load your notes. Try again later.'}</p>
+                        <p className="text-white font-[600] text-[1rem]">{notes.error.message || 'Failed to load your notes. Try again later.'}</p>
                     </div>
                 ) : (
                     <NoteList 
-                        notes={noteData ? noteData : []} 
-                        getMore={fetchNextPage}
-                        isLoadMore={isFetchingNextPage}
-                        isReachedEnd={isReachedEnd}
+                        notes={notes.paginatedData} 
+                        getMore={notes.fetchNextPage}
+                        isLoadMore={notes.isFetchingNextPage}
+                        isReachedEnd={notes.isReachedEnd}
                         onDelete={deleteOneNoteMutation}
                     />
                 )}

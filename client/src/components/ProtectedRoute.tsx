@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import useAuth from "../services/auth.services";
+import useAuth from "../services/auth.service";
 import Loading from "./Loading";
 import { Navigate } from "react-router-dom";
 
@@ -8,8 +8,8 @@ type IProtectedRoute = {
 }
 
 export default function ProtectedRoute(props: IProtectedRoute) {
-    const { loading, currentUserId } = useAuth();
-    if (loading) return <Loading/>
+    const { userLoading, currentUserId } = useAuth();
+    if (userLoading) return <Loading/>
 
     return currentUserId ? <>{props.children}</> : <Navigate to={'/sign-in'}/>
 }

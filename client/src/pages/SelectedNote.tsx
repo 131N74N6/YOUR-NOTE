@@ -1,10 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import type { INote } from "../models/note-model";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAuth from "../services/auth.services";
-import DataModifier from "../services/data.services";
+import { Link, useParams } from "react-router-dom";
 import Notification from "../components/Notification";
 import Loading from "../components/Loading";
 import ReactQuill from 'react-quill-new';
@@ -13,28 +9,16 @@ import Quill from 'quill';
 import List from 'quill/formats/list'; 
 import Blockquote from 'quill/formats/blockquote';
 import CodeBlock from 'quill/formats/code';
+import NoteServices from "../services/note.service";
 
 Quill.register('formats/list', List);
 Quill.register('formats/blockquote', Blockquote);
 Quill.register('formats/code-block', CodeBlock);
 
 export default function SelectedNote() {
-    const { currentUserId } = useAuth();
     const { _id } = useParams();
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
-
-    const { getData, message, setMessage, updateData } = DataModifier();
-
-    const [editTitle, setEditTitle] = useState<string>('');
-    const [editContent, setEditContent] = useState<string>('');
-    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
-
-    const { data: selectedNote, error, isLoading } = getData<INote[]>({
-        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/selected/${_id}`,
-        query_key: [`selected-notes-${_id}`],
-        stale_time: 1800000
-    });
+    const { changeNote, content, getSelectedNote, isProcessing, message, navigate, setContent, setMessage, setTitle, title } = NoteServices();
+    const { data: selectedNote, error, isLoading } = getSelectedNote(_id!);
 
     const modules = {
         toolbar: [
@@ -66,48 +50,23 @@ export default function SelectedNote() {
         'link', 'image', 'video'
     ];
 
-    const changeNoteMutation = useMutation({
-        onMutate: () => setIsDataChanging(true),
-        mutationFn: async () => {
-            if (!_id) throw new Error('Note not found');
-
-            await updateData<INote>({ 
-                api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/change/${_id}`,
-                api_data: {
-                    note_content: editContent.trim(),
-                    note_title: editTitle.trim(),
-                }
-            });
-        },
-        onError: () => {},
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`selected-notes-${_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
-        },
-        onSettled: () => setIsDataChanging(false)
-    });
-
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-                navigate('/notes');
-            }, 3000);
-
+            const timer = setTimeout(() => setMessage(null), 3000);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     useEffect(() => {
         if (_id && selectedNote) {
-            setEditContent(selectedNote?.[0].note_content || '');
-            setEditTitle(selectedNote?.[0].note_title || '');
+            setContent(selectedNote?.[0].note_content || '');
+            setTitle(selectedNote?.[0].note_title || '');
         }
     }, [selectedNote, _id, navigate]);
 
     const saveEditedNote = (event: React.FormEvent): void => {
         event.preventDefault();
-        changeNoteMutation.mutate();
+        changeNote(_id!);
     }
 
     return (
@@ -125,14 +84,14 @@ export default function SelectedNote() {
                     <input 
                         type="text" 
                         placeholder="ex: my favorite music" 
-                        value={editTitle}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditTitle(event.target.value)}
+                        value={title}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] border border-white outline-0 text-white font-[500] rounded-[0.5rem]"
                     />
                     <ReactQuill
                         theme="snow"
-                        value={editContent}
-                        onChange={setEditContent}
+                        value={content}
+                        onChange={setContent}
                         modules={modules}
                         formats={formats}
                         className="overflow-y-auto bg-transparent text-white"
@@ -151,7 +110,7 @@ export default function SelectedNote() {
                         <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                         <button 
                             type="submit" 
-                            disabled={!editContent || !editTitle || isDataChanging}
+                            disabled={!content || !title || isProcessing}
                             className="bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]"
                         >
                             Save

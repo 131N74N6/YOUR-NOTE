@@ -1,27 +1,27 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data.services";
-import useAuth from "../services/auth.services";
+import DataModifier from "../services/data.service";
+import AuthServices from "../services/auth.service";
 import type { IBalanceSummary } from "../models/balance-model";
 
 export default function Home() {
-    const { currentUserId } = useAuth();
+    const { currentUserId, currentUserName } = AuthServices();
     const { getData } = DataModifier();
 
     const { data: balanceSummary, isLoading: isBalanceLoading } = getData<IBalanceSummary>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/summary/${currentUserId}`,
-        stale_time: 600000,
+        stale_time: Infinity,
         query_key: [`balance-total-${currentUserId}`]
     });
 
     const { data: activityTotal, isLoading: isActivityLoading } = getData<number>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/summary/${currentUserId}`,
-        stale_time: 600000,
+        stale_time: Infinity,
         query_key: [`act-total-${currentUserId}`]
     });
 
     const { data: noteTotal, isLoading: isNoteLoading } = getData<number>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/summary/${currentUserId}`,
-        stale_time: 600000,
+        stale_time: Infinity,
         query_key: [`note-total-${currentUserId}`]
     });
 
@@ -30,6 +30,8 @@ export default function Home() {
             <Navbar1/>
             <Navbar2/>
             <div className="p-[1rem] border border-white overflow-y-auto h-full md:w-3/4 w-full rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+                <h2 className="text-white font-[600] text-[1.5rem]">Welcome back, {currentUserName}!</h2>
+                <p className="text-white font-[400] text-[1rem]">Here's a quick overview of your finances and activities.</p>
                 <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-[1rem]">
                     <div className="border border-white h-[200px] p-[0.7rem] text-white font-[500]">
                         <div>{isBalanceLoading ? <span className="flex justify-center items-center">Loading...</span> : null}</div>

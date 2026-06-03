@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { BalanceFormProps } from "../models/balance-model";
-import DataModifier from "../services/data.services";
+import DataModifier from "../services/data.service";
 
 export default function BalanceForm(props: BalanceFormProps) {
     const { message, setMessage } = DataModifier();

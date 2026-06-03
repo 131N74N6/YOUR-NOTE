@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data.services";
+import DataModifier from "../services/data.service";
 import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot-model";
-import useAuth from "../services/auth.services";
+import useAuth from "../services/auth.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Notification from "../components/Notification";
 import ReactMarkdown from "react-markdown";

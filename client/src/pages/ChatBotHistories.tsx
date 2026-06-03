@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import useAuth from "../services/auth.services";
-import DataModifier from "../services/data.services";
+import useAuth from "../services/auth.service";
+import DataModifier from "../services/data.service";
 import type { ChatBotIntrf } from "../models/chatbot-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";

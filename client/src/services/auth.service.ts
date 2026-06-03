@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import type { UserInfoIntrf } from "../models/user-model";
+import type { SignInIntrf, UserInfoIntrf } from "../models/user-model";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export default function useAuth() {
+export default function AuthServices() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [error, setError] = useState<string | null>(null);
@@ -27,10 +27,10 @@ export default function useAuth() {
     const currentUserName = currentUser ? currentUser.username : '';
 
     const signInMt = useMutation({
-        mutationFn: async (props: Pick<UserInfoIntrf, 'email' | 'username'>) => {
+        mutationFn: async (props: SignInIntrf) => {
             try {
                 const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/auths/sign-in`, {
-                    body: JSON.stringify({ email: props.email, username: props.username }),
+                    body: JSON.stringify({ email: props.email, password: props.password }),
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     method: 'POST'
@@ -93,8 +93,6 @@ export default function useAuth() {
             queryClient.clear();
             navigate('/sign-in');
         }
-        localStorage.removeItem('user');
-        navigate('/sign-in');
     }
 
     return { 

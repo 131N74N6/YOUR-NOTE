@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth.services";
+import useAuth from "../services/auth.service";
 
 export default function SignIn() {
     const { currentUserId, error, isSigningIn, setError, signInMt } = useAuth();
@@ -23,7 +23,7 @@ export default function SignIn() {
 
     async function handleSignIn(event: React.FormEvent) {
         event.preventDefault();
-        await signInMt.mutateAsync({ email: email.trim(), username: password });
+        await signInMt.mutateAsync({ email: email.trim(), password: password });
     }
 
     return (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth.services";
+import useAuth from "../services/auth.service";
 
 export default function SignUp() {
     const [email, setEmail] = useState<string>('');

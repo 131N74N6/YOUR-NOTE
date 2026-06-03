@@ -1,13 +1,13 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { GetDataProps, IDeleteApi, InfiniteScrollProps, IPostApi, IPutApi } from "../models/data-model";
-import useAuth from "./auth.services";
+import useAuth from "./auth.service";
 import { useState } from "react";
 
 export default function DataModifier() {
     const { isSigningIn, currentUserId } = useAuth();
     const [message, setMessage] = useState<string | null>(null);
 
-    const deleteData = async(props: IDeleteApi): Promise<void> => {
+    const deleteData = async (props: IDeleteApi) => {
         try {
             const request = await fetch(props.api_url, {
                 credentials: 'include',
@@ -106,7 +106,7 @@ export default function DataModifier() {
         return { paginatedData, error, fetchNextPage, isFetchingNextPage, isLoading, isReachedEnd }
     }
 
-    const insertData = async <HX>(props: IPostApi<HX>): Promise<void> => {
+    const insertData = async <HX>(props: IPostApi<HX>) => {
         try {
             const request = await fetch(props.api_url, { 
                 body: JSON.stringify(props.api_data),
@@ -130,7 +130,7 @@ export default function DataModifier() {
         }
     }
 
-    const updateData = async <HX>(props: IPutApi<HX>): Promise<void> => {
+    const updateData = async <HX>(props: IPutApi<HX>) => {
         try {
             const request = await fetch(props.api_url, { 
                 body: JSON.stringify(props.api_data),

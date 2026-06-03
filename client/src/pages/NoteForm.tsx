@@ -1,31 +1,21 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { useEffect, useState } from "react";
-import useAuth from "../services/auth.services";
+import { useEffect } from "react";
 import Notification from "../components/Notification";
-import type { INote } from "../models/note-model";
-import DataModifier from "../services/data.services";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ReactQuill from 'react-quill-new';
 import 'quill/dist/quill.snow.css';
 import Quill from 'quill';
 import List from 'quill/formats/list'; 
 import Blockquote from 'quill/formats/blockquote';
 import CodeBlock from 'quill/formats/code';
+import NoteServices from "../services/note.service";
 
 Quill.register('formats/list', List);
 Quill.register('formats/blockquote', Blockquote);
 Quill.register('formats/code-block', CodeBlock);
 
 export default function NoteForm() {
-    const { insertData, message, setMessage } = DataModifier();
-    const { currentUserId } = useAuth();
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
-    
-    const [content, setContent] = useState<string>('');
-    const [title, setTitle] = useState<string>('');
-    const [isDataChanging, setIsDataChanging] = useState<boolean>(false);
+    const { addNote, content, currentUserId, isProcessing, message, resetForm, setContent, setMessage, setTitle, title } = NoteServices();
 
     const modules = {
         toolbar: [
@@ -57,47 +47,9 @@ export default function NoteForm() {
         'link', 'image', 'video'
     ];
 
-    const insertNoteMutation = useMutation({
-        onMutate: () => setIsDataChanging(true),
-        mutationFn: async () => {
-            await insertData<INote>({
-                api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/add`,
-                api_data: {
-                    created_at: new Date().toISOString(),
-                    note_content: content.trim(),
-                    note_title: title.trim(),
-                    user_id: currentUserId
-                }
-            });
-        },
-        onError: () => {},
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
-        },
-        onSettled: () => {
-            resetForm();
-            setIsDataChanging(false);
-        }
-    });
-
-    const addNote = (event: React.FormEvent): void => {
-        event.preventDefault();
-        insertNoteMutation.mutate();
-    }
-
-    const resetForm = () => {
-        setTitle('');
-        setContent('');
-    }
-
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-                navigate('/notes');
-            }, 3000);
-
+            const timer = setTimeout(() => setMessage(null), 3000);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
@@ -144,7 +96,7 @@ export default function NoteForm() {
                     <Link className="bg-white text-center cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem]" to={"/notes"}>Back</Link>
                     <button 
                         type="submit" 
-                        disabled={!title || !content || isDataChanging}
+                        disabled={!title || !content || isProcessing}
                         className="bg-white cursor-pointer text-gray-950 p-[0.3rem] rounded-[0.3rem] font-[500] text-[0.9rem] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Save

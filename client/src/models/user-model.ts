@@ -3,6 +3,11 @@ export interface IUser {
     username: string;
 }
 
+export type SignInIntrf = {
+    email: string;
+    password: string;
+}
+
 export type UserInfoIntrf = {
     email: string;
     username: string;
