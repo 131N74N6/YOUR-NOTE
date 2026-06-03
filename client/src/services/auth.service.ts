@@ -12,7 +12,12 @@ export default function AuthServices() {
         queryKey: ['current-user'],
         queryFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/show`, {});
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/show`, {
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json'},
+                    method: 'GET',
+                });
+                
                 const response = await request.json();
                 return response;
             } catch (error) {
