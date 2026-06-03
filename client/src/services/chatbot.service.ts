@@ -70,15 +70,15 @@ export default function ChatbotServices() {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "X-Title": "My Note ChatBot"
                 },
                 body: JSON.stringify({
-                    "model": "google/gemma-4-31b-it:free",
+                    "model": "google/gemma-4-26b-a4b-it:free",
                     "messages": [{ 
                         "role": "user", 
                         "content": question.trim() 
-                    }],
-                    "reasoning": {"enabled": true}
+                    }]
                 })
             });
 

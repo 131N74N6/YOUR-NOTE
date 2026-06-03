@@ -94,6 +94,14 @@ export default function NoteServices() {
         onSettled: () => setIsProcessing(false)
     });
 
+    const getSelectedNote = (id: string) => {
+        return getData<INote[]>({
+            api_url: id ? `${import.meta.env.VITE_BASE_API_URL}/notes/selected/${id}` : '',
+            query_key: [`selected-notes-${id}`],
+            stale_time: 1800000
+        });
+    };
+
     const insertNoteMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
@@ -111,10 +119,10 @@ export default function NoteServices() {
             setMessage(error.message || 'Failed to add note. Try again later');
         },
         onSuccess: (response) => {
-            setMessage(response.message);
             queryClient.invalidateQueries({ queryKey: [`notes-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`note-total-${currentUserId}`] });
             navigate('/notes');
+            setMessage(response.message);
         },
         onSettled: () => {
             resetForm();
@@ -133,7 +141,7 @@ export default function NoteServices() {
     }
 
     return { 
-        addNote, changeNoteMutation, content, currentUserId, deleteOneNoteMutation, deleteManyNotesMutation, getData, 
+        addNote, changeNoteMutation, content, currentUserId, deleteOneNoteMutation, deleteManyNotesMutation, getSelectedNote, 
         isProcessing, message, navigate, notes, resetForm, setContent, setIsProcessing, setMessage, setTitle, title 
     }
 }
