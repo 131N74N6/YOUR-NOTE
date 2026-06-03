@@ -21,7 +21,6 @@ export default function ChatBotDetail() {
 
     const sanitizedAnswer = useMemo(() => {
         if (!chatData) return '';
-        // Sanitize HTML to prevent XSS, then allow safe markdown rendering
         return DOMPurify.sanitize(chatData?.[0]?.answer, {
             ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'sub', 'sup'],
             ALLOWED_ATTR: ['class', 'style']

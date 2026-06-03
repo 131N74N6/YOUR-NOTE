@@ -24,3 +24,7 @@ export type GetDataProps = {
     query_key: string[]; 
     stale_time: number;
 }
+
+export type NavbarIntrf = {
+    is_processing?: boolean;
+}

@@ -32,10 +32,10 @@ export async function editUserInfo(req: AuthRequest, res: Response) {
         if (!email) return res.status(400).json({ message: 'Email is required' });
         if (!username) return res.status(400).json({ message: 'Username is required' });
 
-        const isUserNameExist = await User.findOne({ username });
+        const isUserNameExist = await User.findOne({ username, _id: { $ne: req.user?.user_id } });
         if (isUserNameExist) return res.status(409).json({ message: 'Username already exists' });
 
-        const isEmailExist = await User.findOne({ email });
+        const isEmailExist = await User.findOne({ email, _id: { $ne: req.user?.user_id } });
         if (isEmailExist) return res.status(409).json({ message: 'Email already exists' });
 
         await Promise.all([

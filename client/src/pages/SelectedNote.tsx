@@ -10,6 +10,7 @@ import List from 'quill/formats/list';
 import Blockquote from 'quill/formats/blockquote';
 import CodeBlock from 'quill/formats/code';
 import NoteServices from "../services/note.service";
+import type { INote } from "../models/note-model";
 
 Quill.register('formats/list', List);
 Quill.register('formats/blockquote', Blockquote);
@@ -17,8 +18,13 @@ Quill.register('formats/code-block', CodeBlock);
 
 export default function SelectedNote() {
     const { _id } = useParams();
-    const { changeNote, content, getSelectedNote, isProcessing, message, navigate, setContent, setMessage, setTitle, title } = NoteServices();
-    const { data: selectedNote, error, isLoading } = getSelectedNote(_id!);
+    const { changeNoteMutation, content, getData, isProcessing, message, navigate, setContent, setMessage, setTitle, title } = NoteServices();
+
+    const { data: selectedNote, error, isLoading } = getData<INote[]>({
+        api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/selected/${_id}`,
+        query_key: [`selected-notes-${_id}`],
+        stale_time: 1800000
+    });
 
     const modules = {
         toolbar: [
@@ -66,7 +72,7 @@ export default function SelectedNote() {
 
     const saveEditedNote = (event: React.FormEvent): void => {
         event.preventDefault();
-        changeNote(_id!);
+        changeNoteMutation.mutate(_id!);
     }
 
     return (

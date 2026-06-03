@@ -34,13 +34,16 @@ export default function ActivityServices() {
     const changeActMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async (selected: UpdateActivityDataProps) => {
-            await updateData<IActivity>({
+            return await updateData<IActivity>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/change/${selected._id}`,
                 api_data: { act_name: selected.act_name, schedule_at: selected.schedule_at }
             });
         },
-        onError: () => {},
-        onSuccess: () => {
+        onError: (error) => {
+            setMessage(error.message);
+        },
+        onSuccess: (response) => {
+            setMessage(response.message);
             queryClient.invalidateQueries({ queryKey: [`activities-${currentUserId}`] });
         },
         onSettled: () => {

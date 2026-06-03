@@ -35,10 +35,7 @@ export default function BalanceServices() {
     const changeBalanceMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async (selected: UpdateBalanceProps) => {
-            if (isNaN(selected.amount) || selected.amount <= 0) throw new Error('Enter proper amount');
-            if (!selected.balance_type || !selected.description.trim()) throw new Error('Fill these too');
-
-            await updateData<IBalance>({ 
+            return await updateData<IBalance>({ 
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/change/${selected._id}`,
                 api_data: { 
                     amount: selected.amount, 
@@ -47,8 +44,11 @@ export default function BalanceServices() {
                 }
             });
         },
-        onError: () => {},
-        onSuccess: () => {
+        onError: (error) => {
+            setMessage(error.message || 'Failed to save edited balance');
+        },
+        onSuccess: (response) => {
+            setMessage(response.message);
             queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
         },
         onSettled: () => {
@@ -60,10 +60,13 @@ export default function BalanceServices() {
     const deleteAllBalanceMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
-            await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase-all/${currentUserId}` });
+            return await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase-all/${currentUserId}` });
         },
-        onError: () => {},
-        onSuccess: () => {
+        onError: (error) => {
+            setMessage(error.message || 'Failed to delete all balances');
+        },
+        onSuccess: (response) => {
+            setMessage(response.message);
             queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
         },
@@ -76,7 +79,9 @@ export default function BalanceServices() {
             await deleteData({ api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/erase/${id}` });
             if (selectedId === id) setSelectedId(null);
         },
-        onError: () => {},
+        onError: (error) => {
+            setMessage(error.message || 'Failed to delete balance');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
@@ -87,7 +92,7 @@ export default function BalanceServices() {
     const insertBalanceMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
-            await insertData<IBalance>({
+            return await insertData<IBalance>({
                 api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/add`,
                 api_data: {
                     amount: Number(amount.trim()),
@@ -98,8 +103,11 @@ export default function BalanceServices() {
                 }
             });
         },
-        onError: () => {},
-        onSuccess: () => {
+        onError: (error) => {
+            setMessage(error.message || 'Failed to add balance');
+        },
+        onSuccess: (response) => {
+            setMessage(response.message);
             queryClient.invalidateQueries({ queryKey: [`balances-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`balance-total-${currentUserId}`] });
         },

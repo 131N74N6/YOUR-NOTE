@@ -63,8 +63,8 @@ export default function NoteForm() {
 
     return (
         <div className="flex p-[1rem] md:flex-row h-screen flex-col gap-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
-            <Navbar1/>
-            <Navbar2/>
+            <Navbar1 is_processing={isProcessing}/>
+            <Navbar2 is_processing={isProcessing}/>
             {message ? Notification(message) : null}
             <form onSubmit={addNote} className="flex flex-col h-full gap-[1rem] p-[1rem] md:w-3/4 w-full border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">                
                 <input 

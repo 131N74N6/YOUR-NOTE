@@ -17,8 +17,8 @@ export default function Notes() {
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
-            <Navbar1/>
-            <Navbar2/>
+            <Navbar1 is_processing={isProcessing}/>
+            <Navbar2 is_processing={isProcessing}/>
             {message ? Notification(message) : null}
             <div className="flex flex-col gap-[1rem] md:w-3/4 h-full w-full min-h-[200px] p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
                 <div className="flex gap-[0.7rem]">

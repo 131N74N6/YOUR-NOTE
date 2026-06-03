@@ -26,7 +26,7 @@ export async function signIn(req: Request, res: Response) {
         res.cookie('token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             secure: process.env.NODE_ENV === 'production'
         });
 
@@ -73,7 +73,7 @@ export async function signOut(req: Request, res: Response) {
     try {
         res.clearCookie('token', {
             httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             secure: process.env.NODE_ENV === 'production'
         });
         res.status(200).json({ message: 'Sign out success' });

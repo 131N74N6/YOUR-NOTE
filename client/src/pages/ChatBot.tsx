@@ -1,86 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data.service";
-import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot-model";
-import useAuth from "../services/auth.service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Notification from "../components/Notification";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import DOMPurify from "dompurify";
-import { useNavigate } from "react-router-dom";
+import ChatbotServices from "../services/chatbot.service";
 
 export default function ChatBot() {
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
-    const { currentUserId } = useAuth();
-    const { insertData, message, setMessage } = DataModifier();
-    
-    const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    const [question, setQuestion] = useState<string>('');
-    const [answer, setAnswer] = useState<string>('');
-
-    const sanitizedAnswer = useMemo(() => {
-        if (!answer) return '';
-        // Sanitize HTML to prevent XSS, then allow safe markdown rendering
-        return DOMPurify.sanitize(answer, {
-            ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'sub', 'sup'],
-            ALLOWED_ATTR: ['class', 'style']
-        });
-    }, [answer]);
-
-    const sendQuestionMt = useMutation({
-        onMutate: () => setIsProcessing(true),
-        mutationFn: async () => {
-            const request = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "google/gemma-4-31b-it:free",
-                    "messages": [{ 
-                        "role": "user", 
-                        "content": question.trim() 
-                    }],
-                    "reasoning": {"enabled": true}
-                })
-            });
-
-            const response: OpenRouterResponse = await request.json();
-
-            if (response.choices && response.choices.length > 0) {
-                const messageContent = response.choices[0].message.content;
-                console.log("Received message content:", messageContent);
-
-                if (typeof messageContent === 'string') {
-                    setAnswer(messageContent);
-                    await insertData<ChatBotIntrf>({
-                        api_url: `${import.meta.env.VITE_BASE_API_URL}/chatbot/send-question`, 
-                        api_data: {
-                            question: question.trim(),
-                            answer: messageContent,
-                            created_at: new Date().toISOString(),
-                            user_id: currentUserId
-                        }
-                    });
-                }
-            }
-        },
-        onError: () => {},
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`chat-histories-${currentUserId}`] });
-            setQuestion('');
-        },
-        onSettled: () => setIsProcessing(false)
-    });
-
-    const sendQuestion = async (event: React.FormEvent): Promise<void> => {
-        event.preventDefault();
-        sendQuestionMt.mutate();
-    }
+    const { answer, currentUserId, isProcessing, message, navigate, question, sanitizedAnswer, sendQuestion, setAnswer, setMessage, setQuestion } = ChatbotServices();
 
     useEffect(() => {
         if (message) {
@@ -99,17 +26,11 @@ export default function ChatBot() {
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
-            <Navbar1/>
-            <Navbar2/>
+            <Navbar1 is_processing={isProcessing}/>
+            <Navbar2 is_processing={isProcessing}/>
             {message ? Notification(message) : null}
             <div className="flex flex-col h-full gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
-                <div className="h-[80%] overflow-y-auto prose prose-invert prose-sm max-w-none 
-                    prose-headings:text-white prose-p:text-gray-200 prose-strong:text-white 
-                    prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-400
-                    prose-code:bg-gray-800 prose-code:text-pink-300 prose-code:px-1 prose-code:rounded
-                    prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-700
-                    prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:italic">
-                    
+                <div className="h-[80%] overflow-y-auto">
                     {answer && (
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}

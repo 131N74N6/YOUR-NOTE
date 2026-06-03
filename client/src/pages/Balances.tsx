@@ -30,8 +30,8 @@ export default function Balances() {
 
     return (
         <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
-            <Navbar1/>
-            <Navbar2/>
+            <Navbar1 is_processing={isProcessing}/>
+            <Navbar2 is_processing={isProcessing}/>
             {openForm ? (
                 <BalanceForm 
                     amount={Number(amount)}
