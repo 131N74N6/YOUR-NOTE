@@ -8,7 +8,6 @@ if (process.env.NODE_ENV !== 'production') {
     console.log('DNS servers set to Cloudflare (1.1.1.1) and Google (8.8.8.8)');
 }
 
-import mongoose from 'mongoose';
 import express from "express";
 import { connection } from './mongodb/connection';
 import cors from 'cors';
