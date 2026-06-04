@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 import mongoose from 'mongoose';
 import express from "express";
+import { connection } from './mongodb/connection';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import balanceRouters from "./routers/balance.router";
@@ -20,13 +21,6 @@ import chatBotRouters from './routers/chatbot.router';
 import userRouters from './routers/user.router';
 
 const app = express();
-
-mongoose.connect((`${process.env.MONGODB_URL}`))
-.then(res => {
-    if(res) console.log('Database connection succeffully');
-}).catch(err => {
-    console.log(err);
-});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -47,7 +41,9 @@ app.use('/api/notes', noteRouters);
 app.use('/api/user', userRouters);
 
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(1234, () => console.log(`server running at http://localhost:1234`));
+    connection.then(() => {
+        app.listen(1234, () => console.log(`server running at http://localhost:1234`));
+    });
 }
 
 export default app;
