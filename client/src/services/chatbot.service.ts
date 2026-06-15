@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot.types";
+import type { ChatBotIntrf } from "../models/chatbot.types";
 import { useMemo, useState } from "react";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
@@ -66,48 +66,55 @@ export default function ChatbotServices() {
     const sendQuestionMt = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
-            const request = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            const apiKey = import.meta.env.VITE_AI_API_KEY; 
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+            const request = await fetch(url, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
-                    "Content-Type": "application/json",
-                    "X-Title": "My Note ChatBot"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    "model": "google/gemma-4-26b-a4b-it:free",
-                    "messages": [{ 
-                        "role": "user", 
-                        "content": question.trim() 
+                    contents: [{
+                        parts: [{ text: question.trim() }]
                     }]
                 })
             });
 
-            const response: OpenRouterResponse = await request.json();
+            if (!request.ok) {
+                const errorData = await request.json().catch(() => ({}));
+                throw new Error(errorData?.error?.message || `Gemini API error: ${request.status}`);
+            }
 
-            if (response.choices && response.choices.length > 0) {
-                const messageContent = response.choices[0].message.content;
-                console.log("Received message content:", messageContent);
+            const response = await request.json();
+            
+            const messageContent = response?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                if (typeof messageContent === 'string') {
-                    setAnswer(messageContent);
-                    await insertData<ChatBotIntrf>({
-                        api_url: `${import.meta.env.VITE_BASE_API_URL}/chatbot/send-question`, 
-                        api_data: {
-                            question: question.trim(),
-                            answer: messageContent,
-                            created_at: new Date().toISOString(),
-                            user_id: currentUserId
-                        }
-                    });
-                }
+            if (messageContent) {
+                setAnswer(messageContent);
+                await insertData<ChatBotIntrf>({
+                    api_url: `${import.meta.env.VITE_BASE_API_URL}/chatbot/send-question`, 
+                    api_data: {
+                        question: question.trim(),
+                        answer: messageContent,
+                        created_at: new Date().toISOString(),
+                        user_id: currentUserId
+                    }
+                });
+            } else {
+                throw new Error("Respons dari AI kosong atau tidak valid.");
             }
         },
-        onError: () => {},
+        onError: (error) => {
+            setMessage(error.message || 'Gagal mendapatkan respons dari AI');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`chat-histories-${currentUserId}`] });
-            setQuestion('');
         },
-        onSettled: () => setIsProcessing(false)
+        onSettled: () => {
+            setIsProcessing(false);
+            setQuestion('');
+        }
     });
 
     const sendQuestion = async (event: React.FormEvent): Promise<void> => {

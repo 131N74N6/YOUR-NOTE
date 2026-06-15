@@ -20,18 +20,3 @@ export type ChatBotListIntrf = {
     isReachedEnd: boolean;
     onDelete: UseMutationResult<void, Error, string, void>;
 }
-
-export type OpenRouterMessage = {
-    role: string;
-    content: string;
-    refusal?: string;
-    reasoning?: string;
-}
-
-export type OpenRouterChoice = {
-    message: OpenRouterMessage;
-}
-
-export type OpenRouterResponse = {
-    choices: OpenRouterChoice[];
-}
