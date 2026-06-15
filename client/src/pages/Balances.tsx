@@ -29,7 +29,7 @@ export default function Balances() {
     }, [currentUserId, closeForm]);
 
     return (
-        <main className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
+        <section className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] relative z-10">
             <Navbar1 is_processing={isProcessing}/>
             <Navbar2 is_processing={isProcessing}/>
             {openForm ? (
@@ -47,7 +47,7 @@ export default function Balances() {
                 /> 
             ) : null}
             {message ? Notification(message) : null}
-            <div className="flex flex-col h-full min-h-[200px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col h-full min-h-[200px] gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-50">
                 <div className="flex gap-[0.7rem]">
                     <button 
                         onClick={() => setOpenForm(true)}
@@ -86,6 +86,6 @@ export default function Balances() {
                     />
                 )}
             </div>
-        </main>
+        </section>
     );
 }

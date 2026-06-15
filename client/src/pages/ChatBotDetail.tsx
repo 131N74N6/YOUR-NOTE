@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { Navbar2, Navbar1 } from "../components/Navbar";
 import DataModifier from "../services/data.service";
-import type { ChatBotIntrf } from "../models/chatbot-model";
+import type { ChatBotIntrf } from "../models/chatbot.types";
 import Loading from "../components/Loading";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -16,7 +16,7 @@ export default function ChatBotDetail() {
     const  { data: chatData, error, isLoading } = getData<ChatBotIntrf[]>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/chatbot/detail/${_id}`,
         query_key: [`chat-detail-${_id}`],
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     const sanitizedAnswer = useMemo(() => {
@@ -28,10 +28,10 @@ export default function ChatBotDetail() {
     }, [chatData?.[0]?.answer, _id]);
     
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
+        <section className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col h-full overflow-y-auto gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="flex flex-col h-full overflow-y-auto gap-[1rem] md:w-3/4 w-full p-[1rem] border border-white rounded-[1rem] backdrop-blur-sm backdrop-brightness-50">
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full"><Loading/></div>
                 ) : error ? (
@@ -79,6 +79,6 @@ export default function ChatBotDetail() {
                     </div>
                 )}
             </div>
-        </div>
+        </section>
     )
 }

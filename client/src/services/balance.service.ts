@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AuthServices from "./auth.service";
 import { useState } from "react";
-import type { IBalance, UpdateBalanceProps } from "../models/balance-model";
+import type { IBalance, UpdateBalanceProps } from "../models/balance.types";
 import DataModifier from "./data.service";
 
 export default function BalanceServices() {
@@ -26,7 +26,7 @@ export default function BalanceServices() {
     } = infiniteScroll<IBalance>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/balances/get-all/${currentUserId}`,
         query_key: [`balances-${currentUserId}`],
-        stale_time: 1800000,
+        stale_time: Infinity,
         limit: 12
     });
 

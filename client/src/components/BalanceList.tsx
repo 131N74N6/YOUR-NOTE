@@ -1,4 +1,4 @@
-import type { BalanceListProps } from "../models/balance-model";
+import type { BalanceListProps } from "../models/balance.types";
 import BalanceItem from "./BalanceItem";
 import Loading from "./Loading";
 

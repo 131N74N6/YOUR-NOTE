@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { BalanceFormProps } from "../models/balance-model";
+import type { BalanceFormProps } from "../models/balance.types";
 import DataModifier from "../services/data.service";
 
 export default function BalanceForm(props: BalanceFormProps) {

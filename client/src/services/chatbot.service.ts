@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot-model";
+import type { ChatBotIntrf, OpenRouterResponse } from "../models/chatbot.types";
 import { useMemo, useState } from "react";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +20,7 @@ export default function ChatbotServices() {
         api_url: `${import.meta.env.VITE_BASE_API_URL}/chatbot/all-chat-histories/${currentUserId}`,
         limit: 14,
         query_key: [`chat-histories-${currentUserId}`],
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     const chatBotHistories = { error, fetchNextPage, isFetchingNextPage, isLoading, isReachedEnd, paginatedData };

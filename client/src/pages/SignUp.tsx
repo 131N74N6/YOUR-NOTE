@@ -28,8 +28,8 @@ export default function SignUp() {
     }
 
     return (
-        <div className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] p-3">
-            <form onSubmit={handleSignUp} className="border border-white backdrop-brightness-75 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-90">
+        <section className="flex justify-center items-center h-screen bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')] p-3">
+            <form onSubmit={handleSignUp} className="border border-white backdrop-brightness-50 backdrop-blur-sm p-[1rem] flex flex-col gap-[1rem] w-90">
                 <div className="font-[650] text-[1.5rem] text-white text-center">Welcome</div>
                 <div className="flex flex-col gap-[0.5rem]">
                     <label htmlFor="username" className="text-white">Username</label>
@@ -87,6 +87,6 @@ export default function SignUp() {
                     {isSigningIn ? 'Please wait...' : 'Sign Up'}
                 </button>
             </form>
-        </div>
+        </section>
     );
 }

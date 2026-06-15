@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ActivityItemProps } from "../models/activity-model";
+import type { ActivityItemProps } from "../models/activity.types";
 
 export default function ActivityItem(props: ActivityItemProps) {
     const [editActName, setEditActName] = useState<string>('');

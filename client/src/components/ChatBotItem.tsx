@@ -1,4 +1,4 @@
-import type { ChatBotItemIntrf } from "../models/chatbot-model";
+import type { ChatBotItemIntrf } from "../models/chatbot.types";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,7 +11,7 @@ export default function ChatBotItem(props: ChatBotItemIntrf) {
 
     const sanitizedAnswer = useMemo(() => {
         if (!props.chat.answer) return '';
-        // Sanitize HTML to prevent XSS, then allow safe markdown rendering
+        
         return DOMPurify.sanitize(props.chat.answer, {
             ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'sub', 'sup'],
             ALLOWED_ATTR: ['class', 'style']

@@ -1,4 +1,4 @@
-import type { ChatBotListIntrf } from "../models/chatbot-model";
+import type { ChatBotListIntrf } from "../models/chatbot.types";
 import ChatBotItem from "./ChatBotItem";
 import Loading from "./Loading";
 

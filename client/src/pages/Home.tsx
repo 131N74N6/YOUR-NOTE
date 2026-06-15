@@ -1,7 +1,7 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data.service";
 import AuthServices from "../services/auth.service";
-import type { IBalanceSummary } from "../models/balance-model";
+import type { IBalanceSummary } from "../models/balance.types";
 
 export default function Home() {
     const { currentUserId, currentUserName } = AuthServices();
@@ -26,10 +26,10 @@ export default function Home() {
     });
 
     return (
-        <div className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
+        <section className="h-screen flex md:flex-row flex-col gap-[1rem] p-[1rem] bg-[url('https://res.cloudinary.com/dfreeafbl/image/upload/v1757946836/cloudy-winter_iprjgv.png')]">
             <Navbar1/>
             <Navbar2/>
-            <div className="p-[1rem] border border-white overflow-y-auto h-full md:w-3/4 w-full gap-4 flex flex-col rounded-[1rem] backdrop-blur-sm backdrop-brightness-75">
+            <div className="p-[1rem] border border-white overflow-y-auto h-full md:w-3/4 w-full gap-4 flex flex-col rounded-[1rem] backdrop-blur-sm backdrop-brightness-50">
                 <div className="border border-white p-4">
                     <h2 className="text-white font-[600] text-[1.5rem]">Welcome back, {currentUserName}!</h2>
                     <p className="text-white font-[400] text-[1rem]">Here's a quick overview of your finances and activities.</p>
@@ -79,6 +79,6 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

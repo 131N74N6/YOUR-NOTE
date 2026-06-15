@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AuthServices from "./auth.service";
-import type { IActivity, UpdateActivityDataProps } from "../models/activity-model";
+import type { IActivity, UpdateActivityDataProps } from "../models/activity.types";
 import { useState } from "react";
 import DataModifier from "./data.service";
 
@@ -25,7 +25,7 @@ export default function ActivityServices() {
     } = infiniteScroll<IActivity>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/activities/get-all/${currentUserId}`,
         query_key: [`activities-${currentUserId}`],
-        stale_time: 1800000,
+        stale_time: Infinity,
         limit: 12
     });
 

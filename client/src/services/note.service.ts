@@ -1,5 +1,5 @@
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { INote } from "../models/note-model";
+import type { INote } from "../models/note.types";
 import { useNavigate } from "react-router-dom";
 import AuthServices from "./auth.service";
 import DataModifier from "./data.service";
@@ -26,7 +26,7 @@ export default function NoteServices() {
     } = infiniteScroll<INote>({
         api_url: `${import.meta.env.VITE_BASE_API_URL}/notes/get-all/${currentUserId}`,
         query_key: [`notes-${currentUserId}`],
-        stale_time: 1800000,
+        stale_time: Infinity,
         limit: 12
     });
 
@@ -94,14 +94,6 @@ export default function NoteServices() {
         onSettled: () => setIsProcessing(false)
     });
 
-    const getSelectedNote = (id: string) => {
-        return getData<INote[]>({
-            api_url: id ? `${import.meta.env.VITE_BASE_API_URL}/notes/selected/${id}` : '',
-            query_key: [`selected-notes-${id}`],
-            stale_time: 1800000
-        });
-    };
-
     const insertNoteMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
@@ -141,7 +133,7 @@ export default function NoteServices() {
     }
 
     return { 
-        addNote, changeNoteMutation, content, currentUserId, deleteOneNoteMutation, deleteManyNotesMutation, getSelectedNote, 
+        addNote, changeNoteMutation, content, currentUserId, deleteOneNoteMutation, deleteManyNotesMutation, getData,
         isProcessing, message, navigate, notes, resetForm, setContent, setIsProcessing, setMessage, setTitle, title 
     }
 }

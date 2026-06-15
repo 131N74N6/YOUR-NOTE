@@ -1,4 +1,4 @@
-import type { ActivityListProps } from "../models/activity-model";
+import type { ActivityListProps } from "../models/activity.types";
 import ActivityItem from "./ActivityItem";
 import Loading from "./Loading";
 
