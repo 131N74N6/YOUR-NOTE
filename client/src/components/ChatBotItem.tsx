@@ -1,4 +1,4 @@
-import type { ChatBotItemIntrf } from "../models/chatbot.types";
+import type { ChatBotItemIntrf } from "../models/chatbot.model";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

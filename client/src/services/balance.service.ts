@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AuthServices from "./auth.service";
 import { useState } from "react";
-import type { IBalance, UpdateBalanceProps } from "../models/balance.types";
+import type { IBalance, UpdateBalanceProps } from "../models/balance.model";
 import DataModifier from "./data.service";
 
 export default function BalanceServices() {

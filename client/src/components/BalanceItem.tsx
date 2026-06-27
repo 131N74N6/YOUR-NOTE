@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { BalanceItemProps } from '../models/balance.types';
+import type { BalanceItemProps } from '../models/balance.model';
 
 export default function BalanceItem(props: BalanceItemProps) {
     const [editAmount, setEditAmount] = useState<string>('');

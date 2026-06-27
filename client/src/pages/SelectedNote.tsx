@@ -10,7 +10,7 @@ import List from 'quill/formats/list';
 import Blockquote from 'quill/formats/blockquote';
 import CodeBlock from 'quill/formats/code';
 import NoteServices from "../services/note.service";
-import type { INote } from '../models/note.types';
+import type { INote } from '../models/note.model';
 
 Quill.register('formats/list', List);
 Quill.register('formats/blockquote', Blockquote);

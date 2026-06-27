@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import useAuth from "../services/auth.service";
-import type { NavbarIntrf } from "../models/data.types";
+import type { NavbarIntrf } from "../models/data.model";
 
 export function Navbar1(props?: NavbarIntrf) {
     const navigate = useNavigate();

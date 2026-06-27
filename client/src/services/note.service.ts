@@ -1,5 +1,5 @@
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { INote } from "../models/note.types";
+import type { INote } from "../models/note.model";
 import { useNavigate } from "react-router-dom";
 import AuthServices from "./auth.service";
 import DataModifier from "./data.service";

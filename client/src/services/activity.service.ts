@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AuthServices from "./auth.service";
-import type { IActivity, UpdateActivityDataProps } from "../models/activity.types";
+import type { IActivity, UpdateActivityDataProps } from "../models/activity.model";
 import { useState } from "react";
 import DataModifier from "./data.service";
 

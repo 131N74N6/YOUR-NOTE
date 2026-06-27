@@ -1,7 +1,7 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data.service";
 import AuthServices from "../services/auth.service";
-import type { IBalanceSummary } from "../models/balance.types";
+import type { IBalanceSummary } from "../models/balance.model";
 
 export default function Home() {
     const { currentUserId, currentUserName } = AuthServices();

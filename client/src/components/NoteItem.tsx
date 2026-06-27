@@ -1,5 +1,5 @@
 import ReactMarkdown from "react-markdown";
-import type { NoteItemProps } from "../models/note.types";
+import type { NoteItemProps } from "../models/note.model";
 import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";

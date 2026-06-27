@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ChatBotIntrf } from "../models/chatbot.types";
+import type { ChatBotIntrf } from "../models/chatbot.model";
 import { useMemo, useState } from "react";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
