@@ -21,7 +21,7 @@ export default function ChatBotItem(props: ChatBotItemIntrf) {
     return (
         <div className="flex flex-col border border-white p-4 rounded-2xl gap-4">
             <div className="font-medium text-[1rem] text-white">{props.chat.question}</div>
-            <div className="text-[1rem] text-white">{props.chat.created_at}</div>
+            <div className="text-[1rem] text-white">{new Date(props.chat.created_at).toLocaleString()}</div>
             <div className="line-clamp-4">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
